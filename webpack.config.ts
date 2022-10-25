@@ -1,5 +1,9 @@
+import { fileURLToPath } from 'url'
 import path from 'path'
 import { Configuration } from 'webpack'
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const config: Configuration = {
   mode: 'production',
@@ -16,10 +20,14 @@ const config: Configuration = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
+    extensionAlias: {
+        '.js': ['.ts', '.js'],
+    },
   },
   output: {
     path: path.resolve(__dirname, './dist'),
     filename: 'bundle.js',
+    library: 'CryptoUtil',
     libraryExport: 'default',
     libraryTarget: 'umd',
   },

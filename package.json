@@ -1,6 +1,7 @@
 {
-  "name": "crypto-utils",
-  "version": "1.0.0",
+  "name": "@cmdcode/crypto-utils",
+  "type": "module",
+  "version": "1.0.3",
   "description": "Crypto utils library.",
   "author": "Christopher Scott",
   "license": "CC-BY-1.0",
@@ -23,13 +24,14 @@
     "dist"
   ],
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "unpkg": "dist/bundle.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "pack": "webpack",
-    "tape": "tape -r ts-node/register test/**/*.test.{ts,js}",
-    "test": "nyc --reporter=lcov --require ts-node/register tape test/**/*test.{ts,js} | tap-spec; nyc report ---reporter=text",
+    "webpack": "NODE_OPTIONS='--loader ts-node/esm --no-warnings' webpack --config webpack.config.ts",
+    "tape": "NODE_OPTIONS='--loader ts-node/esm --no-warnings' tape test/**/*.test.js",
+    "test": "NODE_OPTIONS='--loader ts-node/esm --no-warnings' nyc --reporter=lcov --require ts-node/register tape test/**/*test.js | tap-spec; nyc report ---reporter=text",
     "dev": "node -r ts-node/register test/scratch.ts",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write .",

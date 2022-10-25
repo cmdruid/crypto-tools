@@ -1,5 +1,5 @@
 import { webcrypto as crypto } from 'crypto'
-import { ripemd160 } from './ripemd160'
+import { ripemd160 } from './ripemd160.js'
 
 async function digest(
   bytes  : Uint8Array, 

@@ -1,5 +1,5 @@
 import { webcrypto as crypto } from 'crypto'
-import { sha256 } from './hash'
+import { sha256 } from './hash.js'
 
 const ec = new TextEncoder()
 const dc = new TextDecoder()

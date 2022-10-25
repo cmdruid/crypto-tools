@@ -2,21 +2,17 @@
   "ts-node": {
     "transpileOnly": true,
     "files": true,
-    //  "esm": false,
+    "esm": true,
     "compilerOptions": {
-      "module": "CommonJS"
+      "module": "ES2020"
     },
     "include": ["test/**/*.test.ts"]
-    // "preferTsExts": true,
-    //"experimentalResolver": true,
-    //    "experimentalSpecifierResolution": "node",
-    //    "require": [ "tsconfig-paths/register" ]
   },
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
-    "module": "es2020",
-    "target": "es2020",
-    "moduleResolution": "node",
+    "module": "ES2020",
+    "target": "ES2020",
+    "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
