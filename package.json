@@ -1,0 +1,63 @@
+{
+  "name": "crypto-utils",
+  "version": "1.0.0",
+  "description": "Crypto utils library.",
+  "author": "Christopher Scott",
+  "license": "CC-BY-1.0",
+  "keywords": [
+    "crypto",
+    "utils",
+    "library"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmdruid/crypto-utils.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "unpkg": "dist/bundle.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "pack": "webpack",
+    "tape": "tape -r ts-node/register test/**/*.test.{ts,js}",
+    "test": "nyc --reporter=lcov --require ts-node/register tape test/**/*test.{ts,js} | tap-spec; nyc report ---reporter=text",
+    "dev": "node -r ts-node/register test/scratch.ts",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write .",
+    "clean": "rm -rf dist/* coverage .nyc_output"
+  },
+  "devDependencies": {
+    "@types/tape": "^4.13.2",
+    "@typescript-eslint/eslint-plugin": "*",
+    "eslint": "*",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard-with-typescript": "*",
+    "eslint-plugin-import": "*",
+    "eslint-plugin-n": "*",
+    "eslint-plugin-promise": "*",
+    "nyc": "^15.1.0",
+    "prettier": "^2.7.1",
+    "tap-spec": "^5.0.0",
+    "tape": "^5.6.1",
+    "ts-loader": "^9.4.1",
+    "ts-node": "^10.9.1",
+    "typescript": "*",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "@noble/secp256k1": "^1.7.0"
+  },
+  "browser": {
+    "crypto": false
+  }
+}

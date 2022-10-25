@@ -1,0 +1,48 @@
+{
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    //  "esm": false,
+    "compilerOptions": {
+      "module": "CommonJS"
+    },
+    "include": ["test/**/*.test.ts"]
+    // "preferTsExts": true,
+    //"experimentalResolver": true,
+    //    "experimentalSpecifierResolution": "node",
+    //    "require": [ "tsconfig-paths/register" ]
+  },
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+    "module": "es2020",
+    "target": "es2020",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": false,
+    "pretty": true,
+    "importHelpers": true,
+    "removeComments": true,
+    // "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts"]
+}
