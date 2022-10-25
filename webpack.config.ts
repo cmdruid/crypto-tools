@@ -27,7 +27,7 @@ const config: Configuration = {
   output: {
     path: path.resolve(__dirname, './dist'),
     filename: 'bundle.js',
-    library: 'CryptoUtil',
+    library: 'CryptoUtils',
     libraryExport: 'default',
     libraryTarget: 'umd',
   },
