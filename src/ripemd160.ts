@@ -36,14 +36,6 @@ function bigIntToBytes(
   return uint8
 }
 
-function bytesToHex(bytes : Uint8Array) : string {
-  const hex : string[] = []
-  for (let i = 0; i < bytes.length; i++) {
-    hex.push(bytes[i].toString(16).padStart(2, '0'))
-  }
-  return hex.join('')
-}
-
 // Message schedule indexes for the left path.
 const ML = [
   0n, 1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n, 9n, 10n, 11n, 12n, 13n, 14n, 15n,
@@ -156,7 +148,7 @@ function compress(
   return [h1 + cl + dr, h2 + dl + er, h3 + el + ar, h4 + al + br, h0 + bl + cr]
 }
 
-export function ripemd160(
+export default function ripemd160(
   bytes : Uint8Array
 ) : Uint8Array {
   // Compute the RIPEMD-160 hash of data.
@@ -191,27 +183,4 @@ export function ripemd160(
   }
 
   return Uint8Array.from(ret)
-}
-
-export function test160(): boolean {
-  const tests = [
-    ['', '9c1185a5c5e9fc54612808977ee8f548b2258d31'],
-    ['a', '0bdc9d2d256b3ee9daae347be6f4dc835a467ffe'],
-    ['abc', '8eb208f7e05d987a9b044a8e98c6b087f15a0bfc'],
-    ['message digest', '5d0689ef49d2fae572b881b123a85ffa21595f36'],
-    ['abcdefghijklmnopqrstuvwxyz', 'f71c27109c692c1b56bbdceb5b9d2865b3708dbc'],
-    ['abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq', '12a053384a9c0c88e405a06c27dcf49ada62eb2b'],
-    ['ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', 'b0e20b6e3116640286ed3a87a5713079b21f5189'],
-    ['1234567890'.repeat(8), '9b752e45573d4b39f4dbd3323cab82bf63326bfb'],
-    ['a'.repeat(1000000), '52783243c1697bdbe16d37f97f68f08325dc1528']
-  ]
-
-  for (const [preimg, target] of tests) {
-    const ec = new TextEncoder()
-    const res = bytesToHex(ripemd160(ec.encode(preimg)))
-    if (res !== target) {
-      throw new Error(`Test vector failed: ${res} !== ${target}`)
-    }
-  }
-  return true
 }

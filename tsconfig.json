@@ -10,7 +10,7 @@
   },
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
-    "module": "ES2020",
+    "module": "ESNext",
     "target": "ES2020",
     "moduleResolution": "Node",
     "baseUrl": ".",
@@ -18,19 +18,16 @@
       "@/*": ["src/*"]
     },
     "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "useDefineForClassFields": false,
+    "importHelpers": true,
+    "sourceMap": false,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "pretty": true,
-    "importHelpers": true,
     "removeComments": true,
     // "strictNullChecks": true,
     "noImplicitAny": true,
@@ -39,6 +36,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "exclude": ["node_modules"],
-  "include": ["src/**/*.ts"]
+  "exclude": [
+    "node_modules",
+    "test"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "rollup.config.ts"
+  ]
 }
