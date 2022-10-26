@@ -26,15 +26,16 @@
   "main": "dist/main.js",
   "module": "dist/module.js",
   "unpkg": "dist/bundle.min.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "rollup -c rollup.config.ts --configPlugin typescript",
+    "clean": "rm -rf dist/* coverage .nyc_output",
+    "dev": "node -r ts-node/register test/scratch.ts",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .ts",
     "tape": "node --loader ts-node/esm --no-warnings test/index.test.js",
     "test": "nyc --reporter=lcov --require ts-node/register yarn tape | tap-spec; nyc report ---reporter=text",
-    "dev": "node -r ts-node/register test/scratch.ts",
-    "lint": "eslint . --ext .ts",
-    "format": "prettier --write .",
-    "clean": "rm -rf dist/* coverage .nyc_output"
+    "types": "tsc"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^23.0.2",
