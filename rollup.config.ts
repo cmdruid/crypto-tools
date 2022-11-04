@@ -4,6 +4,11 @@ import typescript from '@rollup/plugin-typescript'
 import { terser } from 'rollup-plugin-terser'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import camelcase from 'camelcase'
+
+import pkg from './package.json' assert { type: 'json' }
+
+const libName = camelcase(String('/' + pkg.name)).split('/').at(-1)
 
 const treeshake = {
 	moduleSideEffects: false,
@@ -57,7 +62,7 @@ const browserConfig = {
     {
       file: 'dist/bundle.min.js',
       format: 'iife',
-      name: 'cryptoUtils',
+      name: libName,
       plugins: [terser()],
       sourcemap: true,
       globals: {

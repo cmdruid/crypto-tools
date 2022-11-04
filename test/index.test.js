@@ -1,11 +1,15 @@
 import tape from 'tape'
+import camelcase from 'camelcase'
 import pkg from '../package.json' assert { type: 'json' }
 
-const LIB_NAME = 'cryptoUtils'
+const DEFAULT_LIB = 'src/index.js'
+const EXT = 'test.js'
 
-tape(`Running tests for ${LIB_NAME}`, async t => {
-  const EXT = 'test.js'
-  const mainLib = await getLibrary(LIB_NAME)
+const libName = camelcase(String('/' + pkg.name).split('/').at(-1))
+
+tape(`Running tests for ${libName}`, async t => {
+  
+  const mainLib = await getLibrary()
 
   for (const key of Object.keys(mainLib)) {
     try {
@@ -24,18 +28,20 @@ tape(`Running tests for ${LIB_NAME}`, async t => {
   }
 })
 
-async function getLibrary(libname) {
-  const DEFAULT_LIB = 'src/index.js'
-
+async function getLibrary() {
   if (typeof window !== 'undefined') {
-    return window[LIB_NAME]
+    return window[libName]
   }
 
-  const libpath = (process?.args)
-    ? process.args.slice(2,3)
+  const libpath = (process?.argv)
+    ? process.argv.slice(2,3)
     : DEFAULT_LIB
-  
-  return (libpath.includes('main'))
-  ? require('../' + libpath)
-  : import('../' + libpath).then(m => m.default)
+
+  if (String(libpath).includes('main')) {
+    throw new Error('Unable to run tests on a commonJs module!')
+  }
+
+  console.log(`Testing package: ${libpath}`)
+
+  return import('../' + libpath).then(m => m.default)
 }
