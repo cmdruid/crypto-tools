@@ -1,7 +1,7 @@
 {
   "name": "@cmdcode/crypto-utils",
   "type": "module",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Utility library for cryptographic functions.",
   "author": "Christopher Scott",
   "license": "CC-BY-1.0",
@@ -44,6 +44,7 @@
     "@rollup/plugin-typescript": "^9.0.2",
     "@types/tape": "^4.13.2",
     "@typescript-eslint/eslint-plugin": "*",
+    "camelcase": "^7.0.0",
     "eslint": "*",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard-with-typescript": "*",
@@ -60,6 +61,7 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@cmdcode/bytes-utils": "^1.0.1",
     "@noble/secp256k1": "^1.7.0"
   },
   "browser": {
