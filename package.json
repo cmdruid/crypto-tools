@@ -1,7 +1,7 @@
 {
   "name": "@cmdcode/crypto-utils",
   "type": "module",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Utility library for cryptographic functions.",
   "author": "Christopher Scott",
   "license": "CC-BY-1.0",
