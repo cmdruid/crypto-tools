@@ -12,8 +12,9 @@
     "project": ["tsconfig.json"]
   },
   "rules": {
-    "no-return-await": "off",
-    "@typescript-eslint/return-await": "in-try-catch"
+    "one-var": "off",
+    "return-await": "off",
+    "@typescript-eslint/return-await": [1, "in-try-catch"]
   },
   "ignorePatterns": ["build", "coverage", "dist", "test", "webpack.*"]
 }

@@ -8,30 +8,32 @@ import camelcase from 'camelcase'
 
 import pkg from './package.json' assert { type: 'json' }
 
-const libName = camelcase(String('/' + pkg.name)).split('/').at(-1)
+const libName = camelcase(String('/' + pkg.name))
+  .split('/')
+  .at(-1)
 
 const treeshake = {
-	moduleSideEffects: false,
-	propertyReadSideEffects: false,
-	tryCatchDeoptimization: false
+  moduleSideEffects: false,
+  propertyReadSideEffects: false,
+  tryCatchDeoptimization: false,
 }
 
-const onwarn = warning => {
-	// eslint-disable-next-line no-console
-	console.error(
-		'Building Rollup produced warnings that need to be resolved. ' +
-			'Please keep in mind that the browser build may never have external dependencies!'
-	);
-	// eslint-disable-next-line unicorn/error-message
-	throw Object.assign(new Error(), warning);
+const onwarn = (warning) => {
+  // eslint-disable-next-line no-console
+  console.error(
+    'Building Rollup produced warnings that need to be resolved. ' +
+      'Please keep in mind that the browser build may never have external dependencies!'
+  )
+  // eslint-disable-next-line unicorn/error-message
+  throw Object.assign(new Error(), warning)
 }
 
-const tsConfig = { 
+const tsConfig = {
   compilerOptions: {
     declaration: false,
     declarationDir: null,
-    declarationMap: false
-  }
+    declarationMap: false,
+  },
 }
 
 const nodeConfig = {
@@ -47,12 +49,12 @@ const nodeConfig = {
       file: 'dist/module.js',
       format: 'es',
       sourcemap: true,
-      minifyInternalExports: false
+      minifyInternalExports: false,
     },
   ],
   plugins: [json(), typescript(tsConfig), nodeResolve(), commonjs()],
   strictDeprecations: true,
-  treeshake
+  treeshake,
 }
 
 const browserConfig = {
@@ -67,12 +69,17 @@ const browserConfig = {
       sourcemap: true,
       globals: {
         crypto: 'crypto',
-      }
+      },
     },
   ],
-  plugins: [json(), typescript(tsConfig), nodeResolve({ browser: true }), commonjs()],
+  plugins: [
+    json(),
+    typescript(tsConfig),
+    nodeResolve({ browser: true }),
+    commonjs(),
+  ],
   strictDeprecations: true,
-  treeshake
+  treeshake,
 }
 
 const testConfig = {
@@ -86,19 +93,19 @@ const testConfig = {
       plugins: [terser()],
       sourcemap: false,
       globals: {
-        tape: 'tape'
-      }
-    }
+        tape: 'tape',
+      },
+    },
   ],
   external: ['crypto', 'tape'],
   plugins: [
-    json(), 
-    typescript({ ...tsConfig, sourceMap: false }), 
-    nodeResolve({ browser: true }), 
-    commonjs()
+    json(),
+    typescript({ ...tsConfig, sourceMap: false }),
+    nodeResolve({ browser: true }),
+    commonjs(),
   ],
   strictDeprecations: true,
-  treeshake
+  treeshake,
 }
 
-export default [ nodeConfig, browserConfig, testConfig ];
+export default [nodeConfig, browserConfig, testConfig]

@@ -5,7 +5,8 @@ const dc = new TextDecoder()
 
 function bytesToHex(bytes) {
   // Basic conversion of a byte array into a hex string.
-  const hex = []; let i
+  const hex = []
+  let i
   for (i = 0; i < bytes.length; i++) {
     hex.push(bytes[i].toString(16).padStart(2, '0'))
   }
