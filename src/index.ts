@@ -9,5 +9,5 @@ export default {
   Hash,
   Keys,
   Rand,
-  Utils
+  Utils,
 }
