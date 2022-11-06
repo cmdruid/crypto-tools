@@ -38,7 +38,8 @@
     "lint": "eslint . --ext .ts",
     "tape": "node --loader ts-node/esm --no-warnings test/index.test.js",
     "test": "nyc --reporter=lcov --require ts-node/register yarn tape | tap-spec; nyc report ---reporter=text",
-    "types": "tsc"
+    "types": "tsc",
+    "release": "yarn clean && yarn types && yarn lint && yarn build && yarn test"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^23.0.2",
@@ -64,7 +65,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@cmdcode/bytes-utils": "^1.0.1"
+    "@cmdcode/bytes-utils": "^1.0.8"
   },
   "browser": {
     "crypto": true

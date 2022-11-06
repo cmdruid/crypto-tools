@@ -189,10 +189,10 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@cmdcode/bytes-utils@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@cmdcode/bytes-utils/-/bytes-utils-1.0.1.tgz#a6c3870c8ad79ff7ee048020bcbe518d6cba5dab"
-  integrity sha512-Fvbck6Dd0J7LyHa4bJ12+WAX9IeUlFtivVTQqnSQFRRKz5wdCivVzjfn04+hB0grVjFfuxwHp6GuEUsDtqs1yw==
+"@cmdcode/bytes-utils@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@cmdcode/bytes-utils/-/bytes-utils-1.0.8.tgz#2537eaa7d97dd03fe9ecc6aba00cadbc32655c04"
+  integrity sha512-mXr8UDvw5LJOy/eIUGoCSHIx4diOprLNyAoAPlpPBei2iHXVDCcE70WvgN5FoYaslOEY03KZ+NoE0ll4ozA5yw==
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
