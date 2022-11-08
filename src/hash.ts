@@ -7,10 +7,9 @@ async function digest(
   format: string = 'SHA-256',
   rounds: number = 1
 ): Promise<Uint8Array> {
-  let i,
-    buffer = new ArrayBuffer(32)
+  let i, buffer = bytes.buffer
   for (i = 0; i < rounds; i++) {
-    buffer = await crypto.subtle.digest(format, bytes)
+    buffer = await crypto.subtle.digest(format, buffer)
   }
   return new Uint8Array(buffer)
 }
