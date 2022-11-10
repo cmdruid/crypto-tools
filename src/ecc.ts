@@ -77,14 +77,22 @@ class Field extends Uint8Array {
 
 class Point {
 
+  static N = Noble.CURVE.n
+
   static fromScalar(x : number | bigint | Uint8Array) : Point {
     const b = (x instanceof Uint8Array)
       ? Buff.buff(x.reverse()).toBig()
       : (typeof x === 'number')
         ? BigInt(x)
         : x
-    const p = Noble.Point.BASE.multiply(b)
+    const m = Noble.utils.mod(b, Point.N)
+    const p = Noble.Point.BASE.multiply(m)
     return new Point(p.x, p.y)
+  }
+
+  static fromX(x : Uint8Array) : Point {
+    const h = Buff.buff(x).toHex()
+    return Point.from(Noble.Point.fromHex(h))
   }
 
   static from(point : Point | Noble.Point) : Point {
