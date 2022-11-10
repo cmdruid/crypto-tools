@@ -1,7 +1,8 @@
 // Copyright (c) 2021 Pieter Wuille
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-// Revised and converted to Javascript by Christopher Scott.
+
+// Revised to Typescript.
 
 type state = [bigint, bigint, bigint, bigint, bigint]
 

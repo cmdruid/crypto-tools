@@ -17,6 +17,7 @@ export default function (t, f) {
   const testCount = vectors.length
 
   t.plan(testCount)
+  
   for (let [src, target] of vectors) {
     const res = bytesToHex(f(ec.encode(src)))
     t.equal(target, res)

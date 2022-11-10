@@ -1,10 +1,10 @@
 import { Type } from '@cmdcode/bytes-utils'
 import camelcase from 'camelcase'
-import pkg from '../package.json' assert { type: 'json' }
+import pkg from '../../package.json' assert { type: 'json' }
 
 const SOURCE_PATH = './src'
 const DEFAULT_EXT = 'test.js'
-const DEFAULT_LIB = 'src/index.js'
+const DEFAULT_LIB = '../src/index.js'
 
 let testCache
 
@@ -37,7 +37,7 @@ async function getLibrary(libName) {
   })
 }
 
-function crawlAPI(lib, paths = []) {
+async function crawlAPI(lib, paths = []) {
   for (const [key, val] of Object.entries(lib)) {
     // console.log(`Crawling ${key}: ${Type.of(val)}`)
     if (Type.is.class(val)) {
@@ -57,29 +57,32 @@ function crawlAPI(lib, paths = []) {
     }
 
     else {
-      console.log(paths, val)
+      // console.log(paths, val)
     }
   }
 }
 
-function testInstance(val, paths) {
+async function testInstance(val, paths) {
   const newpath = [...paths, 'new']
   for (const prop of Object.getOwnPropertyNames(val.prototype)) {
     testLoader(prop, val, newpath)
   }
 }
 
-function testLoader(key, val, paths) {
+async function testLoader(key, val, paths) {
   const relpath  = paths.join('/').toLowerCase()
   const fullpath = `${SOURCE_PATH}/${relpath}/${key}.${DEFAULT_EXT}`
-  //console.log(`Testing: ${fullpath}`)
   import(fullpath)
-    .then(test => testRunner(test.default, val, fullpath))
-    .catch(err => err) //console.log(`Failed to import test for: ${fullpath}`))
-}
-
-function testRunner(test, lib, path) {
-  testCache.test(`Testing: ${path}`, t => {
-    test(t, lib)
-  })
+    .then(importedTests => {
+      for (const method of Object.keys(importedTests)) {
+        testCache.test(fullpath.split('/').at(-1), t => {
+          console.log(`Running ${method} tests:\n`)
+          importedTests[method](t, val)
+        })
+      }
+    })
+    .catch(err => {
+      if (err.message.includes('Cannot find module')) return
+      console.log(`Failed to import test for: ${fullpath}\n${err}`)
+    })
 }

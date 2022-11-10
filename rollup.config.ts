@@ -93,11 +93,13 @@ const testConfig = {
       plugins: [terser()],
       sourcemap: false,
       globals: {
+        crypto: 'crypto',
         tape: 'tape',
+        'tiny-secp256k1': 'ecc'
       },
     },
   ],
-  external: ['crypto', 'tape'],
+  external: ['crypto', 'tape', 'tiny-secp256k1'],
   plugins: [
     json(),
     typescript({ ...tsConfig, sourceMap: false }),
@@ -108,4 +110,8 @@ const testConfig = {
   treeshake,
 }
 
-export default [nodeConfig, browserConfig, testConfig]
+export default [
+  nodeConfig, 
+  browserConfig, 
+  testConfig,
+]
