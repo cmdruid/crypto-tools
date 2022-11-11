@@ -158,9 +158,13 @@ class Point {
   }
   
   mul(x : Point | Uint8Array | bigint) : Point {
+    if (x instanceof Uint8Array) {
+      const b = Buff.buff(x.reverse()).toBig()
+      return Point.from(this.p.multiply(b))
+    }
     return (x instanceof Point)
       ? Point.from(this.p.multiply(x.x))
-      : Point.from(this.p.multiply(Point.fromScalar(x).x))
+      : Point.from(this.p.multiply(x))
   }
 }
 

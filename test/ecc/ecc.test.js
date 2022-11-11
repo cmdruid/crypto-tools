@@ -39,26 +39,27 @@ const sig2A = ecc.sign(msg, t1)
 const sig2B = ecc.sign(msg, t2)
 
 export default function ECCTest(t) {
+  t.test('Testing ECC Primitives', t => {
+    t.plan(15)
+    t.equal(ka.num, k1.num, 'should be equal as bigints')
+    t.deepEqual(ka, k1, 'should be equal uints')
+    t.deepEqual(new Uint8Array(k1), new Uint8Array(seed), 'should be equal seed values')
+    t.deepEqual(K1.rawX, K2, 'should be equal points')
 
-  t.plan(15)
-  t.equal(ka.num, k1.num, 'should be equal as bigints')
-  t.deepEqual(ka, k1, 'should be equal uints')
-  t.deepEqual(new Uint8Array(k1), new Uint8Array(seed), 'should be equal seed values')
-  t.deepEqual(K1.rawX, K2, 'should be equal points')
+    t.equal(ecc.verify(msg, K2, sig1A), true, 'sig1A and K2 should be valid')
+    t.equal(ecc.verify(msg, K1.rawX, sig1B), true, 'sig1B and K1 should be valid')
 
-  t.equal(ecc.verify(msg, K2, sig1A), true, 'sig1A and K2 should be valid')
-  t.equal(ecc.verify(msg, K1.rawX, sig1B), true, 'sig1B and K1 should be valid')
+    t.deepEqual(new Uint8Array(t1), new Uint8Array(t2), 'our tweaked scalar should match ecc scalar')
 
-  t.deepEqual(new Uint8Array(t1), new Uint8Array(t2), 'our tweaked scalar should match ecc scalar')
+    t.deepEqual(T1.rawX, T2, 'our tweaked point should match ecc point')
+    t.deepEqual(T2, T3, 'ecc points should match when tweaking point or scalar')
 
-  t.deepEqual(T1.rawX, T2, 'our tweaked point should match ecc point')
-  t.deepEqual(T2, T3, 'ecc points should match when tweaking point or scalar')
+    t.equal(ecc.verify(msg, T1.rawX, sig2A), true, 'T1 should verify signature 2A')
+    t.equal(ecc.verify(msg, T2, sig2A), true, 'T2 should verify signature 2A')
+    t.equal(ecc.verify(msg, T3, sig2A), true, 'T3 should verify signature 2A')
 
-  t.equal(ecc.verify(msg, T1.rawX, sig2A), true, 'T1 should verify signature 2A')
-  t.equal(ecc.verify(msg, T2, sig2A), true, 'T2 should verify signature 2A')
-  t.equal(ecc.verify(msg, T3, sig2A), true, 'T3 should verify signature 2A')
-
-  t.equal(ecc.verify(msg, T1.rawX, sig2B), true, 'T1 should verify signature 2B')
-  t.equal(ecc.verify(msg, T2, sig2B), true, 'T2 should verify signature 2B')
-  t.equal(ecc.verify(msg, T3, sig2B), true, 'T3 should verify signature 2B')
+    t.equal(ecc.verify(msg, T1.rawX, sig2B), true, 'T1 should verify signature 2B')
+    t.equal(ecc.verify(msg, T2, sig2B), true, 'T2 should verify signature 2B')
+    t.equal(ecc.verify(msg, T3, sig2B), true, 'T3 should verify signature 2B')
+  })
 }
