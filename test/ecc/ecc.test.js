@@ -1,17 +1,19 @@
 import { Buff } from '@cmdcode/bytes-utils'
 import * as ecc from 'tiny-secp256k1'
 import * as ECC from '../../src/ecc.js'
+import * as Rand from '../../src/rand.js'
 
 const ec = new TextEncoder()
 
-const { Field } = ECC
+const { Field, Noble } = ECC
 
-const seed  = Buff.hex('3ddd5602285899a946114506157c7997e5444528f3003f6134712147db19b678')
-const bigSeed = BigInt('0x3ddd5602285899a946114506157c7997e5444528f3003f6134712147db19b678')
+const seed  = Buff.hex('80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF')
 
-const ka = new Field(bigSeed)
-const k1 = new Field(seed)
+const kA = ecc.pointFromScalar(seed)
+const kB = Noble.Point.BASE.multiply(BigInt('0x80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF'))
+const k1 = Field.fromPrivate(seed)
 const K1 = k1.point
+
 const K2 = ecc.pointFromScalar(seed, true)
 
 if (K2 === null) {
@@ -23,12 +25,12 @@ const msg = Buff.buff(ec.encode('test'), 32)
 const sig1A = ecc.sign(msg, k1)
 const sig1B = ecc.sign(msg, seed)
 
-const tweak = Buff.num(10, 32)
+const tweak = Buff.num(150, 32)
 
 const t1 = k1.add(tweak)
 const t2 = ecc.privateAdd(seed, tweak)
 const T1 = K1.add(tweak)
-const T2 = ecc.pointAddScalar(K2, tweak.reverse(), true)
+const T2 = ecc.pointAddScalar(K2, tweak, true)
 const T3 = ecc.pointAddScalar(K1.rawX, tweak, true)
 
 if (t2 === null || T2 === null || T3 === null) {
@@ -40,9 +42,7 @@ const sig2B = ecc.sign(msg, t2)
 
 export default function ECCTest(t) {
   t.test('Testing ECC Primitives', t => {
-    t.plan(15)
-    t.equal(ka.num, k1.num, 'should be equal as bigints')
-    t.deepEqual(ka, k1, 'should be equal uints')
+    t.plan(13)
     t.deepEqual(new Uint8Array(k1), new Uint8Array(seed), 'should be equal seed values')
     t.deepEqual(K1.rawX, K2, 'should be equal points')
 

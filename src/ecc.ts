@@ -1,25 +1,41 @@
 import { Buff } from '@cmdcode/bytes-utils'
 import * as Noble from '@noble/secp256k1'
 
+type FieldNum = number | bigint | Uint8Array | Field
+type PointNum = number | bigint | Uint8Array | Point
+
 class Field extends Uint8Array {
 
   static N = Noble.CURVE.n
 
-  static mod(n : bigint, m = Field.N) : Field {
-    return new Field(Noble.utils.mod(n, m))
+  static mod(n : bigint, m = Field.N) : bigint {
+    return Noble.utils.mod(n, m)
   }
 
   static isField = (x : any) : boolean => x instanceof Field
 
-  constructor(num : bigint | Uint8Array) {
-    num = (typeof num === 'bigint') 
-      ? Buff.big(num).reverse()
-      : num
+  static fromPrivate(num : FieldNum) : Field {
+    if (num <= 0) {
+      throw new TypeError('Number cannot be negative.')
+    }
+    if (num >= Field.N) {
+      throw new TypeError('Number cannot be greater than N: 2**256 - 2**32 - 977')
+    }
+    return new Field(num)
+  }
+
+  constructor(num : FieldNum) {
+    num = (num instanceof Uint8Array)
+      ? Buff.from(num).toBig()
+      : (typeof num === 'number')
+        ? BigInt(num)
+        : num
+    num = Buff.big(Field.mod(num))
     super(num)
   }
 
   get num() : bigint {
-    const rev = new Uint8Array(this).reverse()
+    const rev = new Uint8Array(this)
     return Buff.buff(rev).toBig()
   }
 
@@ -27,51 +43,51 @@ class Field extends Uint8Array {
     return Point.fromScalar(this.num)
   } 
 
-  gt(num : Field | bigint | Uint8Array) : boolean {
+  gt(num : FieldNum) : boolean {
     const x = new Field(num)
     return x.num > this.num
   }
 
-  lt(num : Field | bigint | Uint8Array) : boolean {
+  lt(num : FieldNum) : boolean {
     const x = new Field(num)
     return x.num < this.num
   }
 
-  eq(num : Field | bigint | Uint8Array) : boolean {
+  eq(num : FieldNum) : boolean {
     const x = new Field(num)
     return x.num === this.num
   }
 
-  ne(num : Field | bigint | Uint8Array) : boolean {
+  ne(num : FieldNum) : boolean {
     const x = new Field(num)
     return x.num !== this.num
   }
 
-  add(num : Field | bigint | Uint8Array) : Field {
+  add(num : FieldNum) : Field {
     const x = new Field(num)
-    return Field.mod(this.num + x.num)
+    return new Field(this.num + x.num)
   }
 
-  sub(num : Field | bigint | Uint8Array) : Field {
+  sub(num : FieldNum) : Field {
     const x = new Field(num)
-    return Field.mod(this.num - x.num)
+    return new Field(this.num - x.num)
   }
 
-  mul(num : Field | bigint | Uint8Array) : Field {
+  mul(num : FieldNum) : Field {
     const x = new Field(num)
-    return Field.mod(this.num * x.num)
+    return new Field(this.num * x.num)
   }
 
-  pow(num : Field | bigint | Uint8Array, n = Field.N - 1n) : Field {
+  pow(num : FieldNum, n = Field.N - 1n) : Field {
     const x = new Field(num)
     const exp = Field.mod(x.num, n)
-    return Field.mod(this.num ** exp.num)
+    return new Field(this.num ** exp)
   }
 
-  div(num : Field | bigint | Uint8Array) : Field {
+  div(num : FieldNum) : Field {
     const x = new Field(num)
     const divisor = this.pow(x.num, Field.N - 2n)
-    return Field.mod(this.num * divisor.num)
+    return new Field(this.num * divisor.num)
   }
 }
 
@@ -81,7 +97,7 @@ class Point {
 
   static fromScalar(x : number | bigint | Uint8Array) : Point {
     const b = (x instanceof Uint8Array)
-      ? Buff.buff(x.reverse()).toBig()
+      ? Buff.from(x).toBig()
       : (typeof x === 'number')
         ? BigInt(x)
         : x
@@ -116,7 +132,7 @@ class Point {
   get rawX() : Uint8Array {
     const prefix = this.__p.hasEvenY() ? 0x02 : 0x03
     const buffer = Buff.big(this.__x)
-    return Uint8Array.of(prefix, ...buffer.reverse())
+    return Uint8Array.of(prefix, ...buffer)
   }
 
   get rawXR() : Uint8Array {
@@ -126,7 +142,7 @@ class Point {
   }
   
   get rawY() : Uint8Array {
-    return Buff.big(this.__y).reverse()
+    return Buff.big(this.__y)
   }
 
   get x() : bigint {
@@ -137,29 +153,31 @@ class Point {
     return this.__y
   }
 
-  eq(x : Point | Uint8Array | bigint) : boolean {
+  eq(x : PointNum) : boolean {
     return (x instanceof Point)
       ? this.p.equals(new Noble.Point(x.x, x.y))
       : (x instanceof Uint8Array)
         ? this.x.toString() === x.toString()
-        : x === this.x
+        : (typeof x === 'number')
+          ? BigInt(x) === this.x
+          : x === this.x
   }
 
-  add(x : Point | Uint8Array | bigint) : Point {
+  add(x : PointNum) : Point {
     return (x instanceof Point)
       ? Point.from(this.p.add(x.p))
       : Point.from(this.p.add(Point.fromScalar(x).p))
   }
 
-  sub(x : Point | Uint8Array | bigint) : Point {
+  sub(x : PointNum) : Point {
     return (x instanceof Point)
       ? Point.from(this.p.subtract(x.p))
       : Point.from(this.p.subtract(Point.fromScalar(x).p))
   }
   
-  mul(x : Point | Uint8Array | bigint) : Point {
+  mul(x : PointNum) : Point {
     if (x instanceof Uint8Array) {
-      const b = Buff.buff(x.reverse()).toBig()
+      const b = Buff.from(x).toBig()
       return Point.from(this.p.multiply(b))
     }
     return (x instanceof Point)

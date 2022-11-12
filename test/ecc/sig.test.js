@@ -17,9 +17,9 @@ export default function schnorrTest(t) {
     m.set(ec.encode('test message'))
 
     // Setup our (a/A) and (k/R) keypairs.
-    const a = new Field(seedA)
+    const a = Field.fromPrivate(seedA)
     const A = Point.from(a.point)
-    const k = new Field(seedK)
+    const k = Field.fromPrivate(seedK)
     const R = Point.from(k.point)
 
     // Create our hashed message digest comitting to R.
