@@ -1,11 +1,11 @@
 import { Buff } from '@cmdcode/bytes-utils'
 import * as ecc from 'tiny-secp256k1'
-import * as ECC from '../../src/ecc.js'
-import * as Rand from '../../src/rand.js'
+
+import { ECC, Noble, Rand } from '../../src/index.js'
 
 const ec = new TextEncoder()
 
-const { Field, Noble } = ECC
+const { Field } = ECC
 
 const seed  = Buff.hex('80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF')
 

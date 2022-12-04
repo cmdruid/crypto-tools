@@ -189,6 +189,5 @@ class Point {
 
 export {
   Field,
-  Point,
-  Noble
+  Point
 }

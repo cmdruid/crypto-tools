@@ -1,6 +1,7 @@
 import { webcrypto as crypto } from 'crypto'
+import * as Noble from '@noble/secp256k1'
+
 import { getRandBytes } from './rand.js'
-import { Noble } from './ecc.js'
 
 export async function importKey(raw: Uint8Array) : Promise<CryptoKey> {
   /** Derive a shared key-pair and import as a
