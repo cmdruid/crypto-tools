@@ -1,6 +1,6 @@
 import * as ECC  from '../../src/ecc.js'
 import * as Hash from '../../src/hash.js'
-import * as Rand from '../../src/rand.js'
+import * as Rand from '../../src/util.js'
 
 const { Field, Point } = ECC
 const ec = new TextEncoder()

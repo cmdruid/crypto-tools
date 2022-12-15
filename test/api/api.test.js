@@ -1,4 +1,4 @@
-import { Type } from '@cmdcode/bytes-utils'
+import { Type } from '@cmdcode/buff-utils'
 import camelcase from 'camelcase'
 import pkg from '../../package.json' assert { type: 'json' }
 

@@ -1,7 +1,7 @@
-import { Buff } from '@cmdcode/bytes-utils'
+import { Buff } from '@cmdcode/buff-utils'
 import * as ecc from 'tiny-secp256k1'
 
-import { ECC, Noble, Rand } from '../../src/index.js'
+import { ECC, Noble } from '../../src/index.js'
 
 const ec = new TextEncoder()
 

@@ -1,4 +1,4 @@
-import { Buff }  from '@cmdcode/bytes-utils'
+import { Buff }  from '@cmdcode/buff-utils'
 import * as ECC  from '../../src/ecc.js'
 import * as Hash from '../../src/hash.js'
 

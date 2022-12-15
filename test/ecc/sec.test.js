@@ -1,6 +1,6 @@
-import { Buff }  from '@cmdcode/bytes-utils'
+import { Buff }  from '@cmdcode/buff-utils'
 import * as ECC  from '../../src/ecc.js'
-import * as Rand from '../../src/rand.js'
+import * as Rand from '../../src/util.js'
 
 const { Field, Point } = ECC
 
@@ -12,19 +12,16 @@ export default function secretsTest(t) {
     const A = Point.from(a.point)
     const b = Field.fromPrivate(Rand.getRandBytes(32))
     const B = Point.from(b.point)
-    const sharedAB = A.mul(b.num).x
-    const sharedBA = B.mul(a.num).x
+    const sharedAB = B.mul(a.num).x
+    const sharedBA = A.mul(b.num).x
 
     // const c = Field.fromPrivate(Rand.getRandBytes(32))
     // const C = Point.from(c.point)
 
-    // const G = A.add(B).add(C)
+    // const groupA = B.mul(a.num).mul(C.mul(a.num))
+    // const groupB = C.mul(b.num).mul(A.mul(b.num))
+    // const groupC = A.mul(c.num).mul(B.mul(c.num))
 
-    // const groupA = B.mul(a.num).add(A).x
-    // const groupB = G.mul(b.num).add(B).x
-    // const groupC = G.mul(c.num).add(C).x
-
-    // console.log('point:', G)
     // console.log('groupA:', groupA)
     // console.log('groupB:', groupB)
     // console.log('groupC:', groupC)

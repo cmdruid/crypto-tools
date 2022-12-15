@@ -1,14 +1,14 @@
-import { Buff }  from '@cmdcode/bytes-utils'
+import { Buff }  from '@cmdcode/buff-utils'
 
 // Test that two keypairs can derive a shared secret.
 import * as ECC  from '../src/ecc.js'
-import * as Rand from '../src/rand.js'
+import * as Util from '../src/util.js'
 
 const { Field, Point } = ECC
 
 // Define seed values for keys (a) and (k).
-const seedA = Rand.getRandBytes(32)
-const seedZ = Rand.getRandBytes(32)
+const seedA = Util.getRandBytes(32)
+const seedZ = Util.getRandBytes(32)
 
 console.log(seedA, seedZ)
 

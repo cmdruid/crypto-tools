@@ -1,4 +1,4 @@
-import { Buff } from '@cmdcode/bytes-utils'
+import { Buff } from '@cmdcode/buff-utils'
 import * as Noble from '@noble/secp256k1'
 
 type FieldNum = number | bigint | Uint8Array | Field
