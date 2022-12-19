@@ -8,7 +8,7 @@
     "utils",
     "library"
   ],
-  "version": "1.2.7",
+  "version": "1.2.8",
   "type": "module",
   "main": "./dist/main.js",
   "unpkg": "./dist/bundle.min.js",
@@ -67,6 +67,6 @@
   },
   "dependencies": {
     "@cmdcode/buff-utils": "*",
-    "@noble/secp256k1": "*"
+    "@noble/secp256k1": "^1.7.0"
   }
 }
