@@ -189,10 +189,10 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@cmdcode/buff-utils@*":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.1.4.tgz#02aa1ccef16d7ce24801e5e5b3477a355b2462e1"
-  integrity sha512-zdBfzNy29cn1thczROBS2WAgPhTqX06S8XfYYwzmuHFbxUDBNHCmntlD8iBEiElahpGu/qu0L2aO2U8zn/uznQ==
+"@cmdcode/buff-utils@^1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.1.8.tgz#d998977297bc6c4dcfd7b624ee93d125dd048285"
+  integrity sha512-LtUejvnTqUIvKeSGk4kXLjJVrX81Ke3xCsKLGVq9fmYeobl8cqar5YEE9VjlXMXXza0H/TEDQMeegrKmXkz0jw==
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -307,7 +307,7 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@noble/secp256k1@*":
+"@noble/secp256k1@^1.7.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@noble/secp256k1/-/secp256k1-1.7.0.tgz#d15357f7c227e751d90aa06b05a0e5cf993ba8c1"
   integrity sha512-kbacwGSsH/CTout0ZnZWxnW1B+jH/7r/WAAKLBtrRJ/+CUH7lgmQzl3GTrQua3SGKWNSDsS6lmjnDpIJ5Dxyaw==

@@ -1,12 +1,12 @@
+import { Buff, Type } from '@cmdcode/buff-utils'
 import { webcrypto as crypto } from 'crypto'
-import { importKey, getSharedKey } from './keys.js'
-import { Bytes, normalize } from './util.js'
+import { importCryptoKey, getSharedKey } from './keys.js'
 
 export default class Cipher {
   private readonly secret: CryptoKey | Promise<CryptoKey>
 
-  static from = (secret: Bytes) : Cipher => {
-    return new Cipher(normalize(secret))
+  static from = (secret: Type.Bytes) : Cipher => {
+    return new Cipher(Buff.normalizeBytes(secret))
   }
 
   static async encrypt(
@@ -23,7 +23,7 @@ export default class Cipher {
 
   static async decrypt(
     secret : CryptoKey,
-    data : Uint8Array
+    data   : Uint8Array
   ) : Promise<Uint8Array> {
     return crypto.subtle
       .decrypt({ name: 'AES-CBC', iv: data.slice(0, 16) }, secret, data.slice(16))
@@ -32,7 +32,7 @@ export default class Cipher {
 
   constructor(secret: CryptoKey | Uint8Array) {
     this.secret = secret instanceof Uint8Array 
-      ? importKey(secret)
+      ? importCryptoKey(secret)
       : secret
   }
 
@@ -50,22 +50,22 @@ export default class Cipher {
   }
 
   async encryptShared(
-    key  : Bytes,
+    key  : Type.Bytes,
     data : Uint8Array,
     initVector? : Uint8Array
   ) : Promise<Uint8Array> {
     const secret = await this.secret
-    const shared = normalize(key)
+    const shared = Buff.normalizeBytes(key)
     const sharedSecret = await getSharedKey(secret, shared)
     return Cipher.encrypt(sharedSecret, data, initVector)
   }
 
   async decryptShared(
-    key  : Bytes,
+    key  : Type.Bytes,
     data : Uint8Array
   ) : Promise<Uint8Array> {
     const secret = await this.secret
-    const shared = normalize(key)
+    const shared = Buff.normalizeBytes(key)
     const sharedSecret = await getSharedKey(secret, shared)
     return Cipher.decrypt(sharedSecret, data)
   }

@@ -30,7 +30,7 @@ class Field extends Uint8Array {
       : (typeof num === 'number')
         ? BigInt(num)
         : num
-    num = Buff.big(Field.mod(num))
+    num = Buff.big(Field.mod(num), 32)
     super(num)
   }
 
@@ -186,8 +186,42 @@ class Point {
   }
 }
 
+class KeyPair {
+  private readonly _secret : Uint8Array
+
+  constructor(secret : string | Uint8Array) {
+    this._secret = (typeof secret === 'string')
+      ? Buff.hex(secret).toBytes()
+      : secret
+  }
+
+  get field() : Field {
+    return new Field(this._secret)
+  }
+
+  get point() : Point {
+    return this.field.point
+  }
+
+  get privateKey() : Uint8Array {
+    return new Uint8Array(this.field)
+  }
+
+  get privateHex() : string {
+    return new Buff(this.field).toHex()
+  }
+
+  get publicKey() : Uint8Array {
+    return new Uint8Array(this.point.rawX)
+  }
+
+  get publicHex() : string {
+    return new Buff(this.publicKey).toHex()
+  }
+}
 
 export {
   Field,
-  Point
+  Point,
+  KeyPair
 }

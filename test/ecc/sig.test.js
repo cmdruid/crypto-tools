@@ -1,6 +1,6 @@
-import { Buff }  from '@cmdcode/buff-utils'
 import * as ECC  from '../../src/ecc.js'
 import * as Hash from '../../src/hash.js'
+import { getRandBytes } from '../../src/util.js'
 
 const { Field, Point } = ECC
 const ec = new TextEncoder()
@@ -9,7 +9,7 @@ export default function schnorrTest(t) {
   t.test('Testing ECC Schnorr Signatures', async t => {
 
     // Define seed values for keys (a) and (k).
-    const seedA = Buff.hex('3ddd5602285899a946114506157c7997e5444528f3003f6134712147db19b678').toBytes()
+    const seedA = getRandBytes(32)
     const seedK = seedA.reverse()
 
     // Define a dummy message.

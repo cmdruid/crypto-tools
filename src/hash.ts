@@ -1,6 +1,6 @@
 import { webcrypto as crypto } from 'crypto'
 import ripemd160 from './ripemd.js'
-import { importHmac } from './keys.js'
+import { importHmacKey } from './keys.js'
 
 async function digest(
   bytes: Uint8Array,
@@ -38,7 +38,7 @@ export async function hmac256(
   key: Uint8Array,
   data: Uint8Array
 ): Promise<Uint8Array> {
-  const keyfile = await importHmac(key, 'SHA-256')
+  const keyfile = await importHmacKey(key, 'SHA-256')
   return crypto.subtle
     .sign('HMAC', keyfile, data)
     .then((buffer) => new Uint8Array(buffer))
@@ -48,7 +48,7 @@ export async function hmac512(
   key: Uint8Array,
   data: Uint8Array
 ): Promise<Uint8Array> {
-  const keyfile = await importHmac(key, 'SHA-512')
+  const keyfile = await importHmacKey(key, 'SHA-512')
   return crypto.subtle
     .sign('HMAC', keyfile, data)
     .then((buffer) => new Uint8Array(buffer))

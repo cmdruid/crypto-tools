@@ -66,7 +66,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@cmdcode/buff-utils": "*",
+    "@cmdcode/buff-utils": "^1.1.8",
     "@noble/secp256k1": "^1.7.0"
   }
 }
