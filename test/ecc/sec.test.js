@@ -1,6 +1,5 @@
 import { Buff }  from '@cmdcode/buff-utils'
 import * as ECC  from '../../src/ecc.js'
-import * as Rand from '../../src/util.js'
 
 const { Field, Point } = ECC
 
@@ -8,14 +7,14 @@ export default function secretsTest(t) {
   t.test('Testing Shared Secret Derivation', async t => {
 
     // Setup our A, B, C keypairs.
-    const a = Field.fromPrivate(Rand.getRandBytes(32))
+    const a = Field.fromPrivate(Buff.random(32))
     const A = Point.from(a.point)
-    const b = Field.fromPrivate(Rand.getRandBytes(32))
+    const b = Field.fromPrivate(Buff.random(32))
     const B = Point.from(b.point)
     const sharedAB = B.mul(a.num).x
     const sharedBA = A.mul(b.num).x
 
-    // const c = Field.fromPrivate(Rand.getRandBytes(32))
+    // const c = Field.fromPrivate(Buff.random(32))
     // const C = Point.from(c.point)
 
     // const groupA = B.mul(a.num).mul(C.mul(a.num))

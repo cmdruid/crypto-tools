@@ -1,12 +1,12 @@
-import Cipher from '../../src/cipher.js'
-import { getRandBytes } from '../../src/util.js'
+import { Buff } from '@cmdcode/buff-utils'
+import Cipher   from '../../src/cipher.js'
 import { genKeyPair } from '../../src/keys.js'
 
 export default async function (t) {
 
   t.test('Test encryption/decryption of Cipher suite.', async t => {
-    const randomBytes = getRandBytes(32)
-    const randomData  = getRandBytes(32)
+    const randomBytes = Buff.random(32).toBytes()
+    const randomData  = Buff.random(32).toBytes()
     const { publicKey } = genKeyPair()
     const cipher = Cipher.from(randomBytes)
 

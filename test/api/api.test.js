@@ -1,4 +1,4 @@
-import { Type } from '@cmdcode/buff-utils'
+import { Check } from '@cmdcode/buff-utils'
 import camelcase from 'camelcase'
 import pkg from '../../package.json' assert { type: 'json' }
 
@@ -40,18 +40,18 @@ async function getLibrary(libName) {
 async function crawlAPI(lib, paths = []) {
   for (const [key, val] of Object.entries(lib)) {
     // console.log(`Crawling ${key}: ${Type.of(val)}`)
-    if (Type.is.class(val)) {
+    if (Check.is.class(val)) {
       const newpath = [...paths, key]
       testInstance(val, newpath)
       crawlAPI(val, newpath)
       console.log('Registering tests for class:', key)
     }
 
-    else if (Type.is.function(val)) {
+    else if (Check.is.function(val)) {
       testLoader(key, val, paths)
     }
 
-    else if (Type.is.object(val)) {
+    else if (Check.is.object(val)) {
       const newpath = [...paths, key]
       crawlAPI(val, newpath)
     }

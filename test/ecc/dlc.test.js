@@ -1,6 +1,6 @@
+import { Buff }  from '@cmdcode/buff-utils'
 import * as ECC  from '../../src/ecc.js'
 import * as Hash from '../../src/hash.js'
-import * as Rand from '../../src/util.js'
 
 const { Field, Point } = ECC
 const ec = new TextEncoder()
@@ -15,11 +15,11 @@ export default async function dlcTest(t) {
     m2.set(ec.encode('bitcoin transaction'))
 
     // Setup our (a/A), (k/R), and (sk/sR) keypairs.
-    const a  = Field.fromPrivate(Rand.getRandBytes(32))
+    const a  = Field.fromPrivate(Buff.random(32))
     const A  = Point.from(a.point)
-    const k  = Field.fromPrivate(Rand.getRandBytes(32))
+    const k  = Field.fromPrivate(Buff.random(32))
     const R  = Point.from(k.point)
-    const sk = Field.fromPrivate(Rand.getRandBytes(32))
+    const sk = Field.fromPrivate(Buff.random(32))
     const sR = Point.from(sk.point)
 
     // Create our hashed message digest comitting to R.

@@ -1,8 +1,8 @@
+import { Buff } from '@cmdcode/buff-utils'
 import { Noble } from '../../src/index.js'
-import { getRandBytes } from '../../src/util.js'
 
-const randomBytes = getRandBytes(32)
-const randomData  = getRandBytes(32)
+const randomBytes = Buff.random(32).toBytes()
+const randomData  = Buff.random(32).toBytes()
 
 export default async function (t) {
   t.test('Test signing/validation of Noble library.', async t => {

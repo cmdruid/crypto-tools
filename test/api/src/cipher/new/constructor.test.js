@@ -1,9 +1,9 @@
-import { getRandBytes } from '../../../../../src/util.js'
+import { Buff } from '@cmdcode/buff-utils'
 import { importCryptoKey, genCryptoKey } from '../../../../../src/keys.js'
 
 export default async function (t, f) {
   const randomKey = await genCryptoKey()
-  const randomBytes = getRandBytes(32)
+  const randomBytes = Buff.random(32)
   const importedKey = importCryptoKey(randomBytes)
   const cipherWithKey = new f(randomKey)
   const cipherWithImport = new f(randomBytes)

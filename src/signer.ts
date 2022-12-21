@@ -37,7 +37,7 @@ export default class Signer extends KeyPair {
     const msg = Buff.normalizeData(message)
     const sig = Buff.normalizeBytes(signature)
     return (this.type === 'schnorr')
-      ? Noble.schnorr.verify(sig, msg, getXOnlyPub(this.publicKey))
+      ? Noble.schnorr.verify(sig, msg, this.xOnlyPub)
       : Noble.verify(sig, msg, this.publicKey)
   }
 

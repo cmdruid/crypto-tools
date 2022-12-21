@@ -218,6 +218,10 @@ class KeyPair {
   get publicHex() : string {
     return new Buff(this.publicKey).toHex()
   }
+
+  get xOnlyPub() : Uint8Array {
+    return this.publicKey.slice(1, 33)
+  }
 }
 
 export {

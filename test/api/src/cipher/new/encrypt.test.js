@@ -1,8 +1,8 @@
-import { getRandBytes } from '../../../../../src/util.js'
+import { Buff } from '@cmdcode/buff-utils'
 
 export default async function (t, f) {
-  const randomBytes = getRandBytes(32)
-  const randomData = getRandBytes(32)
+  const randomBytes = Buff.random(32).toBytes()
+  const randomData  = Buff.random(32).toBytes()
 
   const cipher = new f(randomBytes)
 
