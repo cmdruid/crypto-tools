@@ -1,6 +1,6 @@
 import { Buff }   from '@cmdcode/buff-utils'
 import * as Noble from '@noble/secp256k1'
-import Signer     from '../../src/signer.js'
+import { Signer } from '../../src/signer.js'
 
 const randomBytes = Buff.random(32).toBytes()
 const randomData  = Buff.random(32).toBytes()

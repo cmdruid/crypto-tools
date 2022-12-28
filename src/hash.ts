@@ -1,25 +1,26 @@
-import { webcrypto as crypto } from 'crypto'
-import ripemd160 from './ripemd.js'
-import { importHmacKey } from './keys.js'
+import { KeyImport } from './keys.js'
+import { ripemd160 } from './ripemd.js'
 
-async function digest(
-  bytes: Uint8Array,
-  format: string = 'SHA-256',
-  rounds: number = 1
+export async function hash(
+  bytes  : Uint8Array,
+  format : string   = 'SHA-256',
+  rounds : number   = 1,
+  hook   : Function = (buff : ArrayBuffer) => buff
 ): Promise<Uint8Array> {
   let i, buffer = bytes.buffer
   for (i = 0; i < rounds; i++) {
     buffer = await crypto.subtle.digest(format, buffer)
+    hook(buffer)
   }
   return new Uint8Array(buffer)
 }
 
 export async function sha256(bytes: Uint8Array): Promise<Uint8Array> {
-  return digest(bytes, 'SHA-256')
+  return hash(bytes, 'SHA-256')
 }
 
 export async function sha512(bytes: Uint8Array): Promise<Uint8Array> {
-  return digest(bytes, 'SHA-512')
+  return hash(bytes, 'SHA-512')
 }
 
 export function ripe160(bytes: Uint8Array): Uint8Array {
@@ -27,7 +28,7 @@ export function ripe160(bytes: Uint8Array): Uint8Array {
 }
 
 export async function hash256(bytes: Uint8Array): Promise<Uint8Array> {
-  return digest(bytes, 'SHA-256', 2)
+  return hash(bytes, 'SHA-256', 2)
 }
 
 export async function hash160(bytes: Uint8Array): Promise<Uint8Array> {
@@ -38,7 +39,7 @@ export async function hmac256(
   key: Uint8Array,
   data: Uint8Array
 ): Promise<Uint8Array> {
-  const keyfile = await importHmacKey(key, 'SHA-256')
+  const keyfile = await KeyImport.hmac(key, 'SHA-256')
   return crypto.subtle
     .sign('HMAC', keyfile, data)
     .then((buffer) => new Uint8Array(buffer))
@@ -48,7 +49,7 @@ export async function hmac512(
   key: Uint8Array,
   data: Uint8Array
 ): Promise<Uint8Array> {
-  const keyfile = await importHmacKey(key, 'SHA-512')
+  const keyfile = await KeyImport.hmac(key, 'SHA-512')
   return crypto.subtle
     .sign('HMAC', keyfile, data)
     .then((buffer) => new Uint8Array(buffer))

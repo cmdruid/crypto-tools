@@ -1,11 +1,9 @@
 import { Buff } from '@cmdcode/buff-utils'
 import * as ecc from 'tiny-secp256k1'
 
-import { ECC, Noble } from '../../src/index.js'
+import { Field, Noble } from '../../src/index.js'
 
 const ec = new TextEncoder()
-
-const { Field } = ECC
 
 const seed  = Buff.hex('80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF')
 

@@ -1,7 +1,8 @@
 import { Buff } from '@cmdcode/buff-utils'
+import { KeyImport } from '../../../../../src/keys'
 
 export default async function (t, f) {
-  const randomBytes = Buff.random(32).toBytes()
+  const randomBytes = KeyImport.generate()
   const randomData  = Buff.random(32).toBytes()
 
   const cipher = new f(randomBytes)

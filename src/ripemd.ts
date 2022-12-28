@@ -458,7 +458,7 @@ function compress(
   return [h1 + cl + dr, h2 + dl + er, h3 + el + ar, h4 + al + br, h0 + bl + cr]
 }
 
-export default function ripemd160(bytes: Uint8Array): Uint8Array {
+export function ripemd160(bytes: Uint8Array): Uint8Array {
   // Compute the RIPEMD-160 hash of data.
 
   // Initialize state.

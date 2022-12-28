@@ -1,10 +1,10 @@
-import { Buff } from '@cmdcode/buff-utils'
-import * as Noble from '@noble/secp256k1'
+import { Buff, Bytes } from '@cmdcode/buff-utils'
+import * as Noble      from '@noble/secp256k1'
 
 type FieldNum = number | bigint | Uint8Array | Field
 type PointNum = number | bigint | Uint8Array | Point
 
-class Field extends Uint8Array {
+export class Field extends Uint8Array {
 
   static N = Noble.CURVE.n
 
@@ -91,7 +91,7 @@ class Field extends Uint8Array {
   }
 }
 
-class Point {
+export class Point {
 
   static N = Noble.CURVE.n
 
@@ -186,13 +186,15 @@ class Point {
   }
 }
 
-class KeyPair {
+export class KeyPair {
   private readonly _secret : Uint8Array
 
-  constructor(secret : string | Uint8Array) {
-    this._secret = (typeof secret === 'string')
-      ? Buff.hex(secret).toBytes()
-      : secret
+  static generate() : KeyPair {
+    return new KeyPair(Buff.random(32))
+  }
+
+  constructor(secret : Bytes) {
+    this._secret = Buff.normalizeBytes(secret)
   }
 
   get field() : Field {
@@ -222,10 +224,4 @@ class KeyPair {
   get xOnlyPub() : Uint8Array {
     return this.publicKey.slice(1, 33)
   }
-}
-
-export {
-  Field,
-  Point,
-  KeyPair
 }

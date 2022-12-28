@@ -1,18 +1,22 @@
-import * as Noble from '@noble/secp256k1'
-import { Buff, Type } from '@cmdcode/buff-utils'
-import { KeyPair }  from './ecc.js'
+import * as Noble  from '@noble/secp256k1'
+import { KeyPair } from './ecc.js'
+import { Buff, Bytes, Data } from '@cmdcode/buff-utils'
 
 export type SignatureTypes = 'ecdsa' | 'schnorr'
 
-export default class Signer extends KeyPair {
+export class Signer extends KeyPair {
 
   public readonly type : string
 
   static from(
-    bytes : Type.Bytes,
+    bytes : Bytes,
     type? : SignatureTypes
   ) : Signer {
     return new Signer(Buff.normalizeBytes(bytes), type)
+  }
+
+  static generate() : Signer {
+    return new Signer(Buff.random(32))
   }
 
   constructor(
@@ -23,7 +27,7 @@ export default class Signer extends KeyPair {
     this.type = type ?? 'schnorr'
   }
 
-  async sign(message : Type.Data) : Promise<Uint8Array> {
+  async sign(message : Data) : Promise<Uint8Array> {
     const msg = Buff.normalizeData(message)
     return (this.type === 'schnorr')
       ? Noble.schnorr.sign(msg, this.privateKey)
@@ -31,8 +35,8 @@ export default class Signer extends KeyPair {
   }
 
   async verify(
-    message   : Type.Data,
-    signature : Type.Bytes
+    message   : Data,
+    signature : Bytes
   ) : Promise<boolean> {
     const msg = Buff.normalizeData(message)
     const sig = Buff.normalizeBytes(signature)
@@ -42,9 +46,9 @@ export default class Signer extends KeyPair {
   }
 
   static async verify(
-    message   : Type.Data,
-    pubKey    : Type.Bytes,
-    signature : Type.Bytes,
+    message   : Data,
+    pubKey    : Bytes,
+    signature : Bytes,
     type?     : SignatureTypes
   ) : Promise<boolean> {
     type = (type !== undefined) ? type : 'schnorr'
