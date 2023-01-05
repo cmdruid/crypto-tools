@@ -9,8 +9,8 @@ export default async function (t) {
 
   t.test('Test signing/validation of Signer suite.', async t => {
 
-    const schnorrSigner = Signer.from(randomBytes)
-    const ecdsaSigner   = Signer.from(randomBytes, 'ecdsa')
+    const schnorrSigner = new Signer(randomBytes)
+    const ecdsaSigner   = new Signer(randomBytes, 'ecdsa')
 
     const schnorrPub = schnorrSigner.publicKey
     const schnorrXonlyPub = schnorrSigner.xOnlyPub

@@ -1,5 +1,5 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
-import { KeyImport, KeyExport } from './keys.js'
+import { KeyImport, KeyExport } from './utils.js'
 
 export class Cipher {
   private readonly key: CryptoKey
@@ -7,7 +7,7 @@ export class Cipher {
   static async fromSecret(
     secretKey: Bytes
   ) : Promise<Cipher> {
-    const secret    = Buff.normalizeBytes(secretKey)
+    const secret    = Buff.normalize(secretKey)
     const cryptoKey = await KeyImport.crypto(secret)
     return new Cipher(cryptoKey)
   }
@@ -55,7 +55,7 @@ export class Cipher {
   }
 
   async encrypt(
-    data : Uint8Array, 
+    data : Uint8Array,
     initVector? : Uint8Array
   ) : Promise<Uint8Array> {
     return Cipher.encrypt(this.key, data, initVector)

@@ -5,8 +5,8 @@ export async function ecdh(
   secretKey : Bytes,
   sharedKey : Bytes
 ) : Promise<Uint8Array> {
-  const secret = Buff.normalizeBytes(secretKey)
-  const shared = Buff.normalizeBytes(sharedKey)
+  const secret = Buff.normalize(secretKey)
+  const shared = Buff.normalize(sharedKey)
   return Noble.getSharedSecret(secret, shared, true)
 }
 

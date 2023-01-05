@@ -1,4 +1,4 @@
-import { KeyImport } from './keys.js'
+import { KeyImport } from './utils.js'
 import { ripemd160 } from './ripemd.js'
 
 export async function hash(

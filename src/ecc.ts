@@ -1,8 +1,8 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 import * as Noble      from '@noble/secp256k1'
 
-type FieldNum = number | bigint | Uint8Array | Field
-type PointNum = number | bigint | Uint8Array | Point
+type FieldNum = string | number | bigint | Uint8Array | Field
+type PointNum = string | number | bigint | Uint8Array | Point
 
 export class Field extends Uint8Array {
 
@@ -14,23 +14,19 @@ export class Field extends Uint8Array {
 
   static isField = (x : any) : boolean => x instanceof Field
 
-  static fromPrivate(num : FieldNum) : Field {
-    if (num <= 0) {
-      throw new TypeError('Number cannot be negative.')
-    }
-    if (num >= Field.N) {
-      throw new TypeError('Number cannot be greater than N: 2**256 - 2**32 - 977')
-    }
-    return new Field(num)
+  static normalize(num : FieldNum) : Uint8Array {
+    num = normalize(num)
+    num = Field.mod(num)
+    num = Noble.utils._normalizePrivateKey(num)
+    return Buff.big(num).toBytes()
+  }
+
+  static validate(num : bigint) : boolean {
+    return Noble.utils.isValidPrivateKey(num)
   }
 
   constructor(num : FieldNum) {
-    num = (num instanceof Uint8Array)
-      ? Buff.from(num).toBig()
-      : (typeof num === 'number')
-        ? BigInt(num)
-        : num
-    num = Buff.big(Field.mod(num), 32)
+    num = Field.normalize(num)
     super(num)
   }
 
@@ -40,8 +36,18 @@ export class Field extends Uint8Array {
   }
 
   get point() : Point {
-    return Point.fromScalar(this.num)
-  } 
+    return Point.fromNum(this.num)
+  }
+
+  get hasOddY() : boolean {
+    return this.point.hasOddY
+  }
+
+  get negated() : Field {
+    return (this.hasOddY) 
+      ? this.negate()
+      : this
+  }
 
   gt(num : FieldNum) : boolean {
     const x = new Field(num)
@@ -89,25 +95,30 @@ export class Field extends Uint8Array {
     const divisor = this.pow(x.num, Field.N - 2n)
     return new Field(this.num * divisor.num)
   }
+
+  negate() : Field {
+    return new Field(Field.N - this.num)
+  }
 }
 
 export class Point {
 
   static N = Noble.CURVE.n
 
-  static fromScalar(x : number | bigint | Uint8Array) : Point {
-    const b = (x instanceof Uint8Array)
-      ? Buff.from(x).toBig()
-      : (typeof x === 'number')
-        ? BigInt(x)
-        : x
-    const m = Noble.utils.mod(b, Point.N)
-    const p = Noble.Point.BASE.multiply(m)
-    return new Point(p.x, p.y)
+  static normalize(num : PointNum) : bigint {
+    return normalize(num)
   }
 
-  static fromX(x : Uint8Array) : Point {
-    const h = Buff.buff(x).toHex()
+  static fromNum(num : PointNum) : Point {
+    num = Point.normalize(num)
+    const f = Noble.utils.mod(num, Point.N)
+    const P = Noble.Point.BASE.multiply(f)
+    return new Point(P.x, P.y)
+  }
+
+  static fromXOnly(x : PointNum) : Point {
+    x = Point.normalize(x)
+    const h = Buff.big(x).toHex()
     return Point.from(Noble.Point.fromHex(h))
   }
 
@@ -123,10 +134,15 @@ export class Point {
     this.__p = new Noble.Point(x, y)
     this.__x = this.__p.x
     this.__y = this.__p.y
+    this.__p.assertValidity()
   }
 
   get p() : Noble.Point {
     return this.__p
+  }
+
+  get hasOddY() : boolean {
+    return !this.__p.hasEvenY()
   }
 
   get rawX() : Uint8Array {
@@ -166,23 +182,23 @@ export class Point {
   add(x : PointNum) : Point {
     return (x instanceof Point)
       ? Point.from(this.p.add(x.p))
-      : Point.from(this.p.add(Point.fromScalar(x).p))
+      : Point.from(this.p.add(Point.fromNum(x).p))
   }
 
   sub(x : PointNum) : Point {
     return (x instanceof Point)
       ? Point.from(this.p.subtract(x.p))
-      : Point.from(this.p.subtract(Point.fromScalar(x).p))
+      : Point.from(this.p.subtract(Point.fromNum(x).p))
   }
   
   mul(x : PointNum) : Point {
-    if (x instanceof Uint8Array) {
-      const b = Buff.from(x).toBig()
-      return Point.from(this.p.multiply(b))
-    }
     return (x instanceof Point)
       ? Point.from(this.p.multiply(x.x))
-      : Point.from(this.p.multiply(x))
+      : Point.from(this.p.multiply(Point.normalize(x)))
+  }
+
+  negate() : Point {
+    return Point.from(this.__p.negate())
   }
 }
 
@@ -194,7 +210,7 @@ export class KeyPair {
   }
 
   constructor(secret : Bytes) {
-    this._secret = Buff.normalizeBytes(secret)
+    this._secret = Buff.normalize(secret)
   }
 
   get field() : Field {
@@ -224,4 +240,20 @@ export class KeyPair {
   get xOnlyPub() : Uint8Array {
     return this.publicKey.slice(1, 33)
   }
+}
+
+function normalize(num : FieldNum | PointNum) : bigint {
+  if (num instanceof Uint8Array) {
+    return Buff.buff(num).toBig()
+  }
+  if (typeof num === 'string') {
+    return Buff.hex(num).toBig()
+  }
+  if (typeof num === 'number') {
+    return BigInt(num)
+  }
+  if (typeof num === 'bigint') {
+    return num
+  }
+  throw TypeError('Invalid input type:' + typeof num)
 }

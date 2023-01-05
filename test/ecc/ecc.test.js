@@ -9,7 +9,7 @@ const seed  = Buff.hex('80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF
 
 const kA = ecc.pointFromScalar(seed)
 const kB = Noble.Point.BASE.multiply(BigInt('0x80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF'))
-const k1 = Field.fromPrivate(seed)
+const k1 = new Field(seed)
 const K1 = k1.point
 
 const K2 = ecc.pointFromScalar(seed, true)

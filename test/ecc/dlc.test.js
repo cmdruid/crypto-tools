@@ -15,11 +15,11 @@ export default async function dlcTest(t) {
     m2.set(ec.encode('bitcoin transaction'))
 
     // Setup our (a/A), (k/R), and (sk/sR) keypairs.
-    const a  = Field.fromPrivate(Buff.random(32))
+    const a  = new Field(Buff.random(32))
     const A  = Point.from(a.point)
-    const k  = Field.fromPrivate(Buff.random(32))
+    const k  = new Field(Buff.random(32))
     const R  = Point.from(k.point)
-    const sk = Field.fromPrivate(Buff.random(32))
+    const sk = new Field(Buff.random(32))
     const sR = Point.from(sk.point)
 
     // Create our hashed message digest comitting to R.

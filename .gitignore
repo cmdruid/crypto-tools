@@ -36,4 +36,5 @@ node_modules/
 # Distributions
 dist
 
+#VSCode
 .vscode

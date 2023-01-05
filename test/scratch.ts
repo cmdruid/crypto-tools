@@ -1,13 +1,14 @@
-import { genKeyPair } from '../src/keys.js'
+import { Buff } from '@cmdcode/buff-utils'
+import { KeyChain } from '../src/chain.js'
 
-let counter = 0
+const key  = Buff.random(32).toHex()
 
-while (counter < 1000) {
-  const key = genKeyPair()
-  if (key.privateKey.length !== 32) {
-    console.log(key.privateKey)
-    console.log(counter)
-    break
-  }
-  counter ++
-}
+const keychain = await KeyChain.create(key)
+
+const node = await keychain.derive('bananas')
+
+const supernode = await node.resolve('apples/and/carrots')
+
+const imported = await KeyChain.import(key + '/this/is/a/test')
+
+console.log(imported)

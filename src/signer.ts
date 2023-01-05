@@ -8,19 +8,12 @@ export class Signer extends KeyPair {
 
   public readonly type : string
 
-  static from(
-    bytes : Bytes,
-    type? : SignatureTypes
-  ) : Signer {
-    return new Signer(Buff.normalizeBytes(bytes), type)
-  }
-
   static generate() : Signer {
     return new Signer(Buff.random(32))
   }
 
   constructor(
-    secret : Uint8Array,
+    secret : Bytes,
     type?  : SignatureTypes
   ) {
     super(secret)
@@ -28,7 +21,7 @@ export class Signer extends KeyPair {
   }
 
   async sign(message : Data) : Promise<Uint8Array> {
-    const msg = Buff.normalizeData(message)
+    const msg = Buff.serialize(message)
     return (this.type === 'schnorr')
       ? Noble.schnorr.sign(msg, this.privateKey)
       : Noble.sign(msg, this.privateKey)
@@ -38,8 +31,8 @@ export class Signer extends KeyPair {
     message   : Data,
     signature : Bytes
   ) : Promise<boolean> {
-    const msg = Buff.normalizeData(message)
-    const sig = Buff.normalizeBytes(signature)
+    const msg = Buff.serialize(message)
+    const sig = Buff.normalize(signature)
     return (this.type === 'schnorr')
       ? Noble.schnorr.verify(sig, msg, this.xOnlyPub)
       : Noble.verify(sig, msg, this.publicKey)
@@ -52,9 +45,9 @@ export class Signer extends KeyPair {
     type?     : SignatureTypes
   ) : Promise<boolean> {
     type = (type !== undefined) ? type : 'schnorr'
-    const msg = Buff.normalizeData(message)
-    const pub = Buff.normalizeBytes(pubKey)
-    const sig = Buff.normalizeBytes(signature)
+    const msg = Buff.serialize(message)
+    const pub = Buff.normalize(pubKey)
+    const sig = Buff.normalize(signature)
     return (type === 'schnorr')
       ? Noble.schnorr.verify(sig, msg, getXOnlyPub(pub))
       : Noble.verify(sig, msg, pub)
