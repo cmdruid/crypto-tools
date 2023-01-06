@@ -1,7 +1,7 @@
 
 import { Buff } from '@cmdcode/buff-utils'
-import * as ECC  from '../../src/ecc.js'
-import * as Hash from '../../src/hash.js'
+import * as ECC from '../../src/ecc.js'
+import { Hash } from '../../src/hash.js'
 
 const { Field, Point } = ECC
 const ec = new TextEncoder()

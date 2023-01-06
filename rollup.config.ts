@@ -1,39 +1,31 @@
 // rollup.config.ts
-import json        from '@rollup/plugin-json'
 import typescript  from '@rollup/plugin-typescript'
-import terser      from '@rollup/plugin-terser'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import commonjs    from '@rollup/plugin-commonjs'
-import camelcase   from 'camelcase'
-
-import pkg from './package.json' assert { type: 'json' }
-
-const libName = camelcase(String('/' + pkg.name))
-  .split('/')
-  .at(-1)
+import { terser }  from 'rollup-plugin-terser'
 
 const treeshake = {
-  moduleSideEffects: false,
-  propertyReadSideEffects: false,
-  tryCatchDeoptimization: false,
+	moduleSideEffects: false,
+	propertyReadSideEffects: false,
+	tryCatchDeoptimization: false
 }
 
-const onwarn = (warning) => {
-  // eslint-disable-next-line no-console
-  console.error(
-    'Building Rollup produced warnings that need to be resolved. ' +
-      'Please keep in mind that the browser build may never have external dependencies!'
-  )
-  // eslint-disable-next-line unicorn/error-message
-  throw Object.assign(new Error(), warning)
+const onwarn = warning => {
+	// eslint-disable-next-line no-console
+	console.error(
+		'Building Rollup produced warnings that need to be resolved. ' +
+			'Please keep in mind that the browser build may never have external dependencies!'
+	);
+	// eslint-disable-next-line unicorn/error-message
+	throw Object.assign(new Error(), warning);
 }
 
-const tsConfig = {
+const tsConfig = { 
   compilerOptions: {
     declaration: false,
     declarationDir: null,
-    declarationMap: false,
-  },
+    declarationMap: false
+  }
 }
 
 const nodeConfig = {
@@ -49,12 +41,12 @@ const nodeConfig = {
       file: 'dist/module.js',
       format: 'es',
       sourcemap: true,
-      minifyInternalExports: false,
+      minifyInternalExports: false
     },
   ],
-  plugins: [json(), typescript(tsConfig), nodeResolve(), commonjs()],
+  plugins: [ typescript(tsConfig), nodeResolve(), commonjs() ],
   strictDeprecations: true,
-  treeshake,
+  treeshake
 }
 
 const browserConfig = {
@@ -64,54 +56,45 @@ const browserConfig = {
     {
       file: 'dist/bundle.min.js',
       format: 'iife',
-      name: libName,
+      name: 'cryptoUtils',
       plugins: [terser()],
       sourcemap: true,
       globals: {
         crypto: 'crypto',
-      },
+      }
     },
   ],
-  plugins: [
-    json(),
-    typescript(tsConfig),
-    nodeResolve({ browser: true }),
-    commonjs(),
+  plugins: [ 
+    typescript(tsConfig), 
+    nodeResolve({ browser: true, preferBuiltins: false }), 
+    commonjs() 
   ],
   strictDeprecations: true,
-  treeshake,
+  treeshake
 }
 
-const testConfig = {
-  input: 'test/index.test.js',
-  onwarn,
-  output: [
-    {
-      file: 'test/browser.test.js',
-      format: 'iife',
-      name: 'test',
-      plugins: [terser()],
-      sourcemap: false,
-      globals: {
-        crypto: 'crypto',
-        tape: 'tape',
-        'tiny-secp256k1': 'ecc'
-      },
-    },
-  ],
-  external: ['crypto', 'tape', 'tiny-secp256k1'],
-  plugins: [
-    json(),
-    typescript({ ...tsConfig, sourceMap: false }),
-    nodeResolve({ browser: true }),
-    commonjs(),
-  ],
-  strictDeprecations: true,
-  treeshake,
-}
+// const testConfig = {
+//   input: 'test/index.test.js',
+//   onwarn,
+//   output: [
+//     {
+//       file: 'test/browser.test.js',
+//       format: 'iife',
+//       name: 'test',
+//       sourcemap: false,
+//       globals: {
+//         tape: 'tape'
+//       }
+//     }
+//   ],
+//   external: ['tape'],
+//   plugins: [
+//     typescript({ ...tsConfig, sourceMap: false }), 
+//     nodeResolve(), 
+//     commonjs()
+//   ],
+//   strictDeprecations: true,
+//   treeshake
+// }
 
-export default [
-  nodeConfig, 
-  browserConfig, 
-  testConfig,
-]
+export default [ nodeConfig, browserConfig ];

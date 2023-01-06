@@ -6,7 +6,7 @@
 
 type state = [bigint, bigint, bigint, bigint, bigint]
 
-function bytesToBigInt(bytes: Uint8Array): bigint {
+function bytesToBigInt (bytes : Uint8Array) : bigint {
   let num = 0n
   for (let i = bytes.length - 1; i >= 0; i--) {
     num = num * 256n + BigInt(bytes[i])
@@ -14,8 +14,8 @@ function bytesToBigInt(bytes: Uint8Array): bigint {
   return BigInt(num)
 }
 
-function bigIntToBytes(num: bigint, size: number = 0): Uint8Array {
-  const bytes: bigint[] = []
+function bigIntToBytes (num : bigint, size : number = 0) : Uint8Array {
+  const bytes : bigint[] = []
 
   while (num > 0) {
     const byte = num & 0xffn
@@ -115,7 +115,7 @@ const ML = [
   11n,
   6n,
   15n,
-  13n,
+  13n
 ]
 
 // Message schedule indexes for the right path.
@@ -199,7 +199,7 @@ const MR = [
   0n,
   3n,
   9n,
-  11n,
+  11n
 ]
 
 // Rotation counts for the left path.
@@ -283,7 +283,7 @@ const RL = [
   11n,
   8n,
   5n,
-  6n,
+  6n
 ]
 
 // Rotation counts for the right path.
@@ -367,7 +367,7 @@ const RR = [
   15n,
   13n,
   11n,
-  11n,
+  11n
 ]
 
 // K constants for the left path.
@@ -376,7 +376,7 @@ const KL = [0n, 0x5a827999n, 0x6ed9eba1n, 0x8f1bbcdcn, 0xa953fd4en]
 // K constants for the right path.
 const KR = [0x50a28be6n, 0x5c4dd124n, 0x6d703ef3n, 0x7a6d76e9n, 0n]
 
-function fi(x: bigint, y: bigint, z: bigint, i: bigint): bigint {
+function fi (x : bigint, y : bigint, z : bigint, i : bigint) : bigint {
   // The f1, f2, f3, f4, and f5 functions from the specification.
   switch (true) {
     case i === 0n:
@@ -394,24 +394,24 @@ function fi(x: bigint, y: bigint, z: bigint, i: bigint): bigint {
   }
 }
 
-function rol(x: bigint, i: bigint): bigint {
+function rol (x : bigint, i : bigint) : bigint {
   // Rotate the bottom 32 bits of x left by i bits.
   return ((x << i) | ((x & 0xffffffffn) >> (32n - i))) & 0xffffffffn
 }
 
-function compress(
-  h0: bigint,
-  h1: bigint,
-  h2: bigint,
-  h3: bigint,
-  h4: bigint,
-  block: Uint8Array
-): state {
+function compress (
+  h0 : bigint,
+  h1 : bigint,
+  h2 : bigint,
+  h3 : bigint,
+  h4 : bigint,
+  block : Uint8Array
+) : state {
   // Compress state (h0, h1, h2, h3, h4) with block.
-  const x: bigint[] = []
+  const x : bigint[] = []
 
-  let rnd: bigint, elt: bigint, ert: bigint
-  let ml: bigint, kl: bigint, mr: bigint, kr: bigint
+  let rnd : bigint, elt : bigint, ert : bigint
+  let ml : bigint, kl : bigint, mr : bigint, kr : bigint
   // Init left side of the array.
   let al = h0,
     bl = h1,
@@ -458,16 +458,16 @@ function compress(
   return [h1 + cl + dr, h2 + dl + er, h3 + el + ar, h4 + al + br, h0 + bl + cr]
 }
 
-export function ripemd160(bytes: Uint8Array): Uint8Array {
+export function ripemd160 (bytes : Uint8Array) : Uint8Array {
   // Compute the RIPEMD-160 hash of data.
 
   // Initialize state.
-  let state: state = [
+  let state : state = [
     0x67452301n,
     0xefcdab89n,
     0x98badcfen,
     0x10325476n,
-    0xc3d2e1f0n,
+    0xc3d2e1f0n
   ]
 
   // Process full 64-byte blocks in the input.
@@ -476,12 +476,12 @@ export function ripemd160(bytes: Uint8Array): Uint8Array {
   }
 
   // Construct final blocks (with padding and size).
-  const zfill: number[] = new Array((119 - bytes.length) & 63).fill(0)
-  const pad: number[] = [0x80, ...zfill]
-  const fin: Uint8Array = Uint8Array.from([
+  const zfill : number[] = new Array((119 - bytes.length) & 63).fill(0)
+  const pad : number[] = [0x80, ...zfill]
+  const fin : Uint8Array = Uint8Array.from([
     ...bytes.slice(bytes.length & ~63),
     ...pad,
-    ...bigIntToBytes(BigInt(8 * bytes.length), 8),
+    ...bigIntToBytes(BigInt(8 * bytes.length), 8)
   ])
 
   // Process final blocks.

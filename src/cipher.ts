@@ -1,67 +1,77 @@
-import { Buff, Bytes } from '@cmdcode/buff-utils'
-import { KeyImport, KeyExport } from './utils.js'
+import { Buff, Bytes, Data } from '@cmdcode/buff-utils'
+import { KeyUtil } from './utils.js'
+
+const crypto = globalThis.crypto
 
 export class Cipher {
-  private readonly key: CryptoKey
+  private readonly key : CryptoKey
 
-  static async fromSecret(
-    secretKey: Bytes
+  static async fromSecret (
+    secret : Bytes
   ) : Promise<Cipher> {
-    const secret    = Buff.normalize(secretKey)
-    const cryptoKey = await KeyImport.crypto(secret)
+    const cryptoKey = await KeyUtil.normalize(secret)
     return new Cipher(cryptoKey)
   }
 
-  static async fromShared(
-    secretKey : Bytes,
-    sharedKey : Bytes
+  static async fromShared (
+    secret : Bytes,
+    shared : Bytes
   ) : Promise<Cipher> {
-    const cryptoKey = await KeyImport.shared(secretKey, sharedKey)
+    const cryptoKey = await KeyUtil.shared(secret, shared)
     return new Cipher(cryptoKey)
   }
 
-  static async encrypt(
-    secret : CryptoKey,
-    data   : Uint8Array,
-    initVector? : Uint8Array
+  static async encrypt (
+    secret  : Bytes | CryptoKey,
+    data    : Data,
+    vector ?: Bytes
   ) : Promise<Uint8Array> {
-
-    const iv = initVector ?? crypto.getRandomValues(new Uint8Array(16))
+    const key = await KeyUtil.normalize(secret)
+    const dat = Buff.serialize(data)
+    const iv  = (vector !== undefined) ? Buff.normalize(vector) : Buff.random(16)
     return crypto.subtle
-      .encrypt({ name: 'AES-CBC', iv }, secret, data)
+      .encrypt({ name: 'AES-CBC', iv }, key, dat)
       .then((buffer) => Uint8Array.of(...iv, ...new Uint8Array(buffer)))
   }
 
-  static async decrypt(
-    secret : CryptoKey,
-    data   : Uint8Array
+  static async decrypt (
+    secret  : Bytes | CryptoKey,
+    data    : Data,
+    vector ?: Bytes
   ) : Promise<Uint8Array> {
+    data = Buff.serialize(data)
+    const key = await KeyUtil.normalize(secret)
+    const dat = (vector !== undefined) ? data : data.slice(16)
+    const iv  = (vector !== undefined) ? Buff.normalize(vector) : data.slice(0, 16)
     return crypto.subtle
-      .decrypt({ name: 'AES-CBC', iv: data.slice(0, 16) }, secret, data.slice(16))
+      .decrypt({ name: 'AES-CBC', iv }, key, dat)
       .then((buffer) => new Uint8Array(buffer))
   }
 
-  constructor(cryptoKey: CryptoKey) {
+  constructor (cryptoKey : CryptoKey) {
     this.key = cryptoKey
   }
 
-  get secretKey() : Promise<Uint8Array> {
-    return KeyExport.crypto(this.key)
+  get secretKey () : Promise<Uint8Array> {
+    return KeyUtil.export(this.key)
   }
 
-  get secretHex() : Promise<string> {
+  get secretHex () : Promise<string> {
     return this.secretKey
       .then(b => Buff.buff(b).toHex())
   }
 
-  async encrypt(
-    data : Uint8Array,
-    initVector? : Uint8Array
+  async encrypt (
+    data    : Data,
+    vector ?: Bytes
   ) : Promise<Uint8Array> {
-    return Cipher.encrypt(this.key, data, initVector)
+    return Cipher.encrypt(this.key, data, vector)
   }
 
-  async decrypt(data : Uint8Array) : Promise<Uint8Array> {
-    return Cipher.decrypt(this.key, data)
+  async decrypt (
+    data    : Data,
+    vector ?: Bytes
+  ) : Promise<Uint8Array> {
+    return Cipher.decrypt(this.key, data, vector)
   }
 }
