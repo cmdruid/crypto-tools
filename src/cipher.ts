@@ -1,5 +1,5 @@
-import { Buff, Bytes, Data } from '@cmdcode/buff-utils'
-import { KeyUtil } from './utils.js'
+import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { KeyUtil }     from './utils.js'
 
 const crypto = globalThis.crypto
 
@@ -23,26 +23,26 @@ export class Cipher {
 
   static async encrypt (
     secret  : Bytes | CryptoKey,
-    data    : Data,
+    message : Bytes,
     vector ?: Bytes
   ) : Promise<Uint8Array> {
+    const msg = Buff.normalize(message)
     const key = await KeyUtil.normalize(secret)
-    const dat = Buff.serialize(data)
     const iv  = (vector !== undefined) ? Buff.normalize(vector) : Buff.random(16)
     return crypto.subtle
-      .encrypt({ name: 'AES-CBC', iv }, key, dat)
+      .encrypt({ name: 'AES-CBC', iv }, key, msg)
       .then((buffer) => Uint8Array.of(...iv, ...new Uint8Array(buffer)))
   }
 
   static async decrypt (
     secret  : Bytes | CryptoKey,
-    data    : Data,
+    message : Bytes,
     vector ?: Bytes
   ) : Promise<Uint8Array> {
-    data = Buff.serialize(data)
+    const msg = Buff.normalize(message)
     const key = await KeyUtil.normalize(secret)
-    const dat = (vector !== undefined) ? data : data.slice(16)
-    const iv  = (vector !== undefined) ? Buff.normalize(vector) : data.slice(0, 16)
+    const dat = (vector !== undefined) ? msg : msg.slice(16)
+    const iv  = (vector !== undefined) ? Buff.normalize(vector) : msg.slice(0, 16)
     return crypto.subtle
       .decrypt({ name: 'AES-CBC', iv }, key, dat)
       .then((buffer) => new Uint8Array(buffer))
@@ -62,16 +62,16 @@ export class Cipher {
   }
 
   async encrypt (
-    data    : Data,
+    message : Bytes,
     vector ?: Bytes
   ) : Promise<Uint8Array> {
-    return Cipher.encrypt(this.key, data, vector)
+    return Cipher.encrypt(this.key, message, vector)
   }
 
   async decrypt (
-    data    : Data,
+    message : Bytes,
     vector ?: Bytes
   ) : Promise<Uint8Array> {
-    return Cipher.decrypt(this.key, data, vector)
+    return Cipher.decrypt(this.key, message, vector)
   }
 }
