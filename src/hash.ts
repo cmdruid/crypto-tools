@@ -1,4 +1,4 @@
-import { Buff, Bytes, Data }   from '@cmdcode/buff-utils'
+import { Buff, Bytes, Data } from '@cmdcode/buff-utils'
 
 import { KeyUtil }   from './utils.js'
 import { ripemd160 } from './ripemd.js'
