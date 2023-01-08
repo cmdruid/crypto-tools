@@ -238,6 +238,14 @@ export class KeyPair {
   get xOnlyPub () : Uint8Array {
     return this.publicKey.slice(1, 33)
   }
+
+  get prvkey () : string {
+    return this.privateHex
+  }
+
+  get pubkey () : string {
+    return new Buff(this.xOnlyPub).toHex()
+  }
 }
 
 function normalize (num : FieldNum | PointNum) : bigint {
