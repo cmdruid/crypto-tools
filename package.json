@@ -8,7 +8,7 @@
     "utils",
     "library"
   ],
-  "version": "1.4.2",
+  "version": "1.4.3",
   "type": "module",
   "main": "./dist/main.js",
   "unpkg": "./dist/bundle.min.js",
@@ -34,7 +34,6 @@
     "build": "rollup -c rollup.config.ts --configPlugin typescript",
     "clean": "rm -rf dist/* coverage .nyc_output",
     "scratch": "node --loader ts-node/esm --no-warnings test/scratch.ts",
-    "format": "prettier --write .",
     "lint": "eslint . --ext .ts",
     "fix": "eslint --fix . --ext .ts",
     "tape": "node --loader ts-node/esm --no-warnings test/index.test.js",
