@@ -17,7 +17,7 @@ export class Field extends Uint8Array {
     num = normalize(num)
     num = Field.mod(num)
     num = Noble.utils._normalizePrivateKey(num)
-    return Buff.big(num).toBytes()
+    return Buff.big(num, 32).toBytes()
   }
 
   static validate (num : bigint) : boolean {
@@ -116,7 +116,7 @@ export class Point {
 
   static fromXOnly (x : PointNum) : Point {
     x = Point.normalize(x)
-    const h = Buff.big(x).toHex()
+    const h = Buff.big(x, 32).toHex()
     return Point.from(Noble.Point.fromHex(h))
   }
 
@@ -208,7 +208,7 @@ export class KeyPair {
   }
 
   constructor (secret : Bytes) {
-    this._secret = Buff.normalize(secret)
+    this._secret = Buff.normalize(secret, 32)
   }
 
   get field () : Field {
