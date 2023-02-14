@@ -8,7 +8,7 @@
     "utils",
     "library"
   ],
-  "version": "1.5.0",
+  "version": "1.5.1",
   "type": "module",
   "main": "./dist/main.js",
   "unpkg": "./dist/bundle.min.js",
@@ -63,6 +63,6 @@
   },
   "dependencies": {
     "@cmdcode/buff-utils": "^1.2.2",
-    "@noble/secp256k1": "^1.7.0"
+    "@cmdcode/secp256k1": "^1.0.1"
   }
 }
