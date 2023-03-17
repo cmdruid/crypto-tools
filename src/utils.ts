@@ -1,7 +1,17 @@
-import * as Noble      from '@noble/secp256k1'
+import * as Noble      from '@cmdcode/secp256k1'
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 
-const crypto = globalThis.crypto
+export const crypto = getCryptoLib()
+
+function getCryptoLib () : Crypto {
+  if (typeof globalThis !== 'undefined') {
+    return globalThis.crypto
+  }
+  if (typeof window !== 'undefined') {
+    return window.crypto
+  }
+  throw new Error('Must be using https in browser, or node/deno environment that supports globalthis.crypto object!')
+}
 
 async function ecdh (
   secretKey : Bytes,

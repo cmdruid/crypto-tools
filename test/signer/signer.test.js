@@ -1,34 +1,34 @@
 import { Buff }   from '@cmdcode/buff-utils'
-import * as Noble from '@noble/secp256k1'
-import { Signer } from '../../src/signer.js'
+import * as Noble from '@cmdcode/secp256k1'
+import { KeyPair } from '../../src/keypair.js'
+import { verify }  from '../../src/signer.js'
 
 const randomBytes = Buff.random(32).toBytes()
 const randomData  = Buff.random(32).toBytes()
 
 export default async function (t) {
 
-  t.test('Test signing/validation of Signer suite.', async t => {
+  t.test('Test signing/validation of KeyPair suite.', async t => {
 
-    const schnorrSigner = new Signer(randomBytes)
-    const ecdsaSigner   = new Signer(randomBytes, 'ecdsa')
+    const schnorrKeyPair = new KeyPair(randomBytes)
+    const ecdsaKeyPair   = new KeyPair(randomBytes)
 
-    const schnorrPub = schnorrSigner.publicKey
-    const schnorrXonlyPub = schnorrSigner.xOnlyPub
+    const schnorrPub = schnorrKeyPair.pub.rawX
     const NobleSchnorrPub = Noble.schnorr.getPublicKey(randomBytes)
 
-    const ecdsaPub   = ecdsaSigner.publicKey
+    const ecdsaPub   = ecdsaKeyPair.pub.raw
     const NobleEcdsaPub = Noble.getPublicKey(randomBytes, true)
 
-    const schnorrSig = await schnorrSigner.sign(randomData)
-    const ecdsaSig   = await ecdsaSigner.sign(randomData)
+    const schnorrSig = await schnorrKeyPair.sign(randomData)
+    const ecdsaSig   = await ecdsaKeyPair.sign(randomData, 'ecdsa')
 
-    const isValidA = await schnorrSigner.verify(randomData, schnorrSig)
-    const isValidB = await ecdsaSigner.verify(randomData, ecdsaSig)
-    const isValidC = await Signer.verify(randomData, schnorrPub, schnorrSig)
-    const isValidD = await Signer.verify(randomData, ecdsaPub, ecdsaSig, 'ecdsa')
+    const isValidA = await schnorrKeyPair.verify(randomData, schnorrSig)
+    const isValidB = await ecdsaKeyPair.verify(randomData, ecdsaSig, 'ecdsa')
+    const isValidC = await verify(randomData, schnorrPub, schnorrSig)
+    const isValidD = await verify(randomData, ecdsaPub, ecdsaSig, 'ecdsa')
 
     t.plan(6)
-    t.deepEqual(schnorrXonlyPub, NobleSchnorrPub, 'Schnorr pubkeys should match.')
+    t.deepEqual(schnorrPub, NobleSchnorrPub, 'Schnorr pubkeys should match.')
     t.deepEqual(ecdsaPub, NobleEcdsaPub, 'ECDSA pubkeys should match.')
     t.equal(isValidA, true, 'Schnorr signature A should be valid.')
     t.equal(isValidB, true, 'ECDSA signature B should be valid.')

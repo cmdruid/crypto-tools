@@ -8,9 +8,9 @@ export default function secretsTest(t) {
 
     // Setup our A, B, C keypairs.
     const a = new Field(Buff.random(32))
-    const A = Point.from(a.point)
+    const A = Point.import(a.point)
     const b = new Field(Buff.random(32))
-    const B = Point.from(b.point)
+    const B = Point.import(b.point)
     const sharedAB = B.mul(a.num).x
     const sharedBA = A.mul(b.num).x
 

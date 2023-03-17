@@ -1,8 +1,8 @@
-import { Buff, Bytes } from '@cmdcode/buff-utils'
-import * as Noble      from '@noble/secp256k1'
+import { Buff }   from '@cmdcode/buff-utils'
+import * as Noble from '@cmdcode/secp256k1'
 
-type FieldNum = string | number | bigint | Uint8Array | Field
-type PointNum = string | number | bigint | Uint8Array | Point
+type FieldValue = string | number | bigint | Uint8Array | Field
+type PointValue = string | number | bigint | Uint8Array | Point
 
 export class Field extends Uint8Array {
   static N = Noble.CURVE.n
@@ -11,31 +11,43 @@ export class Field extends Uint8Array {
     return Noble.utils.mod(n, m)
   }
 
-  static isField = (x : any) : boolean => x instanceof Field
-
-  static normalize (num : FieldNum) : Uint8Array {
-    num = normalize(num)
+  static normalize (num : FieldValue) : Uint8Array {
+    num = normalizeField(num)
     num = Field.mod(num)
-    num = Noble.utils._normalizePrivateKey(num)
-    return Buff.big(num, 32).toBytes()
+    Field.validate(num)
+    return Buff.big(num, 32)
   }
 
   static validate (num : bigint) : boolean {
     return Noble.utils.isValidPrivateKey(num)
   }
 
-  constructor (num : FieldNum) {
-    num = Field.normalize(num)
-    super(num)
+  constructor (x : FieldValue) {
+    super(Field.normalize(x))
+  }
+
+  get buff () : Buff {
+    return new Buff(this)
+  }
+
+  get raw () : Uint8Array {
+    return this.buff.raw
   }
 
   get num () : bigint {
-    const rev = new Uint8Array(this)
-    return Buff.buff(rev).toBig()
+    return this.buff.big
+  }
+
+  get big () : bigint {
+    return this.buff.big
+  }
+
+  get hex () : string {
+    return this.buff.hex
   }
 
   get point () : Point {
-    return Point.fromNum(this.num)
+    return this.generate()
   }
 
   get hasOddY () : boolean {
@@ -48,126 +60,150 @@ export class Field extends Uint8Array {
       : this
   }
 
-  gt (num : FieldNum) : boolean {
+  gt (num : FieldValue) : boolean {
     const x = new Field(num)
     return x.num > this.num
   }
 
-  lt (num : FieldNum) : boolean {
+  lt (num : FieldValue) : boolean {
     const x = new Field(num)
     return x.num < this.num
   }
 
-  eq (num : FieldNum) : boolean {
+  eq (num : FieldValue) : boolean {
     const x = new Field(num)
     return x.num === this.num
   }
 
-  ne (num : FieldNum) : boolean {
+  ne (num : FieldValue) : boolean {
     const x = new Field(num)
     return x.num !== this.num
   }
 
-  add (num : FieldNum) : Field {
+  add (num : FieldValue) : Field {
     const x = new Field(num)
     return new Field(this.num + x.num)
   }
 
-  sub (num : FieldNum) : Field {
+  sub (num : FieldValue) : Field {
     const x = new Field(num)
     return new Field(this.num - x.num)
   }
 
-  mul (num : FieldNum) : Field {
+  mul (num : FieldValue) : Field {
     const x = new Field(num)
     return new Field(this.num * x.num)
   }
 
-  pow (num : FieldNum, n = Field.N - 1n) : Field {
+  pow (num : FieldValue, n = Field.N - 1n) : Field {
     const x = new Field(num)
-    const exp = Field.mod(x.num, n)
-    return new Field(this.num ** exp)
+    const e = Field.mod(x.num, n)
+    return new Field(this.num ** e)
   }
 
-  div (num : FieldNum) : Field {
+  div (num : FieldValue) : Field {
     const x = new Field(num)
-    const divisor = this.pow(x.num, Field.N - 2n)
-    return new Field(this.num * divisor.num)
+    const d = this.pow(x.num, Field.N - 2n)
+    return new Field(this.num * d.num)
   }
 
   negate () : Field {
     return new Field(Field.N - this.num)
+  }
+
+  generate () : Point {
+    return Point.import(Noble.Point.BASE.multiply(this.big))
   }
 }
 
 export class Point {
   static N = Noble.CURVE.n
 
-  static normalize (num : PointNum) : bigint {
-    return normalize(num)
+  static validate (x : PointValue) : boolean {
+    try {
+      x = new Point(x)
+      return true
+    } catch { return false }
   }
 
-  static fromNum (num : PointNum) : Point {
-    num = Point.normalize(num)
-    const f = Noble.utils.mod(num, Point.N)
-    const P = Noble.Point.BASE.multiply(f)
-    return new Point(P.x, P.y)
+  static normalize (x : PointValue) : Noble.Point {
+    x = normalizePoint(x)
+    return Noble.Point.fromHex(x)
   }
 
-  static fromXOnly (x : PointNum) : Point {
-    x = Point.normalize(x)
-    const h = Buff.big(x, 32).toHex()
-    return Point.from(Noble.Point.fromHex(h))
+  static generate (num : FieldValue) : Point {
+    return new Field(num).generate()
   }
 
-  static from (point : Point | Noble.Point) : Point {
+  static import (point : Point | Noble.Point) : Point {
     return new Point(point.x, point.y)
   }
 
-  private readonly __p : Noble.Point
-  private readonly __x : bigint
-  private readonly __y : bigint
+  readonly __p : Noble.Point
 
-  constructor (x : bigint, y : bigint) {
-    this.__p = new Noble.Point(x, y)
-    this.__x = this.__p.x
-    this.__y = this.__p.y
-    this.__p.assertValidity()
+  constructor (x : PointValue, y ?: bigint) {
+    this.__p = (
+      typeof x === 'bigint' &&
+      typeof y === 'bigint'
+    )
+      ? new Noble.Point(x, y)
+      : Point.normalize(x)
+    this.p.assertValidity()
   }
 
   get p () : Noble.Point {
     return this.__p
   }
 
-  get hasOddY () : boolean {
-    return !this.__p.hasEvenY()
-  }
-
-  get rawX () : Uint8Array {
-    const prefix = this.__p.hasEvenY() ? 0x02 : 0x03
-    const buffer = Buff.big(this.__x)
-    return Uint8Array.of(prefix, ...buffer)
-  }
-
-  get rawXR () : Uint8Array {
-    const prefix = this.__p.hasEvenY() ? 0x02 : 0x03
-    const buffer = Buff.big(this.__x)
-    return Uint8Array.of(prefix, ...buffer)
-  }
-
-  get rawY () : Uint8Array {
-    return Buff.big(this.__y)
-  }
-
   get x () : bigint {
-    return this.__x
+    return this.p.x
   }
 
   get y () : bigint {
-    return this.__y
+    return this.p.y
   }
 
-  eq (x : PointNum) : boolean {
+  get buff () : Buff {
+    const p = this.p.toRawBytes(true)
+    if (p.length < 33) {
+      const prefix = this.p.hasEvenY() ? 0x02 : 0x03
+      return Buff.of(prefix, ...p)
+    } else { return Buff.raw(p) }
+  }
+
+  get buffX () : Buff {
+    return new Buff(getXonly(this.buff))
+  }
+
+  get raw () : Uint8Array {
+    return this.buff.raw
+  }
+
+  get rawX () : Uint8Array {
+    return this.buffX.raw
+  }
+
+  get rawY () : Uint8Array {
+    return Buff.big(this.y).raw
+  }
+
+  get hex () : string {
+    return this.buff.hex
+  }
+
+  get hexX () : string {
+    return this.buffX.hex
+  }
+
+  get hasEvenY () : boolean {
+    return this.p.hasEvenY()
+  }
+
+  get hasOddY () : boolean {
+    return !this.p.hasEvenY()
+  }
+
+  eq (x : PointValue) : boolean {
     return (x instanceof Point)
       ? this.p.equals(new Noble.Point(x.x, x.y))
       : (x instanceof Uint8Array)
@@ -177,89 +213,73 @@ export class Point {
           : x === this.x
   }
 
-  add (x : PointNum) : Point {
+  add (x : PointValue) : Point {
     return (x instanceof Point)
-      ? Point.from(this.p.add(x.p))
-      : Point.from(this.p.add(Point.fromNum(x).p))
+      ? Point.import(this.p.add(x.p))
+      : Point.import(this.p.add(Point.generate(x).p))
   }
 
-  sub (x : PointNum) : Point {
+  sub (x : PointValue) : Point {
     return (x instanceof Point)
-      ? Point.from(this.p.subtract(x.p))
-      : Point.from(this.p.subtract(Point.fromNum(x).p))
+      ? Point.import(this.p.subtract(x.p))
+      : Point.import(this.p.subtract(Point.generate(x).p))
   }
 
-  mul (x : PointNum) : Point {
+  mul (x : PointValue) : Point {
     return (x instanceof Point)
-      ? Point.from(this.p.multiply(x.x))
-      : Point.from(this.p.multiply(Point.normalize(x)))
+      ? Point.import(this.p.multiply(x.x))
+      : Point.import(this.p.multiply(normalizeField(x)))
   }
 
   negate () : Point {
-    return Point.from(this.__p.negate())
+    return Point.import(this.p.negate())
   }
 }
 
-export class KeyPair {
-  private readonly _secret : Uint8Array
-
-  static generate () : KeyPair {
-    return new KeyPair(Buff.random(32))
-  }
-
-  constructor (secret : Bytes) {
-    this._secret = Buff.normalize(secret, 32)
-  }
-
-  get field () : Field {
-    return new Field(this._secret)
-  }
-
-  get point () : Point {
-    return this.field.point
-  }
-
-  get privateKey () : Uint8Array {
-    return new Uint8Array(this.field)
-  }
-
-  get privateHex () : string {
-    return new Buff(this.field).toHex()
-  }
-
-  get publicKey () : Uint8Array {
-    return new Uint8Array(this.point.rawX)
-  }
-
-  get publicHex () : string {
-    return new Buff(this.publicKey).toHex()
-  }
-
-  get xOnlyPub () : Uint8Array {
-    return this.publicKey.slice(1, 33)
-  }
-
-  get prvkey () : string {
-    return this.privateHex
-  }
-
-  get pubkey () : string {
-    return new Buff(this.xOnlyPub).toHex()
-  }
+function getXonly (x : Uint8Array) : Uint8Array {
+  return (x.length > 32) ? x.slice(1, 33) : x
 }
 
-function normalize (num : FieldNum | PointNum) : bigint {
-  if (num instanceof Uint8Array) {
-    return Buff.buff(num).toBig()
+function normalizeField (value : FieldValue | PointValue) : bigint {
+  if (value instanceof Field) {
+    return value.num
   }
-  if (typeof num === 'string') {
-    return Buff.hex(num).toBig()
+  if (value instanceof Point) {
+    return value.x
   }
-  if (typeof num === 'number') {
-    return BigInt(num)
+  if (value instanceof Uint8Array) {
+    return Buff.raw(value).big
   }
-  if (typeof num === 'bigint') {
-    return num
+  if (typeof value === 'string') {
+    return Buff.hex(value).big
   }
-  throw TypeError('Invalid input type:' + typeof num)
+  if (typeof value === 'number') {
+    return Buff.num(value).big
+  }
+  if (typeof value === 'bigint') {
+    return BigInt(value)
+  }
+  throw TypeError('Invalid input type:' + typeof value)
+}
+
+function normalizePoint (value : FieldValue | PointValue) : string {
+  if (value instanceof Field) {
+    return value.hex
+  }
+  if (value instanceof Point) {
+    return value.hex
+  }
+  if (value instanceof Uint8Array) {
+    return Buff.raw(value).hex
+  }
+  if (typeof value === 'string') {
+    return value
+  }
+  if (typeof value === 'number') {
+    return Buff.num(value).hex
+  }
+  if (typeof value === 'bigint') {
+    return Buff.big(value).hex
+  }
+  throw TypeError('Invalid input type:' + typeof value)
 }

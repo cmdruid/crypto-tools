@@ -1,0 +1,83 @@
+{
+  "pub_vectors": [
+    {
+      "internalPubkey": "d6889cb081036e0faefa3a35157ad71086b123b2b144b649798b494c300a961d",
+      "tweak": "b86e7be8f39bab32a6f2c0443abbc210f0edac0e2c53d501b36b64437d9c6c70",
+      "tweakedPubkey": "53a1f6e454df1aa2776a2814a721372d6258050de330b3c6d10ee8f4e0dda343"
+    },
+    {
+      "internalPubkey": "187791b6f712a8ea41c8ecdd0ee77fab3e85263b37e1ec18a3651926b3a6cf27",
+      "tweak": "cbd8679ba636c1110ea247542cfbd964131a6be84f873f7f3b62a777528ed001",
+      "tweakedPubkey": "147c9c57132f6e7ecddba9800bb0c4449251c92a1e60371ee77557b6620f3ea3"
+    },
+    {
+      "internalPubkey": "93478e9488f956df2396be2ce6c5cced75f900dfa18e7dabd2428aae78451820",
+      "tweak": "6af9e28dbf9d6aaf027696e2598a5b3d056f5fd2355a7fd5a37a0e5008132d30",
+      "tweakedPubkey": "e4d810fd50586274face62b8a807eb9719cef49c04177cc6b76a9a4251d5450e"
+    },
+    {
+      "internalPubkey": "ee4fe085983462a184015d1f782d6a5f8b9c2b60130aff050ce221ecf3786592",
+      "tweak": "9e0517edc8259bb3359255400b23ca9507f2a91cd1e4250ba068b4eafceba4a9",
+      "tweakedPubkey": "712447206d7a5238acc7ff53fbe94a3b64539ad291c7cdbc490b7577e4b17df5"
+    },
+    {
+      "internalPubkey": "f9f400803e683727b14f463836e1e78e1c64417638aa066919291a225f0e8dd8",
+      "tweak": "639f0281b7ac49e742cd25b7f188657626da1ad169209078e2761cefd91fd65e",
+      "tweakedPubkey": "77e30a5522dd9f894c3f8b8bd4c4b2cf82ca7da8a3ea6a239655c39c050ab220"
+    },
+    {
+      "internalPubkey": "e0dfe2300b0dd746a3f8674dfd4525623639042569d829c7f0eed9602d263e6f",
+      "tweak": "b57bfa183d28eeb6ad688ddaabb265b4a41fbf68e5fed2c72c74de70d5a786f4",
+      "tweakedPubkey": "91b64d5324723a985170e4dc5a0f84c041804f2cd12660fa5dec09fc21783605"
+    },
+    {
+      "internalPubkey" : "55adf4e8967fbd2e29f20ac896e60c3b0f1d5b0efa9d34941b5958c7b0a0312d",
+      "tweak"          : "6579138e7976dc13b6a92f7bfd5a2fc7684f5ea42419d43368301470f3b74ed9",
+      "tweakedPubkey"  : "75169f4001aa68f15bbed28b218df1d0a62cbbcf1188c6665110c293c907b831"
+    }
+  ],
+  "sec_vectors": [
+    {
+      "internalPrivkey" : "6b973d88838f27366ed61c9ad6367663045cb456e28335c109e30717ae0c6baa",
+      "internalPubkey"  : "d6889cb081036e0faefa3a35157ad71086b123b2b144b649798b494c300a961d",
+      "tweak"           : "b86e7be8f39bab32a6f2c0443abbc210f0edac0e2c53d501b36b64437d9c6c70",
+      "tweakedPrivkey"  : "2405b971772ad26915c8dcdf10f238753a9b837e5f8e6a86fd7c0cce5b7296d9"
+    },
+    {
+      "internalPrivkey" : "1e4da49f6aaf4e5cd175fe08a32bb5cb4863d963921255f33d3bc31e1343907f",
+      "internalPubkey"  : "187791b6f712a8ea41c8ecdd0ee77fab3e85263b37e1ec18a3651926b3a6cf27",
+      "tweak"           : "cbd8679ba636c1110ea247542cfbd964131a6be84f873f7f3b62a777528ed001",
+      "tweakedPrivkey"  : "ea260c3b10e60f6de018455cd0278f2f5b7e454be1999572789e6a9565d26080"
+    },
+    {
+      "internalPrivkey" : "d3c7af07da2d54f7a7735d3d0fc4f0a73164db638b2f2f7c43f711f6d4aa7e64",
+      "internalPubkey"  : "93478e9488f956df2396be2ce6c5cced75f900dfa18e7dabd2428aae78451820",
+      "tweak"           : "6af9e28dbf9d6aaf027696e2598a5b3d056f5fd2355a7fd5a37a0e5008132d30",
+      "tweakedPrivkey"  : "97323385e57015b75b0339a549c56a948eb961555973f0951f555ae6039ef00d"
+    },
+    {
+      "internalPrivkey" : "f36bb07a11e469ce941d16b63b11b9b9120a84d9d87cff2c84a8d4affb438f4e",
+      "internalPubkey"  : "e0dfe2300b0dd746a3f8674dfd4525623639042569d829c7f0eed9602d263e6f",
+      "tweak"           : "b57bfa183d28eeb6ad688ddaabb265b4a41fbf68e5fed2c72c74de70d5a786f4",
+      "tweakedPrivkey"  : "a8e7aa924f0d58854185a490e6c41f6efb7b675c0f3331b7f14b549400b4d501"
+    },
+    {
+      "internalPrivkey" : "415cfe9c15d9cea27d8104d5517c06e9de48e2f986b695e4f5ffebf230e725d8",
+      "internalPubkey"  : "55adf4e8967fbd2e29f20ac896e60c3b0f1d5b0efa9d34941b5958c7b0a0312d",
+      "tweak"           : "6579138e7976dc13b6a92f7bfd5a2fc7684f5ea42419d43368301470f3b74ed9",
+      "tweakedPrivkey"  : "241c14f2639d0d7139282aa6abde28dd8a067baa9d633e4e7230287ec2d02901"
+    },
+    {
+      "internalPrivkey" : "c7b0e81f0a9a0b0499e112279d718cca98e79a12e2f137c72ae5b213aad0d103",
+      "internalPubkey"  : "ee4fe085983462a184015d1f782d6a5f8b9c2b60130aff050ce221ecf3786592",
+      "tweak"           : "9e0517edc8259bb3359255400b23ca9507f2a91cd1e4250ba068b4eafceba4a9",
+      "tweakedPrivkey"  : "65b6000cd2bfa6b7cf736767a8955760e62b6649058cbc970b7c0871d786346b"
+    },
+    {
+      "internalPrivkey" : "77863416be0d0665e517e1c375fd6f75839544eca553675ef7fdf4949518ebaa",
+      "internalPubkey"  : "f9f400803e683727b14f463836e1e78e1c64417638aa066919291a225f0e8dd8",
+      "tweak"           : "639f0281b7ac49e742cd25b7f188657626da1ad169209078e2761cefd91fd65e",
+      "tweakedPrivkey"  : "ec18ce6af99f43815db543f47b8af5ff5df3b2cb7315c955aa4a86e8143d2bf5"
+    }
+  ]
+}

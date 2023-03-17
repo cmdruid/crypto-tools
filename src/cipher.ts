@@ -1,7 +1,5 @@
-import { Buff, Bytes } from '@cmdcode/buff-utils'
-import { KeyUtil }     from './utils.js'
-
-const crypto = globalThis.crypto
+import { Buff, Bytes }     from '@cmdcode/buff-utils'
+import { crypto, KeyUtil } from './utils.js'
 
 export class Cipher {
   private readonly key : CryptoKey
@@ -58,7 +56,7 @@ export class Cipher {
 
   get secretHex () : Promise<string> {
     return this.secretKey
-      .then(b => Buff.buff(b).toHex())
+      .then(b => Buff.raw(b).hex)
   }
 
   async encrypt (

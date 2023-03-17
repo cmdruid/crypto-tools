@@ -1,9 +1,14 @@
-import { Buff, Bytes, Data } from '@cmdcode/buff-utils'
+import {
+  Buff,
+  Bytes,
+  Data,
+  sha256  as sha256sync,
+  hash256 as hash256sync,
+  hmac256 as hmac256sync
+} from '@cmdcode/buff-utils'
 
-import { KeyUtil }   from './utils.js'
-import { ripemd160 } from './ripemd.js'
-
-const crypto = globalThis.crypto
+import { crypto, KeyUtil } from './utils.js'
+import { ripemd160 }       from './ripemd.js'
 
 async function digest (
   bytes  : Bytes,
@@ -77,5 +82,10 @@ export const Hash = {
   hash160,
   hash256,
   hmac256,
-  hmac512
+  hmac512,
+  sync: {
+    sha256  : sha256sync,
+    hash256 : hash256sync,
+    hmac256 : hmac256sync
+  }
 }

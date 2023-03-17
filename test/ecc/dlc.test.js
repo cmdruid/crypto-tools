@@ -16,11 +16,11 @@ export default async function dlcTest(t) {
 
     // Setup our (a/A), (k/R), and (sk/sR) keypairs.
     const a  = new Field(Buff.random(32))
-    const A  = Point.from(a.point)
+    const A  = Point.import(a.point)
     const k  = new Field(Buff.random(32))
-    const R  = Point.from(k.point)
+    const R  = Point.import(k.point)
     const sk = new Field(Buff.random(32))
-    const sR = Point.from(sk.point)
+    const sR = Point.import(sk.point)
 
     // Create our hashed message digest comitting to R.
     const hmR = await Hash.sha256(Uint8Array.of(...m1, ...R.rawX))
