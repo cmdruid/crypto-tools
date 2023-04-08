@@ -67,6 +67,17 @@ async function getSharedCryptoKey (
   return importCryptoKey(bytes.slice(1, 33))
 }
 
+function getXOnlyPub (bytes : Bytes) : Buff {
+  const b = Buff.bytes(bytes)
+  if (b.length === 33) {
+    return b.slice(1, 33)
+  }
+  if (b.length === 32) {
+    return b
+  }
+  throw new Error('Invalid key length: ' + String(b.length))
+}
+
 export const KeyUtil = {
   ecdh,
   import    : importCryptoKey,
@@ -74,5 +85,6 @@ export const KeyUtil = {
   hmac      : importHmacKey,
   shared    : getSharedCryptoKey,
   generate  : generateCryptoKey,
-  normalize : normalizeCryptoKey
+  normalize : normalizeCryptoKey,
+  xOnlyPub  : getXOnlyPub
 }

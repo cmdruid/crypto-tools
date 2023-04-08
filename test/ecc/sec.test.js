@@ -1,7 +1,5 @@
 import { Buff }  from '@cmdcode/buff-utils'
-import * as ECC  from '../../src/ecc.js'
-
-const { Field, Point } = ECC
+import { Field, Point } from '../../src/ecc.js'
 
 export default function secretsTest(t) {
   t.test('Testing Shared Secret Derivation', async t => {
@@ -11,8 +9,8 @@ export default function secretsTest(t) {
     const A = Point.import(a.point)
     const b = new Field(Buff.random(32))
     const B = Point.import(b.point)
-    const sharedAB = B.mul(a.num).x
-    const sharedBA = A.mul(b.num).x
+    const sharedAB = B.mul(a).x
+    const sharedBA = A.mul(b).x
 
     // const c = Field.fromPrivate(Buff.random(32))
     // const C = Point.from(c.point)

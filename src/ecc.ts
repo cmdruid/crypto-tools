@@ -1,5 +1,6 @@
 import { Buff }   from '@cmdcode/buff-utils'
 import * as Noble from '@cmdcode/secp256k1'
+import { KeyUtil } from './utils.js'
 
 type FieldValue = string | number | bigint | Uint8Array | Field
 type PointValue = string | number | bigint | Uint8Array | Point
@@ -7,8 +8,30 @@ type PointValue = string | number | bigint | Uint8Array | Point
 export class Field extends Uint8Array {
   static N = Noble.CURVE.n
 
-  static mod (n : bigint, m = Field.N) : bigint {
-    return Noble.utils.mod(n, m)
+  static mod (x : bigint, n = Field.N) : bigint {
+    return Noble.utils.mod(x, n)
+  }
+
+  static pow (x : bigint, e : bigint, n = Field.N) : bigint {
+    // Wrap starting values to field size.
+    x = Field.mod(x, n)
+    e = Field.mod(e, n)
+    // If x value is zero, return zero.
+    if (x === 0n) return 0n
+    // Initialize result as 1.
+    let res = 1n
+    // While e value is greater than 0:
+    while (e > 0n) {
+      // If e value is odd, multiply x with result.
+      if ((e & 1n) === 1n) {
+        res = Field.mod(res * x, n)
+      }
+      // With e value being even, (e = e / 2).
+      e = e >> 1n
+      // Update x value.
+      x = Field.mod(x * x, n)
+    }
+    return res
   }
 
   static normalize (num : FieldValue) : Uint8Array {
@@ -34,10 +57,6 @@ export class Field extends Uint8Array {
     return this.buff.raw
   }
 
-  get num () : bigint {
-    return this.buff.big
-  }
-
   get big () : bigint {
     return this.buff.big
   }
@@ -50,6 +69,10 @@ export class Field extends Uint8Array {
     return this.generate()
   }
 
+  get xpoint () : Point {
+    return new Point(this.point.rawX)
+  }
+
   get hasOddY () : boolean {
     return this.point.hasOddY
   }
@@ -60,55 +83,55 @@ export class Field extends Uint8Array {
       : this
   }
 
-  gt (num : FieldValue) : boolean {
-    const x = new Field(num)
-    return x.num > this.num
+  gt (big : FieldValue) : boolean {
+    const x = new Field(big)
+    return x.big > this.big
   }
 
-  lt (num : FieldValue) : boolean {
-    const x = new Field(num)
-    return x.num < this.num
+  lt (big : FieldValue) : boolean {
+    const x = new Field(big)
+    return x.big < this.big
   }
 
-  eq (num : FieldValue) : boolean {
-    const x = new Field(num)
-    return x.num === this.num
+  eq (big : FieldValue) : boolean {
+    const x = new Field(big)
+    return x.big === this.big
   }
 
-  ne (num : FieldValue) : boolean {
-    const x = new Field(num)
-    return x.num !== this.num
+  ne (big : FieldValue) : boolean {
+    const x = new Field(big)
+    return x.big !== this.big
   }
 
-  add (num : FieldValue) : Field {
-    const x = new Field(num)
-    return new Field(this.num + x.num)
+  add (big : FieldValue) : Field {
+    const x = new Field(big)
+    return new Field(this.big + x.big)
   }
 
-  sub (num : FieldValue) : Field {
-    const x = new Field(num)
-    return new Field(this.num - x.num)
+  sub (big : FieldValue) : Field {
+    const x = new Field(big)
+    return new Field(this.big - x.big)
   }
 
-  mul (num : FieldValue) : Field {
-    const x = new Field(num)
-    return new Field(this.num * x.num)
+  mul (big : FieldValue) : Field {
+    const x = new Field(big)
+    return new Field(this.big * x.big)
   }
 
-  pow (num : FieldValue, n = Field.N - 1n) : Field {
-    const x = new Field(num)
-    const e = Field.mod(x.num, n)
-    return new Field(this.num ** e)
+  pow (big : FieldValue, n = Field.N - 1n) : Field {
+    const x = new Field(big)
+    const e = Field.mod(x.big, n)
+    return new Field(this.big ** e)
   }
 
-  div (num : FieldValue) : Field {
-    const x = new Field(num)
-    const d = this.pow(x.num, Field.N - 2n)
-    return new Field(this.num * d.num)
+  div (big : FieldValue) : Field {
+    const x = new Field(big)
+    const d = this.pow(x.big, Field.N - 2n)
+    return new Field(this.big * d.big)
   }
 
   negate () : Field {
-    return new Field(Field.N - this.num)
+    return new Field(Field.N - this.big)
   }
 
   generate () : Point {
@@ -131,8 +154,8 @@ export class Point {
     return Noble.Point.fromHex(x)
   }
 
-  static generate (num : FieldValue) : Point {
-    return new Field(num).generate()
+  static generate (big : FieldValue) : Point {
+    return new Field(big).generate()
   }
 
   static import (point : Point | Noble.Point) : Point {
@@ -172,7 +195,7 @@ export class Point {
   }
 
   get buffX () : Buff {
-    return new Buff(getXonly(this.buff))
+    return KeyUtil.xOnlyPub(this.buff)
   }
 
   get raw () : Uint8Array {
@@ -236,13 +259,9 @@ export class Point {
   }
 }
 
-function getXonly (x : Uint8Array) : Uint8Array {
-  return (x.length > 32) ? x.slice(1, 33) : x
-}
-
 function normalizeField (value : FieldValue | PointValue) : bigint {
   if (value instanceof Field) {
-    return value.num
+    return value.big
   }
   if (value instanceof Point) {
     return value.x
