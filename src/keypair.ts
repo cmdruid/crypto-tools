@@ -136,6 +136,10 @@ export class PublicKey extends Uint8Array {
     pubkey  : Bytes,
     options : KeyOptions = {}
   ) {
+    // Initialize our key config.
+    const config = { ...DEFAULT_CONFIG, ...options }
+    // If enabled, enforce xonly policy.
+    if (config.xonly) pubkey = PublicKey.xOnly(pubkey)
     // Validate public key.
     const bytes = new Point(pubkey).raw
     // Create key as raw compressed point.
