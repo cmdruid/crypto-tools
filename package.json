@@ -8,7 +8,7 @@
     "utils",
     "library"
   ],
-  "version": "1.7.2",
+  "version": "1.7.3",
   "type": "module",
   "main": "./dist/main.js",
   "unpkg": "./dist/bundle.min.js",
@@ -64,7 +64,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@cmdcode/buff-utils": "^1.6.9",
+    "@cmdcode/buff-utils": "^1.6.10",
     "@cmdcode/secp256k1": "^1.0.7"
   }
 }
