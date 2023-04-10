@@ -4,7 +4,10 @@ import { Buff, Bytes } from '@cmdcode/buff-utils'
 export const crypto = getCryptoLib()
 
 function getCryptoLib () : Crypto {
-  if (typeof globalThis !== 'undefined') {
+  if (
+    typeof globalThis !== 'undefined' &&
+    typeof globalThis.crypto !== 'undefined'
+  ) {
     return globalThis.crypto
   }
   if (typeof window !== 'undefined') {
@@ -67,7 +70,7 @@ async function getSharedCryptoKey (
   return importCryptoKey(bytes.slice(1, 33))
 }
 
-function getXOnlyPub (bytes : Bytes) : Buff {
+export function getXOnlyPub (bytes : Bytes) : Buff {
   const b = Buff.bytes(bytes)
   if (b.length === 33) {
     return b.slice(1, 33)
@@ -85,6 +88,5 @@ export const KeyUtil = {
   hmac      : importHmacKey,
   shared    : getSharedCryptoKey,
   generate  : generateCryptoKey,
-  normalize : normalizeCryptoKey,
-  xOnlyPub  : getXOnlyPub
+  normalize : normalizeCryptoKey
 }

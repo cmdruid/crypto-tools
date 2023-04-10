@@ -1,6 +1,5 @@
 import { Buff }   from '@cmdcode/buff-utils'
 import * as Noble from '@cmdcode/secp256k1'
-import { KeyUtil } from './utils.js'
 
 type FieldValue = string | number | bigint | Uint8Array | Field
 type PointValue = string | number | bigint | Uint8Array | Point
@@ -46,7 +45,7 @@ export class Field extends Uint8Array {
   }
 
   constructor (x : FieldValue) {
-    super(Field.normalize(x))
+    super(Field.normalize(x), 32)
   }
 
   get buff () : Buff {
@@ -70,7 +69,7 @@ export class Field extends Uint8Array {
   }
 
   get xpoint () : Point {
-    return new Point(this.point.rawX)
+    return new Point(this.point.x)
   }
 
   get hasOddY () : boolean {
@@ -159,7 +158,10 @@ export class Point {
   }
 
   static import (point : Point | Noble.Point) : Point {
-    return new Point(point.x, point.y)
+    const p = (point instanceof Point)
+      ? { x: point.x.big, y: point.y.big }
+      : point
+    return new Point(p.x, p.y)
   }
 
   readonly __p : Noble.Point
@@ -178,44 +180,28 @@ export class Point {
     return this.__p
   }
 
-  get x () : bigint {
-    return this.p.x
+  get x () : Buff {
+    return Buff.big(this.p.x, 32)
   }
 
-  get y () : bigint {
-    return this.p.y
+  get y () : Buff {
+    return Buff.big(this.p.y, 32)
   }
 
   get buff () : Buff {
     const p = this.p.toRawBytes(true)
     if (p.length < 33) {
       const prefix = this.p.hasEvenY() ? 0x02 : 0x03
-      return Buff.of(prefix, ...p)
+      return Buff.join([prefix, p])
     } else { return Buff.raw(p) }
-  }
-
-  get buffX () : Buff {
-    return KeyUtil.xOnlyPub(this.buff)
   }
 
   get raw () : Uint8Array {
     return this.buff.raw
   }
 
-  get rawX () : Uint8Array {
-    return this.buffX.raw
-  }
-
-  get rawY () : Uint8Array {
-    return Buff.big(this.y).raw
-  }
-
   get hex () : string {
     return this.buff.hex
-  }
-
-  get hexX () : string {
-    return this.buffX.hex
   }
 
   get hasEvenY () : boolean {
@@ -226,14 +212,14 @@ export class Point {
     return !this.p.hasEvenY()
   }
 
-  eq (x : PointValue) : boolean {
-    return (x instanceof Point)
-      ? this.p.equals(new Noble.Point(x.x, x.y))
-      : (x instanceof Uint8Array)
-        ? this.x.toString() === x.toString()
-        : (typeof x === 'number')
-          ? BigInt(x) === this.x
-          : x === this.x
+  eq (value : PointValue) : boolean {
+    return (value instanceof Point)
+      ? this.p.equals(new Noble.Point(value.x.big, value.y.big))
+      : (value instanceof Uint8Array)
+        ? this.x.big === Buff.raw(value).big
+        : (typeof value === 'number')
+          ? BigInt(value) === this.x.big
+          : value === this.x.big
   }
 
   add (x : PointValue) : Point {
@@ -248,10 +234,10 @@ export class Point {
       : Point.import(this.p.subtract(Point.generate(x).p))
   }
 
-  mul (x : PointValue) : Point {
-    return (x instanceof Point)
-      ? Point.import(this.p.multiply(x.x))
-      : Point.import(this.p.multiply(normalizeField(x)))
+  mul (value : PointValue) : Point {
+    return (value instanceof Point)
+      ? Point.import(this.p.multiply(value.x.big))
+      : Point.import(this.p.multiply(normalizeField(value)))
   }
 
   negate () : Point {
@@ -264,7 +250,7 @@ function normalizeField (value : FieldValue | PointValue) : bigint {
     return value.big
   }
   if (value instanceof Point) {
-    return value.x
+    return value.x.big
   }
   if (value instanceof Uint8Array) {
     return Buff.raw(value).big

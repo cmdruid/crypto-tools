@@ -1,19 +1,16 @@
 import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { Field, Point } from './ecc.js'
-import { sign, verify } from './signer.js'
-import { KeyUtil }      from './utils.js'
+import { sign, SignatureType, verify } from './signer.js'
+import { getXOnlyPub } from './utils.js'
 
-type KeyType    = 'ecdsa' | 'schnorr'
 type KeyOptions = Partial<KeyConfig>
 
 interface KeyConfig {
-  type  : KeyType
-  xonly : boolean
+  type : SignatureType
 }
 
 const DEFAULT_CONFIG : KeyConfig = {
-  type  : 'schnorr',
-  xonly : false
+  type: 'ecdsa'
 }
 
 export class SecretKey extends Uint8Array {
@@ -23,6 +20,7 @@ export class SecretKey extends Uint8Array {
   }
 
   readonly config : KeyConfig
+  readonly xonly  : boolean
 
   constructor (
     secret  : Bytes,
@@ -30,6 +28,7 @@ export class SecretKey extends Uint8Array {
   ) {
     super(new Field(secret))
     this.config = { ...DEFAULT_CONFIG, ...options }
+    this.xonly  = this.config.type === 'taproot'
   }
 
   get buff () : Buff {
@@ -53,9 +52,7 @@ export class SecretKey extends Uint8Array {
   }
 
   get pub () : PublicKey {
-    return (this.config.xonly)
-      ? new PublicKey(this.point.rawX, this.config)
-      : new PublicKey(this.point.raw, this.config)
+    return new PublicKey(this.point.raw, this.config)
   }
 
   get hasEvenY () : boolean {
@@ -67,7 +64,7 @@ export class SecretKey extends Uint8Array {
   }
 
   get xfilter () : SecretKey {
-    return (this.config.xonly && this.hasOddY)
+    return (this.xonly && this.hasOddY)
       ? this.negate()
       : this
   }
@@ -115,6 +112,10 @@ export class SecretKey extends Uint8Array {
   ) : Promise<boolean> {
     return verify(signature, message, this.pub.raw, type)
   }
+
+  toWIF (prefix = 0x80) : string {
+    return Buff.join([prefix, this, 0x01]).b58chk
+  }
 }
 
 export class PublicKey extends Uint8Array {
@@ -128,9 +129,10 @@ export class PublicKey extends Uint8Array {
     return new SecretKey(bytes, opt).pub
   }
 
-  static xOnly = KeyUtil.xOnlyPub
+  static xfilter = getXOnlyPub
 
   readonly config : KeyConfig
+  readonly xonly  : boolean
 
   constructor (
     pubkey  : Bytes,
@@ -138,18 +140,19 @@ export class PublicKey extends Uint8Array {
   ) {
     // Initialize our key config.
     const config = { ...DEFAULT_CONFIG, ...options }
-    // If enabled, enforce xonly policy.
-    if (config.xonly) pubkey = PublicKey.xOnly(pubkey)
-    // Validate public key.
-    const bytes = new Point(pubkey).raw
-    // Create key as raw compressed point.
-    super(bytes, 33)
+    // handle x-only key policy.
+    if (config.type === 'taproot') {
+      super(PublicKey.xfilter(pubkey), 32)
+    } else {
+      super(Buff.bytes(pubkey), 33)
+    }
     // Save key configuration.
     this.config = { ...DEFAULT_CONFIG, ...options }
+    this.xonly  = config.type === 'taproot'
   }
 
   get buff () : Buff {
-    return new Buff(this)
+    return (this.xonly) ? this.x : new Buff(this)
   }
 
   get raw () : Uint8Array {
@@ -164,16 +167,12 @@ export class PublicKey extends Uint8Array {
     return new Point(this)
   }
 
-  get buffX () : Buff {
-    return PublicKey.xOnly(this.raw)
+  get x () : Buff {
+    return this.point.x
   }
 
-  get rawX () : Uint8Array {
-    return this.buffX.raw
-  }
-
-  get hexX () : string {
-   return this.buffX.hex
+  get y () : Buff {
+    return this.point.y
   }
 
   get hasEvenY () : boolean {

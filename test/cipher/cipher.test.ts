@@ -1,8 +1,9 @@
 import { Buff }    from '@cmdcode/buff-utils'
+import { Test }    from 'tape'
 import { Cipher }  from '../../src/cipher.js'
 import { KeyPair } from '../../src/keypair.js'
 
-export default async function (t) {
+export default async function (t : Test) {
 
   t.test('Test encryption/decryption of Cipher suite.', async t => {
 
@@ -25,8 +26,8 @@ export default async function (t) {
     const encryptedB = await sharedCipherB.encrypt(randomData)
 
     t.notEqual(
-      Buff.raw(encryptedA.slice(0,16)).toHex(),
-      Buff.raw(encryptedB.slice(0,16)).toHex(),
+      Buff.raw(encryptedA.slice(0,16)).hex,
+      Buff.raw(encryptedB.slice(0,16)).hex,
       'Both IVs should be different.'
     )
 
@@ -34,8 +35,8 @@ export default async function (t) {
     const decryptedB = await sharedCipherB.decrypt(encryptedA)
 
     t.equal(
-      Buff.raw(decryptedA).toHex(),
-      Buff.raw(decryptedB).toHex(),
+      Buff.raw(decryptedA).hex,
+      Buff.raw(decryptedB).hex,
       'Both decrypted payloads should be equal.'
     )
   })

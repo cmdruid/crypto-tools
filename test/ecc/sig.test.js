@@ -24,12 +24,12 @@ export default function schnorrTest(t) {
     const R = Point.import(k.point)
 
     // Create our hashed message digest comitting to R.
-    const hmR = await Hash.sha256(Uint8Array.of(...m, ...R.rawX))
+    const hmR = await Hash.sha256(Uint8Array.of(...m, ...R.x))
 
     // Should derive the same "signature" by 
     // using identical tweaks between keypairs.
-    const sig = k.sub(a.mul(hmR)).point.x
-    const siG = R.sub(A.mul(hmR)).x
+    const sig = k.sub(a.mul(hmR)).point.x.hex
+    const siG = R.sub(A.mul(hmR)).x.hex
 
     t.plan(1)
     t.equal(sig, siG, 'signature derivations should be equal.')

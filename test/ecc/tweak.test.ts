@@ -17,7 +17,7 @@ export default function tweakTests(t : Test) {
 
       const msg = Buff.random().hex
 
-      const seckey = new SecretKey(internalPrivkey, { xonly : true })
+      const seckey = new SecretKey(internalPrivkey, { type: 'taproot' })
       t.equal(seckey.hex, internalPrivkey, 'Internal secret keys should match.')
 
       // const field  = new Field(internalPrivkey)
@@ -25,7 +25,7 @@ export default function tweakTests(t : Test) {
       // console.log(field.hex)
 
       const pubkey = seckey.pub
-      t.equal(pubkey.hexX, internalPubkey, 'Internal public keys should match.')
+      t.equal(pubkey.hex, internalPubkey, 'Internal public keys should match.')
 
       const tweaked_sec = seckey.add(tweak)
       t.equal(tweaked_sec.hex, tweakedPrivkey, 'The tweaked private keys should match.')
@@ -43,7 +43,7 @@ export default function tweakTests(t : Test) {
       const seckey_sig = await tweaked_sec.sign(msg)
       const noble_sig  = await schnorr.sign(msg, tweakedPrivkey)
 
-      const pubkey_valid = await tweakedPub.verify(noble_sig, msg, 'schnorr')
+      const pubkey_valid = await tweakedPub.verify(noble_sig, msg, 'taproot')
       const noble_valid  = await schnorr.verify(seckey_sig, msg, targetPub)
 
       t.equal(pubkey_valid, true, 'The seckey signature should validate.')

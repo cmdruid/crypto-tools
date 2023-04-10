@@ -9,8 +9,8 @@ export default function secretsTest(t) {
     const A = Point.import(a.point)
     const b = new Field(Buff.random(32))
     const B = Point.import(b.point)
-    const sharedAB = B.mul(a).x
-    const sharedBA = A.mul(b).x
+    const sharedAB = B.mul(a).x.hex
+    const sharedBA = A.mul(b).x.hex
 
     // const c = Field.fromPrivate(Buff.random(32))
     // const C = Point.from(c.point)

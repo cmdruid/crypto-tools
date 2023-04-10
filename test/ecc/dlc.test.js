@@ -23,8 +23,8 @@ export default async function dlcTest(t) {
     const sR = Point.import(sk.point)
 
     // Create our hashed message digest comitting to R.
-    const hmR = await Hash.sha256(Uint8Array.of(...m1, ...R.rawX))
-    const hsR = await Hash.sha256(Uint8Array.of(...m2, ...sR.rawX))
+    const hmR = await Hash.sha256(Uint8Array.of(...m1, ...R.x))
+    const hsR = await Hash.sha256(Uint8Array.of(...m2, ...sR.x))
 
     // This signature proof can be used as a public key.
     const siG = R.sub(A.mul(hmR))
@@ -39,7 +39,7 @@ export default async function dlcTest(t) {
     const DLC = sR.sub(siG.mul(hsR))
 
     t.plan(2)
-    t.equal(sig.point.x, siG.x, 'signature proofs should be equal.')
-    t.equal(dlc.point.x, DLC.x, 'dlc proofs should be equal.')
+    t.equal(sig.point.x.hex, siG.x.hex, 'signature proofs should be equal.')
+    t.equal(dlc.point.x.hex, DLC.x.hex, 'dlc proofs should be equal.')
   })
 }
