@@ -1,4 +1,4 @@
-import tape from 'tape'
+import tape        from 'tape'
 import CipherTest  from './cipher/cipher.test.js'
 import NobleTest   from './signer/noble.test.js'
 import SignerTest  from './signer/signer.test.js'

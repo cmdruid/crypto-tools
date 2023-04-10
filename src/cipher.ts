@@ -1,5 +1,6 @@
-import { Buff, Bytes }     from '@cmdcode/buff-utils'
-import { crypto, KeyUtil } from './utils.js'
+import { webcrypto as crypto } from '@cmdcode/webcrypto'
+import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { KeyUtil }     from './utils.js'
 
 export class Cipher {
   private readonly key : CryptoKey

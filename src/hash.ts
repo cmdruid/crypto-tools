@@ -1,3 +1,5 @@
+import { webcrypto as crypto } from '@cmdcode/webcrypto'
+
 import {
   Buff,
   Bytes,
@@ -7,8 +9,8 @@ import {
   hmac256 as hmac256sync
 } from '@cmdcode/buff-utils'
 
-import { crypto, KeyUtil } from './utils.js'
-import { ripemd160 }       from './ripemd.js'
+import { KeyUtil }   from './utils.js'
+import { ripemd160 } from './ripemd.js'
 
 async function digest (
   bytes  : Bytes,

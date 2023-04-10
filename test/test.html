@@ -9,9 +9,15 @@
   </head>
   <body>
     <script type="module">
-      console.dir(window)
-      const { KeyUtil } = window.cryptoUtils
-      console.log(await KeyUtil.generate())
+      console.log(window.cryptoUtils)
+      const { Noble } = window.cryptoUtils
+      const { sign, verify, getPublicKey, utils } = Noble
+      const privKey   = utils.randomPrivateKey()
+      const message   = utils.randomBytes()
+      const pubkey    = getPublicKey(privKey)
+      const signature = await sign(message, privKey)
+      const isValid   = verify(signature, message, pubkey)
+      console.log('Signature is valid:', isValid)
     </script>
   </body>
 </html>

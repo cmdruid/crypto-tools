@@ -12,12 +12,16 @@ const treeshake = {
 	tryCatchDeoptimization: false
 }
 
-const onwarn = warning => {
-	// eslint-disable-next-line no-console
+const onwarn = (warning) => {
+  if (
+    warning.code === 'MISSING_NODE_BUILTINS' &&
+    warning.ids.length === 1  &&
+    warning.ids[0] === 'crypto'
+  ) { return }
 	console.error(
 		'Building Rollup produced warnings that need to be resolved. ' +
 			'Please keep in mind that the browser build may never have external dependencies!'
-	);
+	)
 	// eslint-disable-next-line unicorn/error-message
 	throw Object.assign(new Error(), warning);
 }
@@ -60,7 +64,10 @@ const browserConfig = {
       format: 'iife',
       name: libraryName,
       plugins: [terser()],
-      sourcemap: true
+      sourcemap: true,
+      globals: {
+        crypto  : 'crypto'
+      }
     },
   ],
   plugins: [ 
