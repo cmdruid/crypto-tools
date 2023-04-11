@@ -13,7 +13,7 @@ export function sign (
   const key = Buff.bytes(secret).raw
   switch (type) {
     case 'ecdsa':
-      return secp.sign(msg, key).toCompactRawBytes()
+      return secp.sign(msg, key).toDERRawBytes()
     case 'taproot':
       return schnorr.sign(msg, key)
     default:
