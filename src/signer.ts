@@ -4,11 +4,11 @@ import { getXOnlyPub } from './utils.js'
 
 export type SignatureType = 'ecdsa' | 'taproot'
 
-export async function sign (
+export function sign (
   secret  : Bytes,
   message : Bytes,
   type    : SignatureType = 'taproot'
-) : Promise<Uint8Array> {
+) : Uint8Array {
   const msg = Buff.bytes(message).raw
   const key = Buff.bytes(secret).raw
   switch (type) {
@@ -21,12 +21,12 @@ export async function sign (
   }
 }
 
-export async function verify (
+export function verify (
   signature : Bytes,
   message   : Bytes,
   pubkey    : Bytes,
   type      : SignatureType = 'taproot'
-) : Promise<boolean> {
+) : boolean {
   const sig = Buff.bytes(signature).raw
   const msg = Buff.bytes(message).raw
   const pub = Buff.bytes(pubkey).raw

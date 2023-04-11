@@ -98,18 +98,18 @@ export class SecretKey extends Uint8Array {
     return new SecretKey(this.field.negate(), this.config)
   }
 
-  async sign (
+  sign (
     message : Bytes,
     type = this.config.type
-  ) : Promise<Uint8Array> {
+  ) : Uint8Array {
     return sign(this.raw, message, type)
   }
 
-  async verify (
+  verify (
     signature : Bytes,
     message   : Bytes,
     type = this.config.type
-  ) : Promise<boolean> {
+  ) : boolean {
     return verify(signature, message, this.pub.raw, type)
   }
 
@@ -199,11 +199,11 @@ export class PublicKey extends Uint8Array {
     return new PublicKey(this.point.negate().raw, this.config)
   }
 
-  async verify (
+  verify (
     signature : Bytes,
     message   : Bytes,
     type = this.config.type
-  ) : Promise<boolean> {
+  ) : boolean {
     return verify(signature, message, this.raw, type)
   }
 }
