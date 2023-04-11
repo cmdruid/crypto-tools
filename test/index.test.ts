@@ -1,6 +1,5 @@
 import tape        from 'tape'
 import CipherTest  from './cipher/cipher.test.js'
-import NobleTest   from './signer/noble.test.js'
 import SignerTest  from './signer/signer.test.js'
 import ECCTest     from './ecc/ecc.test.js'
 import schnorrTest from './ecc/sig.test.js'
@@ -16,7 +15,6 @@ tape('Crypto-Utils Test Suite', async t => {
   })
 
   t.test('Signer Tests', t => {
-    NobleTest(t)
     SignerTest(t)
   })
 

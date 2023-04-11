@@ -1,4 +1,4 @@
-export * as Noble from '@cmdcode/secp256k1'
+export * as Noble from '@noble/curves/secp256k1'
 export * from './cipher.js'
 export * from './keypair.js'
 export * from './signer.js'

@@ -1,4 +1,4 @@
-import * as Noble      from '@cmdcode/secp256k1'
+import { secp256k1 as secp } from '@noble/curves/secp256k1'
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { webcrypto as crypto } from '@cmdcode/webcrypto'
 
@@ -8,7 +8,7 @@ async function ecdh (
 ) : Promise<Uint8Array> {
   const secret = Buff.normalize(secretKey)
   const shared = Buff.normalize(sharedKey)
-  return Noble.getSharedSecret(secret, shared, true)
+  return secp.getSharedSecret(secret, shared, true)
 }
 
 async function importCryptoKey (key : Bytes) : Promise<CryptoKey> {

@@ -196,11 +196,6 @@
   resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.6.11.tgz#d1eb85cf98fa4ef2a82311f4f2b1e63b5decb7fb"
   integrity sha512-Xaq+lTrHg3fpMBKgvLTZ3p+0CfkcEJxUpnl+lrS5twd9fvV/8zNeoi8989JeSAS3LDADhwb6wEqB5SQH1pikfw==
 
-"@cmdcode/secp256k1@^1.0.9":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@cmdcode/secp256k1/-/secp256k1-1.0.9.tgz#8d328eeb29299226974642f71c9fd3390d79b960"
-  integrity sha512-yX5FhD9NaVhGzFCnQOkHVZYxZfK2GsYZlZ8rfSopuc5wFJvP6dwB9XWNfUxVgHrfvdvLy+bkuIpDoby8n2ylFw==
-
 "@cmdcode/webcrypto@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@cmdcode/webcrypto/-/webcrypto-1.0.0.tgz#a576af0a98135a987a870656f75c9ff18a0957f0"
@@ -337,6 +332,18 @@
   dependencies:
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
+
+"@noble/curves@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-0.9.1.tgz#0ad33ebee0fdc870e1afcd74daa06f188e89b8fe"
+  integrity sha512-SpO5TViHvyBV8RrvGejzzl0+wbSm21q+hC6ZmK5NtqOjigR+WW9OohvKL0M3EHKvWzqaZ5Z7F46ejxAVDTBnvQ==
+  dependencies:
+    "@noble/hashes" "1.3.0"
+
+"@noble/hashes@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.0.tgz#085fd70f6d7d9d109671090ccae1d3bec62554a1"
+  integrity sha512-ilHEACi9DwqJB0pw7kv+Apvh50jiiSyR/cQ3y4W7lOR5mhvn/50FLUfsnfJz0BDZtl/RR16kXvptiv6q1msYZg==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -2584,9 +2591,9 @@ semver@^6.0.0, semver@^6.3.0:
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
 semver@^7.0.0, semver@^7.3.7, semver@^7.3.8:
-  version "7.3.8"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.8.tgz#07a78feafb3f7b32347d725e33de7e2a2df67798"
-  integrity sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.4.0.tgz#8481c92feffc531ab1e012a8ffc15bdd3a0f4318"
+  integrity sha512-RgOxM8Mw+7Zus0+zcLEUn8+JfoLpj/huFTItQy2hsM4khuC1HYRDp0cU482Ewn/Fcy6bCjufD8vAj7voC66KQw==
   dependencies:
     lru-cache "^6.0.0"
 

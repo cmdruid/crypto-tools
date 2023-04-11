@@ -1,4 +1,4 @@
-import * as Noble      from '@cmdcode/secp256k1'
+import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { getXOnlyPub } from './utils.js'
 
@@ -13,9 +13,9 @@ export async function sign (
   const key = Buff.bytes(secret).raw
   switch (type) {
     case 'ecdsa':
-      return Noble.sign(msg, key)
+      return secp.sign(msg, key).toCompactRawBytes()
     case 'taproot':
-      return Noble.schnorr.sign(msg, key)
+      return schnorr.sign(msg, key)
     default:
       throw new Error('Unknown signature type:' + String(type))
   }
@@ -32,9 +32,9 @@ export async function verify (
   const pub = Buff.bytes(pubkey).raw
   switch (type) {
     case 'ecdsa':
-      return Noble.verify(sig, msg, pub)
+      return secp.verify(sig, msg, pub)
     case 'taproot':
-      return Noble.schnorr.verify(sig, msg, getXOnlyPub(pub))
+      return schnorr.verify(sig, msg, getXOnlyPub(pub))
     default:
       throw new Error('Unknown signature type:' + String(type))
   }

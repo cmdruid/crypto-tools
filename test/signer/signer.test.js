@@ -1,5 +1,5 @@
 import { Buff }   from '@cmdcode/buff-utils'
-import * as Noble from '@cmdcode/secp256k1'
+import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
 import { KeyPair } from '../../src/keypair.js'
 import { verify }  from '../../src/signer.js'
 
@@ -14,10 +14,10 @@ export default async function (t) {
     const ecdsa_sec = new KeyPair(randomBytes)
 
     const schnr_pub       = schnr_sec.pub.hex
-    const noble_schnr_pub = Buff.raw(Noble.schnorr.getPublicKey(randomBytes)).hex
+    const noble_schnr_pub = Buff.raw(schnorr.getPublicKey(randomBytes)).hex
 
     const ecdsa_pub       = ecdsa_sec.pub.hex
-    const noble_ecdsa_pub = Buff.raw(Noble.getPublicKey(randomBytes, true)).hex
+    const noble_ecdsa_pub = Buff.raw(secp.getPublicKey(randomBytes, true)).hex
 
     const schnr_sig = await schnr_sec.sign(randomData, 'taproot')
     const ecdsa_sig = await ecdsa_sec.sign(randomData, 'ecdsa')
@@ -26,8 +26,8 @@ export default async function (t) {
     const int_ecdsa_verify = await ecdsa_sec.verify(ecdsa_sig, randomData, 'ecdsa')
     const ext_schnr_verify = await verify(schnr_sig, randomData, schnr_pub, 'taproot')
     const ext_ecdsa_verify = await verify(ecdsa_sig, randomData, ecdsa_pub, 'ecdsa')
-    const nbl_schnr_verify = await Noble.schnorr.verify(schnr_sig, randomData, schnr_pub)
-    const nbl_ecdsa_verify = Noble.verify(ecdsa_sig, randomData, ecdsa_pub)
+    const nbl_schnr_verify = schnorr.verify(schnr_sig, randomData, schnr_pub)
+    const nbl_ecdsa_verify = secp.verify(ecdsa_sig, randomData, ecdsa_pub)
 
     t.plan(8)
     t.equal(schnr_pub, noble_schnr_pub, 'Schnorr pubkeys should match.')

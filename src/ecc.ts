@@ -1,14 +1,19 @@
-import { Buff }   from '@cmdcode/buff-utils'
-import * as Noble from '@cmdcode/secp256k1'
+import { ProjPointType } from '@noble/curves/abstract/weierstrass'
+import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
+import { Buff } from '@cmdcode/buff-utils'
+
+type ECPoint = ProjPointType<bigint>
+
+const { ProjectivePoint: NoblePoint } = secp
 
 type FieldValue = string | number | bigint | Uint8Array | Field
 type PointValue = string | number | bigint | Uint8Array | Point
 
 export class Field extends Uint8Array {
-  static N = Noble.CURVE.n
+  static N = secp.CURVE.n
 
   static mod (x : bigint, n = Field.N) : bigint {
-    return Noble.utils.mod(x, n)
+    return schnorr.utils.mod(x, n)
   }
 
   static pow (x : bigint, e : bigint, n = Field.N) : bigint {
@@ -41,7 +46,7 @@ export class Field extends Uint8Array {
   }
 
   static validate (num : bigint) : boolean {
-    return Noble.utils.isValidPrivateKey(num)
+    return secp.utils.isValidPrivateKey(num)
   }
 
   constructor (x : FieldValue) {
@@ -134,12 +139,12 @@ export class Field extends Uint8Array {
   }
 
   generate () : Point {
-    return Point.import(Noble.Point.BASE.multiply(this.big))
+    return Point.import(NoblePoint.BASE.multiply(this.big))
   }
 }
 
 export class Point {
-  static N = Noble.CURVE.n
+  static N = secp.CURVE.n
 
   static validate (x : PointValue) : boolean {
     try {
@@ -148,35 +153,38 @@ export class Point {
     } catch { return false }
   }
 
-  static normalize (x : PointValue) : Noble.Point {
-    x = normalizePoint(x)
-    return Noble.Point.fromHex(x)
+  static normalize (x : PointValue) : ECPoint {
+    let bytes = normalizePoint(x)
+    if (bytes.length === 32) {
+      bytes = bytes.prepend(0x02)
+    }
+    return NoblePoint.fromHex(bytes.hex)
   }
 
   static generate (big : FieldValue) : Point {
     return new Field(big).generate()
   }
 
-  static import (point : Point | Noble.Point) : Point {
+  static import (point : Point | ECPoint) : Point {
     const p = (point instanceof Point)
       ? { x: point.x.big, y: point.y.big }
-      : point
+      : { x: point.x, y: point.y }
     return new Point(p.x, p.y)
   }
 
-  readonly __p : Noble.Point
+  readonly __p : ECPoint
 
-  constructor (x : PointValue, y ?: bigint) {
+  constructor (x : PointValue, y ?: bigint, z = 1n) {
     this.__p = (
       typeof x === 'bigint' &&
       typeof y === 'bigint'
     )
-      ? new Noble.Point(x, y)
+      ? new NoblePoint(x, y, z)
       : Point.normalize(x)
     this.p.assertValidity()
   }
 
-  get p () : Noble.Point {
+  get p () : ECPoint {
     return this.__p
   }
 
@@ -189,11 +197,7 @@ export class Point {
   }
 
   get buff () : Buff {
-    const p = this.p.toRawBytes(true)
-    if (p.length < 33) {
-      const prefix = this.p.hasEvenY() ? 0x02 : 0x03
-      return Buff.join([prefix, p])
-    } else { return Buff.raw(p) }
+    return Buff.raw(this.p.toRawBytes(true))
   }
 
   get raw () : Uint8Array {
@@ -214,7 +218,7 @@ export class Point {
 
   eq (value : PointValue) : boolean {
     return (value instanceof Point)
-      ? this.p.equals(new Noble.Point(value.x.big, value.y.big))
+      ? this.p.equals(new NoblePoint(value.x.big, value.y.big, 1n))
       : (value instanceof Uint8Array)
         ? this.x.big === Buff.raw(value).big
         : (typeof value === 'number')
@@ -267,24 +271,20 @@ function normalizeField (value : FieldValue | PointValue) : bigint {
   throw TypeError('Invalid input type:' + typeof value)
 }
 
-function normalizePoint (value : FieldValue | PointValue) : string {
-  if (value instanceof Field) {
-    return value.hex
+function normalizePoint (value : FieldValue | PointValue) : Buff {
+  if (
+    value instanceof Field ||
+    value instanceof Point
+  ) {
+    return value.buff
   }
-  if (value instanceof Point) {
-    return value.hex
-  }
-  if (value instanceof Uint8Array) {
-    return Buff.raw(value).hex
-  }
-  if (typeof value === 'string') {
-    return value
-  }
-  if (typeof value === 'number') {
-    return Buff.num(value).hex
-  }
-  if (typeof value === 'bigint') {
-    return Buff.big(value).hex
+  if (
+    value instanceof Uint8Array ||
+    typeof value === 'string'   ||
+    typeof value === 'number'   ||
+    typeof value === 'bigint'
+  ) {
+    return Buff.bytes(value)
   }
   throw TypeError('Invalid input type:' + typeof value)
 }
