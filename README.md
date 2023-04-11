@@ -154,8 +154,8 @@ class SecretKey extends Uint8Array {
   pow(bytes: Bytes): SecretKey;
   negate(): SecretKey;
 
-  sign(message: Bytes, type?: SignatureType): Promise<Uint8Array>;
-  verify(signature: Bytes, message: Bytes, type?: SignatureType): Promise<boolean>;
+  sign(message: Bytes, type?: SignatureType): Uint8Array
+  verify(signature: Bytes, message: Bytes, type?: SignatureType): boolean
 
   toWIF(prefix?: number): string;
 }
@@ -181,6 +181,6 @@ class PublicKey extends Uint8Array {
   mul(bytes: Bytes): PublicKey;
   negate(): PublicKey;
 
-  verify(signature: Bytes, message: Bytes, type?: SignatureType): Promise<boolean>;
+  verify(signature: Bytes, message: Bytes, type?: SignatureType): boolean
 }
 ```
