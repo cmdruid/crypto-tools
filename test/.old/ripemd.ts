@@ -490,7 +490,7 @@ export function ripemd160 (bytes : Uint8Array) : Uint8Array {
   }
 
   // Produce output.
-  const ret = []
+  const ret : number[] = []
   for (let i = 0; i < state.length; i++) {
     const num = state[i] & 0xffffffffn
     ret.push(...bigIntToBytes(num, 4))

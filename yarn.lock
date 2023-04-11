@@ -191,10 +191,10 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@cmdcode/buff-utils@^1.6.11":
-  version "1.6.11"
-  resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.6.11.tgz#d1eb85cf98fa4ef2a82311f4f2b1e63b5decb7fb"
-  integrity sha512-Xaq+lTrHg3fpMBKgvLTZ3p+0CfkcEJxUpnl+lrS5twd9fvV/8zNeoi8989JeSAS3LDADhwb6wEqB5SQH1pikfw==
+"@cmdcode/buff-utils@^1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.7.1.tgz#00333fc450bc2a9b8aaec5dda608a2965e013ce5"
+  integrity sha512-1YBCnqIZtWEmd5Qi8Kbs1T8SQUsU6PbZzCEa8CJYmT9UfxS/nJsd1v8bwl9sVYeUYlJHIbTx6FO9jB3fDXh6tA==
 
 "@cmdcode/webcrypto@^1.0.0":
   version "1.0.0"
@@ -340,7 +340,7 @@
   dependencies:
     "@noble/hashes" "1.3.0"
 
-"@noble/hashes@1.3.0":
+"@noble/hashes@1.3.0", "@noble/hashes@^1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.0.tgz#085fd70f6d7d9d109671090ccae1d3bec62554a1"
   integrity sha512-ilHEACi9DwqJB0pw7kv+Apvh50jiiSyR/cQ3y4W7lOR5mhvn/50FLUfsnfJz0BDZtl/RR16kXvptiv6q1msYZg==

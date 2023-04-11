@@ -161,8 +161,8 @@ export class Point {
     return NoblePoint.fromHex(bytes.hex)
   }
 
-  static generate (big : FieldValue) : Point {
-    return new Field(big).generate()
+  static generate (value : FieldValue) : Point {
+    return new Field(value).generate()
   }
 
   static import (point : Point | ECPoint) : Point {
@@ -174,12 +174,12 @@ export class Point {
 
   readonly __p : ECPoint
 
-  constructor (x : PointValue, y ?: bigint, z = 1n) {
+  constructor (x : PointValue, y ?: bigint) {
     this.__p = (
       typeof x === 'bigint' &&
       typeof y === 'bigint'
     )
-      ? new NoblePoint(x, y, z)
+      ? new NoblePoint(x, y, 1n)
       : Point.normalize(x)
     this.p.assertValidity()
   }

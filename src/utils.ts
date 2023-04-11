@@ -1,6 +1,6 @@
-import { secp256k1 as secp } from '@noble/curves/secp256k1'
-import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { secp256k1 as secp }   from '@noble/curves/secp256k1'
 import { webcrypto as crypto } from '@cmdcode/webcrypto'
+import { Buff, Bytes }         from '@cmdcode/buff-utils'
 
 async function ecdh (
   secretKey : Bytes,
