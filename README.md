@@ -1,37 +1,25 @@
 # Crypto Utils
 
-An experimental library for making cryptography great again. Wraps the @noble/curves/secp256k1 library.  
+Wraps the @noble/curves/secp256k1 library and provides a simpler API.
 
-Everything is fully-typed and straight-forward to use. Documentation coming soon!  
+Everything is fully-typed and straight-forward to use. More documentation coming soon!  
 
 ## How to Use
 
 ### Import
 
-```ts
-
+Example import into a browser-based project:
+```html
+<script src="https://unpkg.com/@cmdcode/crypto-utils"></script>
+<script> const { Field, Point, SecretKey, PublicKey } = window.cryptoUtils </script>
 ```
-
-### Cipher
-
+Example import into a commonjs project:
 ```ts
-class Cipher {
-  
-  static fromSecret(secret: Bytes): Promise<Cipher>;
-  static fromShared(secret: Bytes, shared: Bytes): Promise<Cipher>;
-
-  static encrypt(secret: Bytes | CryptoKey, message: Bytes, vector?: Bytes): Promise<Uint8Array>;
-  static decrypt(secret: Bytes | CryptoKey, message: Bytes, vector?: Bytes): Promise<Uint8Array>;
-
-  constructor(cryptoKey: CryptoKey);
-
-  get buff() : Promise<Uint8Array>;
-  get hex()  : Promise<string>;
-  get raw()  : Promise<string>;
-
-  encrypt(message: Bytes, vector?: Bytes): Promise<Uint8Array>;
-  decrypt(message: Bytes, vector?: Bytes): Promise<Uint8Array>;
-}
+const { Field, Point, SecretKey, PublicKey } = require('@cmdcode/crypto-utils')
+```
+Example import into an ES module project:
+```ts
+import { Field, Point, SecretKey, PublicKey } from '@cmdcode/crypto-utils'
 ```
 
 ### Field / Point
@@ -126,7 +114,7 @@ class Point {
 }
 ```
 
-### KeyPair
+### SecretKey / PublicKey
 
 ```ts
 class SecretKey extends Uint8Array {
@@ -159,6 +147,7 @@ class SecretKey extends Uint8Array {
 
   toWIF(prefix?: number): string;
 }
+
 class PublicKey extends Uint8Array {
   static random(opt: KeyOptions): PublicKey;
   static fromSecret(bytes: Bytes, opt: KeyOptions): PublicKey;
@@ -184,3 +173,30 @@ class PublicKey extends Uint8Array {
   verify(signature: Bytes, message: Bytes, type?: SignatureType): boolean
 }
 ```
+
+## Development / Testing
+
+This library uses yarn for package management, tape for writing tests, and rollup for cross-platform releases. Here are a few scripts that are useful for development.
+
+```bash
+## Compiles types and builds release candidates in /dist folder.
+yarn build
+## Run any typescript file using real-time compilation.
+yarn start contrib/example.ts
+## Runs all tests listed in test folder. 
+yarn test
+## Full macro script for generating a new release candidate.
+yarn release
+```
+
+## Bugs / Issues
+
+If you run into any bugs or have any questions, please submit an issue ticket.
+
+## Contribution
+
+Feel free to fork and make contributions. Suggestions are welcome!
+
+## License
+
+Use this library however you want!

@@ -1,14 +1,14 @@
 import { Buff } from '@cmdcode/buff-utils'
 import * as ecc from 'tiny-secp256k1'
 
-import { Field, Noble } from '../../src/index.js'
+import { Field, secp } from '../../src/index.js'
 
 const ec = new TextEncoder()
 
 const seed  = Buff.hex('80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF')
 
 const kA = ecc.pointFromScalar(seed)
-const kB = Noble.secp256k1.ProjectivePoint.BASE.multiply(BigInt('0x80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF'))
+const kB = secp.ProjectivePoint.BASE.multiply(BigInt('0x80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF80FFFFFF'))
 const k1 = new Field(seed)
 const K1 = k1.point
 
