@@ -1,7 +1,12 @@
 import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { Field, Point } from './ecc.js'
-import { getXOnlyPub }  from './utils.js'
-import { sign, SignatureType, verify } from './signer.js'
+import { getXOnlyPub } from './utils.js'
+
+import {
+  sign,
+  SignatureType,
+  verify
+} from './signer.js'
 
 type KeyOptions = Partial<KeyConfig>
 

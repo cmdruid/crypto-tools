@@ -10,14 +10,14 @@
   <body>
     <script type="module">
       console.log(window.cryptoUtils)
-      const { Noble } = window.cryptoUtils
-      const { sign, verify, getPublicKey, utils } = Noble
-      const privKey   = utils.randomPrivateKey()
-      const message   = utils.randomBytes()
-      const pubkey    = getPublicKey(privKey)
-      const signature = await sign(message, privKey)
+      const { sha256, sign, verify, utils } = window.cryptoUtils
+      const privKey   = utils.getRandom()
+      const message   = utils.getRandom()
+      const pubkey    = utils.getPublicKey(privKey, true)
+      const signature = await sign(privKey, message)
       const isValid   = verify(signature, message, pubkey)
       console.log('Signature is valid:', isValid)
+      console.log(sha256('deadbeef'))
     </script>
   </body>
 </html>
