@@ -174,6 +174,22 @@ class PublicKey extends Uint8Array {
 }
 ```
 
+## Hash Methods
+
+You can also import the following hash methods:
+
+```ts
+import {
+  sha256,
+  sha512,
+  ripe160,
+  hash160,
+  hash256,
+  hmac256,
+  hmac512
+} from '@cmdcode/crypto-utils'
+```
+
 ## Development / Testing
 
 This library uses yarn for package management, tape for writing tests, and rollup for cross-platform releases. Here are a few scripts that are useful for development.

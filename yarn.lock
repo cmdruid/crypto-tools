@@ -196,11 +196,6 @@
   resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.7.1.tgz#00333fc450bc2a9b8aaec5dda608a2965e013ce5"
   integrity sha512-1YBCnqIZtWEmd5Qi8Kbs1T8SQUsU6PbZzCEa8CJYmT9UfxS/nJsd1v8bwl9sVYeUYlJHIbTx6FO9jB3fDXh6tA==
 
-"@cmdcode/webcrypto@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@cmdcode/webcrypto/-/webcrypto-1.0.0.tgz#a576af0a98135a987a870656f75c9ff18a0957f0"
-  integrity sha512-CzzqkObnZ4lTrqkQcogslNhb7tnPz0nu0sfbf0fF7+EERlehNcUfzZ3wJjFy2uuo2Ou1dM8HHc8OdHC/vNKLhQ==
-
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz#00629c35a688e05a88b1cda684fb9d5e73f000a1"
