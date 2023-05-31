@@ -148,6 +148,7 @@ export class Point {
 
   static validate (x : PointValue) : boolean {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       x = new Point(x)
       return true
     } catch { return false }

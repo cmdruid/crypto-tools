@@ -119,7 +119,7 @@ export class SecretKey extends Uint8Array {
   }
 
   toWIF (prefix = 0x80) : string {
-    return Buff.join([prefix, this, 0x01]).b58chk
+    return Buff.join([ prefix, this, 0x01 ]).b58chk
   }
 }
 
