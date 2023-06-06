@@ -191,10 +191,10 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@cmdcode/buff-utils@^1.7.1":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.7.1.tgz#00333fc450bc2a9b8aaec5dda608a2965e013ce5"
-  integrity sha512-1YBCnqIZtWEmd5Qi8Kbs1T8SQUsU6PbZzCEa8CJYmT9UfxS/nJsd1v8bwl9sVYeUYlJHIbTx6FO9jB3fDXh6tA==
+"@cmdcode/buff-utils@^1.7.4":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.7.4.tgz#f7c0f188f194dae8970ce4e96d05ba9d09c86744"
+  integrity sha512-K/1Bo+VLZcJYghMZOXTxe2oD+lzzx2j5kk6kaoOUkPS2NLj3qylgVJZWtuS8NF6c96rtamgf3WBPUSit57Fh0w==
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
