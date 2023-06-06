@@ -10,12 +10,12 @@
   ],
   "version": "1.9.3",
   "type": "module",
-  "main": "./dist/main.js",
+  "main": "./dist/main.cjs",
   "unpkg": "./dist/bundle.min.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
-    "import": "./dist/module.js",
-    "require": "./dist/main.js"
+    "import": "./dist/module.mjs",
+    "require": "./dist/main.cjs"
   },
   "repository": {
     "type": "git",
