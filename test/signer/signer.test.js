@@ -10,8 +10,8 @@ export default async function (t) {
 
   t.test('Test signing/validation of KeyPair suite.', async t => {
 
-    const schnr_sec = new KeyPair(randomBytes, { type: 'taproot' })
-    const ecdsa_sec = new KeyPair(randomBytes)
+    const schnr_sec = new KeyPair(randomBytes, { type: 'schnorr', xonly: true })
+    const ecdsa_sec = new KeyPair(randomBytes, { type: 'ecdsa' })
 
     const schnr_pub       = schnr_sec.pub.hex
     const noble_schnr_pub = Buff.raw(schnorr.getPublicKey(randomBytes)).hex
@@ -19,13 +19,13 @@ export default async function (t) {
     const ecdsa_pub       = ecdsa_sec.pub.hex
     const noble_ecdsa_pub = Buff.raw(secp.getPublicKey(randomBytes, true)).hex
 
-    const schnr_sig = await schnr_sec.sign(randomData, 'taproot')
-    const ecdsa_sig = await ecdsa_sec.sign(randomData, 'ecdsa')
+    const schnr_sig = schnr_sec.sign(randomData)
+    const ecdsa_sig = ecdsa_sec.sign(randomData)
 
-    const int_schnr_verify = await schnr_sec.verify(schnr_sig, randomData, 'taproot')
-    const int_ecdsa_verify = await ecdsa_sec.verify(ecdsa_sig, randomData, 'ecdsa')
-    const ext_schnr_verify = await verify(schnr_sig, randomData, schnr_pub, 'taproot')
-    const ext_ecdsa_verify = await verify(ecdsa_sig, randomData, ecdsa_pub, 'ecdsa')
+    const int_schnr_verify = schnr_sec.verify(schnr_sig, randomData)
+    const int_ecdsa_verify = ecdsa_sec.verify(ecdsa_sig, randomData)
+    const ext_schnr_verify = verify(schnr_sig, randomData, schnr_pub, { type: 'schnorr', xonly: true })
+    const ext_ecdsa_verify = verify(ecdsa_sig, randomData, ecdsa_pub, { type: 'ecdsa' })
     const nbl_schnr_verify = schnorr.verify(schnr_sig, randomData, schnr_pub)
     const nbl_ecdsa_verify = secp.verify(ecdsa_sig, randomData, ecdsa_pub)
 

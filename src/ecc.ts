@@ -273,10 +273,10 @@ function normalizeField (value : FieldValue | PointValue) : bigint {
 }
 
 function normalizePoint (value : FieldValue | PointValue) : Buff {
-  if (
-    value instanceof Field ||
-    value instanceof Point
-  ) {
+  if (value instanceof Field) {
+    return value.point.buff
+  }
+  if (value instanceof Point) {
     return value.buff
   }
   if (
