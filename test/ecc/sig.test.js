@@ -5,7 +5,7 @@ import * as ECC from '../../src/ecc.js'
 const { Field, Point } = ECC
 const ec = new TextEncoder()
 
-export default function schnorrTest(t) {
+export function schnorrTest(t) {
   t.test('Testing ECC Schnorr Signatures', async t => {
 
     // Define seed values for keys (a) and (k).
