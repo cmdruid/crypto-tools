@@ -124,8 +124,8 @@ export class Field extends Uint8Array {
 
   pow (big : FieldValue, n = Field.N - 1n) : Field {
     const x = new Field(big)
-    const e = Field.mod(x.big, n)
-    return new Field(this.big ** e)
+    const p = Field.pow(this.big, x.big, n)
+    return new Field(p)
   }
 
   div (big : FieldValue) : Field {
