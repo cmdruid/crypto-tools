@@ -1,7 +1,7 @@
 import { Buff }   from '@cmdcode/buff-utils'
 import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
 import { KeyPair } from '../../src/keypair.js'
-import { verify }  from '../../src/signer.js'
+import { verify }  from '../../src/secp.js'
 
 const randomBytes = Buff.random(32)
 const randomData  = Buff.random(32)

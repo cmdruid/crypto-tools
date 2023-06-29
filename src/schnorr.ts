@@ -1,8 +1,8 @@
-import { Buff, Bytes }  from '@cmdcode/buff-utils'
-import { Field, Point } from './ecc.js'
-import { getXOnlyPub, hashTag, safeThrow } from './utils.js'
+import { Buff, Bytes }    from '@cmdcode/buff-utils'
+import { Field, Point }   from './ecc.js'
 import { SignerConfig }   from './schema/types.js'
 import { SIGNER_DEFAULT } from './schema/defaults.js'
+import { getXOnlyPub, hashTag, safeThrow } from './utils.js'
 
 const FIELD_SIZE  = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2Fn
 const CURVE_ORDER = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141n
@@ -16,7 +16,8 @@ export function sign (
    * Implementation of signature algorithm as specified in BIP0340.
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
-  const { aux = Buff.random(), nonce, xonly } = { ...SIGNER_DEFAULT, ...options }
+  const opt = { ...SIGNER_DEFAULT, ...options }
+  const { adaptor, aux = Buff.random(32), nonce, tweak, xonly } = opt
 
   // Normalize our message into bytes.
   const m = Buff.bytes(message)
@@ -27,7 +28,7 @@ export function sign (
   // For taproot: If P has an odd Y coordinate, return negated version of d'.
   const d  = (xonly && P.hasOddY) ? dp.negated.big : dp.big
   // Hash the auxiliary data according to BIP 0340.
-  const a  = hashTag('BIP0340/aux', Buff.bytes(aux))
+  const a  = hashTag('BIP0340/aux', Buff.bytes(aux) ?? Buff.random(32))
   // Let t equal the byte-wise xor of (d) and (a).
   const t  = d ^ a.big
   // Include our nonce values into a tagged hash.
@@ -39,13 +40,27 @@ export function sign (
   // Let k' equal our nonce mod N.
   const kp = new Field(n)
   // Let R equal k' * G.
-  const R  = kp.point
+  let R  = kp.point
+  // If adaptor is present:
+  if (adaptor !== undefined) {
+    // Normalize adaptor.
+    const b = Buff.bytes(adaptor)
+    // Revive adaptor point.
+    const T = new Point(b.big)
+    // Add adaptor point to R.
+    R = R.add(T)
+  }
   // For taproot: If R has an odd Y coordinate, return negated version of k'.
   const k  = (xonly && R.hasOddY) ? kp.negated.big : kp.big
-  // Let e equal the tagged hash('BIP0340/challenge' || R || P || m) mod n.
-  const e  = new Field(hashTag('BIP0340/challenge', R.x.raw, P.x.raw, m))
+  // Let c equal the tagged hash('BIP0340/challenge' || R || P || m) mod n.
+  const c  = new Field(hashTag('BIP0340/challenge', R.x.raw, P.x.raw, m))
   // Let s equal (k + ed) mod n.
-  const s  = new Field(k + (e.big * d))
+  let s  = new Field(k + (c.big * d))
+  // If tweak is defined:
+  if (tweak !== undefined) {
+    const b = Buff.bytes(tweak)
+    s = s.add(b.big)
+  }
   // Return (R || s) as a signature
   return (xonly)
     ? Buff.join([ R.x.raw, s.raw ])
@@ -100,12 +115,12 @@ export function verify (
     safeThrow('Signature s value greater than curve order!', throws)
   }
 
-  // Let e equal the tagged hash('BIP0340/challenge' || R || P || m) mod n.
-  const e  = new Field(hashTag('BIP0340/challenge', r.x.raw, P.x.raw, m))
+  // Let c equal the tagged hash('BIP0340/challenge' || R || P || m) mod n.
+  const c  = new Field(hashTag('BIP0340/challenge', r.x.raw, P.x.raw, m))
 
   // Let R = s * G - eP.
   const sG = new Field(s).point
-  const eP = P.mul(e.big)
+  const eP = P.mul(c.big)
   const R  = sG.sub(eP)
 
   // Reject if R value has an odd Y coordinate.

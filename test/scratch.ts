@@ -1,11 +1,13 @@
 import { Buff }  from '@cmdcode/buff-utils'
 import { Field } from '../src/ecc.js'
 
-const x = new Field('ab'.repeat(32))
-const y = new Field('de'.repeat(32))
+const members = [ 'alice', 'bob', 'carol' ]
+const wallets = []
 
-const s = x.mul(y)
-const n = s.div(y)
-
-console.log('s:', s.hex)
-console.log('n:', n.hex)
+for (let i = 0; i < members.length; i++) {
+  wallets.push({
+    name   : members[i],
+    seckey : Buff.random()
+    pubkey : lift_x
+  })
+}

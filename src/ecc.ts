@@ -145,7 +145,9 @@ export class Field extends Uint8Array {
 }
 
 export class Point {
+  static P = secp.CURVE.p
   static N = secp.CURVE.n
+  static G = secp.CURVE.Gx
 
   static validate (x : PointValue) : boolean {
     try {

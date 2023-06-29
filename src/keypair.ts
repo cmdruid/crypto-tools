@@ -1,7 +1,7 @@
 import { Buff, Bytes }    from '@cmdcode/buff-utils'
 import { Field, Point }   from './ecc.js'
 import { getXOnlyPub }    from './utils.js'
-import { sign, verify }   from './signer.js'
+import { sign, verify }   from './secp.js'
 import { SIGNER_DEFAULT } from './schema/defaults.js'
 import { SignerConfig }   from './schema/types.js'
 
