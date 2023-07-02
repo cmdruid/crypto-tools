@@ -1,5 +1,6 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
+import { Point } from './ecc'
 
 export function getRandom (size ?: number) : Buff {
   return Buff.random(size)
@@ -22,6 +23,16 @@ export function getPublicKey (seckey : Bytes, xonly = false) : Buff {
     ? schnorr.getPublicKey(bytes)
     : secp.getPublicKey(bytes)
   return Buff.raw(pubkey)
+}
+
+export function getSharedKey (
+  seckey : Bytes,
+  pubkey : Bytes,
+  xonly  = false
+) : Buff {
+  const P = new Point(pubkey)
+  const s = P.mul(seckey)
+  return (xonly) ? s.x : s.buff
 }
 
 export function checkSize (input : Bytes, size : number) : void {
