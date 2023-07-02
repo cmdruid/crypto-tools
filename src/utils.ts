@@ -42,12 +42,11 @@ export function getSecretKey (
   secret : Bytes,
   xonly  : boolean = false
 ) : Buff {
-  let   sk = Buff.bytes(secret).big % Field.N
-  const pk = getPublicKey(Buff.big(sk, 32))
-  if (xonly && pk[0] === 3) {
-    sk = Field.N - sk
+  let sk = new Field(secret)
+  if (xonly && sk.point.hasOddY) {
+    sk = sk.negate()
   }
-  return Buff.big(sk, 32)
+  return sk.buff
 }
 
 export function checkSize (input : Bytes, size : number) : void {
