@@ -1,6 +1,6 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
-import { Point } from './ecc'
+import { Point } from './ecc.js'
 
 export function getRandom (size ?: number) : Buff {
   return Buff.random(size)
