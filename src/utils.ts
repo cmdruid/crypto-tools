@@ -1,6 +1,6 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
-import { Point } from './ecc.js'
+import { Field, Point } from './ecc.js'
 
 export function getRandom (size ?: number) : Buff {
   return Buff.random(size)
@@ -17,7 +17,10 @@ export function getXOnlyPub (bytes : Bytes) : Buff {
   throw new Error('Invalid key length: ' + String(b.length))
 }
 
-export function getPublicKey (seckey : Bytes, xonly = false) : Buff {
+export function getPublicKey (
+  seckey : Bytes,
+  xonly = false
+) : Buff {
   const bytes  = Buff.bytes(seckey)
   const pubkey = (xonly)
     ? schnorr.getPublicKey(bytes)
@@ -33,6 +36,18 @@ export function getSharedKey (
   const P = new Point(pubkey)
   const s = P.mul(seckey)
   return (xonly) ? s.x : s.buff
+}
+
+export function getSecretKey (
+  secret : Bytes,
+  xonly  : boolean = false
+) : Buff {
+  let   sk = Buff.bytes(secret).big % Field.N
+  const pk = getPublicKey(Buff.big(sk, 32))
+  if (xonly && pk[0] === 3) {
+    sk = Field.N - sk
+  }
+  return Buff.big(sk, 32)
 }
 
 export function checkSize (input : Bytes, size : number) : void {
