@@ -38,7 +38,7 @@ export default function tweakTests(t : Test) {
       // console.log('pub:', pubkey.hex)
 
       const tweakedPub = pubkey.add(tweak)
-      const targetPub  = new Field(tweakedPrivkey).xpoint.x
+      const targetPub  = new Field(tweakedPrivkey).negated.point.x
 
       const seckey_sig = tweaked_sec.sign(msg)
       const noble_sig  = schnorr.sign(msg, tweakedPrivkey)

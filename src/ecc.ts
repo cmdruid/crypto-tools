@@ -73,10 +73,6 @@ export class Field extends Uint8Array {
     return this.generate()
   }
 
-  get xpoint () : Point {
-    return new Point(this.point.x)
-  }
-
   get hasOddY () : boolean {
     return this.point.hasOddY
   }
@@ -140,7 +136,8 @@ export class Field extends Uint8Array {
   }
 
   generate () : Point {
-    return Point.import(NoblePoint.BASE.multiply(this.big))
+    const point = NoblePoint.BASE.multiply(this.big)
+    return Point.import(point)
   }
 }
 

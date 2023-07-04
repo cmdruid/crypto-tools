@@ -2,23 +2,27 @@ import { Buff, Bytes }    from '@cmdcode/buff-utils'
 import { Field, Point }   from './ecc.js'
 import { getXOnlyPub }    from './utils.js'
 import { sign, verify }   from './secp.js'
-import { SIGNER_DEFAULT } from './schema/defaults.js'
-import { SignerConfig }   from './schema/types.js'
+
+import {
+  signer_defaults,
+  SignerConfig,
+  SignerOptions
+} from './config/signer.js'
 
 export class SecretKey extends Uint8Array {
-  static random (opt ?: Partial<SignerConfig>) : SecretKey {
+  static random (config ?: SignerConfig) : SecretKey {
     // Return a random secret key.
-    return new SecretKey(Buff.random(32), opt)
+    return new SecretKey(Buff.random(32), config)
   }
 
-  readonly config  : SignerConfig
+  readonly opt  : SignerOptions
 
   constructor (
     secret  : Bytes,
-    options : Partial<SignerConfig> = {}
+    config ?: SignerConfig
   ) {
     super(new Field(secret))
-    this.config = { ...SIGNER_DEFAULT, ...options }
+    this.opt = signer_defaults(config)
   }
 
   get buff () : Buff {
@@ -34,7 +38,9 @@ export class SecretKey extends Uint8Array {
   }
 
   get field () : Field {
-    return new Field(this)
+    return (this.opt.xonly)
+      ? new Field(this).negated
+      : new Field(this)
   }
 
   get point () : Point {
@@ -42,7 +48,7 @@ export class SecretKey extends Uint8Array {
   }
 
   get pub () : PublicKey {
-    return new PublicKey(this.point.raw, this.config)
+    return new PublicKey(this.point.raw, this.opt)
   }
 
   get hasEvenY () : boolean {
@@ -53,54 +59,47 @@ export class SecretKey extends Uint8Array {
     return this.point.hasOddY
   }
 
-  get xcheck () : SecretKey {
-    return (this.config.xonly && this.hasOddY)
-      ? this.negate()
-      : this
+  get xonly () : SecretKey {
+    return new SecretKey(this.field.negated, this.opt)
   }
 
   add (bytes : Bytes) : SecretKey {
-    const field = this.xcheck.field
-    return new SecretKey(field.add(bytes), this.config)
+    return new SecretKey(this.field.add(bytes), this.opt)
   }
 
   sub (bytes : Bytes) : SecretKey {
-    const field = this.xcheck.field
-    return new SecretKey(field.sub(bytes), this.config)
+    return new SecretKey(this.field.sub(bytes), this.opt)
   }
 
   mul (bytes : Bytes) : SecretKey {
-    const field = this.xcheck.field
-    return new SecretKey(field.mul(bytes), this.config)
+    return new SecretKey(this.field.mul(bytes), this.opt)
   }
 
   div (bytes : Bytes) : SecretKey {
-    const field = this.xcheck.field
-    return new SecretKey(field.div(bytes), this.config)
+    return new SecretKey(this.field.div(bytes), this.opt)
   }
 
   pow (bytes : Bytes) : SecretKey {
-    const field = this.xcheck.field
-    return new SecretKey(field.pow(bytes), this.config)
+    return new SecretKey(this.field.pow(bytes), this.opt)
   }
 
   negate () : SecretKey {
-    return new SecretKey(this.field.negate(), this.config)
+    return new SecretKey(this.field.negate(), this.opt)
   }
 
   sign (
     message : Bytes,
-    options : Partial<SignerConfig> = this.config
+    config  : SignerConfig = this.opt
   ) : Buff {
-    return sign(this.raw, message, options)
+    return sign(this.raw, message, config)
   }
 
   verify (
     signature : Bytes,
     message   : Bytes,
-    options   : Partial<SignerConfig> = this.config
+    config    : SignerConfig = this.opt
   ) : boolean {
-    return verify(signature, message, this.pub.raw, options)
+    return verify(signature, message, this.pub.raw, config)
   }
 
   toWIF (prefix = 0x80) : string {
@@ -109,42 +108,37 @@ export class SecretKey extends Uint8Array {
 }
 
 export class PublicKey extends Uint8Array {
-  static random (opt ?: Partial<SignerConfig>) : PublicKey {
-    // Return a random public key.
-    return SecretKey.random(opt).pub
-  }
-
-  static fromSecret (
-    bytes : Bytes,
-    opt  ?: Partial<SignerConfig>
+  static from_secret (
+    bytes   : Bytes,
+    config ?: SignerConfig
   ) : PublicKey {
     // Return a public key from a secret key.
-    return new SecretKey(bytes, opt).pub
+    return new SecretKey(bytes, config).pub
   }
 
-  static xfilter = getXOnlyPub
+  static xonly = getXOnlyPub
 
-  readonly config : SignerConfig
+  readonly opt : SignerOptions
 
   constructor (
     pubkey  : Bytes,
-    options : Partial<SignerConfig> = {}
+    config ?: SignerConfig
   ) {
     // Initialize our key config.
-    const config = { ...SIGNER_DEFAULT, ...options }
+    const opt = signer_defaults(config)
 
     // handle x-only key policy.
-    if (config.xonly) {
-      super(PublicKey.xfilter(pubkey))
+    if (opt.xonly) {
+      super(PublicKey.xonly(pubkey))
     } else {
       super(Buff.bytes(pubkey))
     }
     // Save key configuration.
-    this.config = config
+    this.opt = opt
   }
 
   get buff () : Buff {
-    return (this.config.xonly)
+    return (this.opt.xonly)
       ? this.x
       : new Buff(this)
   }
@@ -169,10 +163,6 @@ export class PublicKey extends Uint8Array {
     return this.point.y
   }
 
-  get hasEvenY () : boolean {
-    return this.point.hasEvenY
-  }
-
   get hasOddY () : boolean {
     return this.point.hasOddY
   }
@@ -181,33 +171,33 @@ export class PublicKey extends Uint8Array {
     const point = (key instanceof PublicKey)
       ? this.point.add(key.point)
       : this.point.add(key)
-    return new PublicKey(point.raw, this.config)
+    return new PublicKey(point.raw, this.opt)
   }
 
   sub (key : Bytes | PublicKey) : PublicKey {
     const point = (key instanceof PublicKey)
       ? this.point.sub(key.point)
       : this.point.sub(key)
-    return new PublicKey(point.raw, this.config)
+    return new PublicKey(point.raw, this.opt)
   }
 
   mul (key : Bytes | PublicKey) : PublicKey {
     const point = (key instanceof PublicKey)
-      ? this.point.add(key.point)
-      : this.point.add(key)
-    return new PublicKey(point.raw, this.config)
+      ? this.point.mul(key.point)
+      : this.point.mul(key)
+    return new PublicKey(point.raw, this.opt)
   }
 
   negate () : PublicKey {
-    return new PublicKey(this.point.negate().raw, this.config)
+    return new PublicKey(this.point.negate().raw, this.opt)
   }
 
   verify (
     signature : Bytes,
     message   : Bytes,
-    options   : Partial<SignerConfig> = this.config
+    config    : SignerConfig = this.opt
   ) : boolean {
-    return verify(signature, message, this.raw, options)
+    return verify(signature, message, this, config)
   }
 }
 
