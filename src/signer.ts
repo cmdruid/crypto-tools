@@ -1,53 +1,62 @@
-import { Buff, Bytes }    from '@cmdcode/buff-utils'
-import { Field }          from './ecc.js'
-import { hmac }           from './hash.js'
-import { sign, verify }   from './schnorr.js'
-import { pow }            from './math.js'
-import { getSharedKey }   from './utils.js'
+import { Buff, Bytes }   from '@cmdcode/buff-utils'
+import { Field }         from './ecc.js'
+import { hmac512 }       from './hash.js'
+import { pow }           from './math.js'
+
+import { sign, recover, verify } from './sig.js'
+
+import {
+  getSharedKey,
+  getSharedCode
+} from './utils.js'
 
 import {
   signer_defaults,
   SignerConfig,
-  SignerOptions
-} from './config/signer.js'
+  SignerState
+} from './config.js'
 
 export class Signer {
   static random = Buff.random
   static verify = verify
 
   readonly _secret : Field
-  readonly opt     : SignerOptions
+  readonly _state  : SignerState
 
   constructor (
     secret  : Bytes,
     config ?: SignerConfig
   ) {
-    this._secret = new Field(secret).negated
-    this.opt = signer_defaults(config)
+    const { recovery, xonly } = signer_defaults(config)
+    const field  = new Field(secret)
+    this._state  = { recovery, xonly }
+    this._secret = (this.xonly) ? field.negated : field
   }
 
   get pubkey () : string {
     return this._secret.point.x.hex
   }
 
-  // How can we fit an HD wallet in here?
-  generate (path : Bytes) : Signer {
-    const sec = this.hmac(path)
-    return new Signer(sec, this.opt)
+  get xonly () : boolean {
+    return this._state.xonly
   }
 
   getSharedKey (pubkey : Bytes) : string {
     return getSharedKey(this._secret, pubkey).hex
   }
 
+  getSharedCode (pubkey : Bytes) : string {
+    return getSharedCode(this._secret, pubkey).hex
+  }
+
   hmac (msg : Bytes) : string {
-    return hmac(this._secret, msg).hex
+    return hmac512(this._secret, msg).hex
   }
 
   musign (
     challenge : Bytes,
     nonces    : Bytes[],
-    vectors   : Bytes[]
+    vectors   : [ key_vec : Bytes, nonce_vec: Bytes ]
   ) : string {
     const [ kv, nv ] = vectors.map(e => Buff.bytes(e).big)
     const c = Buff.bytes(challenge).big
@@ -69,6 +78,15 @@ export class Signer {
     message : Bytes,
     config ?: SignerConfig
   ) : string {
+    config = { ...this._state, ...config }
     return sign(this._secret, message, config).hex
+  }
+
+  recover (
+    signature : Bytes,
+    message   : Bytes,
+    pubkey    : Bytes
+  ) : Buff {
+    return recover(signature, message, pubkey, this._secret)
   }
 }

@@ -4,9 +4,6 @@ import { ripemd160 as r160 } from '@noble/hashes/ripemd160'
 import { hmac      as HMAC } from '@noble/hashes/hmac'
 import { Buff, Bytes }       from '@cmdcode/buff-utils'
 
-export type HashType = '160' | '256' | '512'
-export type HmacType = '256' | '512'
-
 export function sha256 (msg : Bytes) : Buff {
   const m = Buff.bytes(msg)
   return Buff.raw(s256(m))
@@ -48,35 +45,4 @@ export function hmac512 (
   const k = Buff.bytes(key)
   const m = Buff.bytes(msg)
   return Buff.raw(HMAC(s512, k, m))
-}
-
-export function hash (
-  msg  : Bytes,
-  type : HashType = '256'
-) : Buff {
-  switch (type) {
-    case '160':
-      return ripe160(msg)
-    case '256':
-      return sha256(msg)
-    case '512':
-      return sha512(msg)
-    default:
-      throw new Error(`Invalid type: ${String(type)}`)
-  }
-}
-
-export function hmac (
-  key  : Bytes,
-  msg  : Bytes,
-  type : HmacType = '256'
-) : Buff {
-  switch (type) {
-    case '256':
-      return hmac256(key, msg)
-    case '512':
-      return hmac512(key, msg)
-    default:
-      throw new Error(`Invalid type: ${String(type)}`)
-  }
 }

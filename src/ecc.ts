@@ -1,56 +1,32 @@
+import { Buff, Bytes }   from '@cmdcode/buff-utils'
+import { secp256k1 }     from '@noble/curves/secp256k1'
 import { ProjPointType } from '@noble/curves/abstract/weierstrass'
-import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
-import { Buff } from '@cmdcode/buff-utils'
+import * as math         from './math.js'
+import * as assert       from './assert.js'
 
-type ECPoint = ProjPointType<bigint>
-
-const { ProjectivePoint: NoblePoint } = secp
-
+type ECPoint    = ProjPointType<bigint>
 type FieldValue = string | number | bigint | Uint8Array | Field
 type PointValue = string | number | bigint | Uint8Array | Point
 
+const NoblePoint = secp256k1.ProjectivePoint
+
 export class Field extends Uint8Array {
-  static N = secp.CURVE.n
+  static N = secp256k1.CURVE.n
 
-  static mod (x : bigint, n = Field.N) : bigint {
-    return schnorr.utils.mod(x, n)
+  static mod (x : FieldValue) : Field {
+    return new Field(x)
   }
 
-  static pow (x : bigint, e : bigint, n = Field.N) : bigint {
-    // Wrap starting values to field size.
-    x = Field.mod(x, n)
-    e = Field.mod(e, n)
-    // If x value is zero, return zero.
-    if (x === 0n) return 0n
-    // Initialize result as 1.
-    let res = 1n
-    // While e value is greater than 0:
-    while (e > 0n) {
-      // If e value is odd, multiply x with result.
-      if ((e & 1n) === 1n) {
-        res = Field.mod(res * x, n)
-      }
-      // With e value being even, (e = e / 2).
-      e = e >> 1n
-      // Update x value.
-      x = Field.mod(x * x, n)
-    }
-    return res
-  }
-
-  static normalize (num : FieldValue) : Uint8Array {
-    num = normalizeField(num)
-    num = Field.mod(num)
-    Field.validate(num)
-    return Buff.big(num, 32)
-  }
-
-  static validate (num : bigint) : boolean {
-    return secp.utils.isValidPrivateKey(num)
+  static is_valid (value : Bytes, throws ?: boolean) : boolean {
+    const big = Buff.bytes(value, 32).big
+    return assert.in_field(big, throws)
   }
 
   constructor (x : FieldValue) {
-    super(Field.normalize(x), 32)
+    let b = normalizeField(x)
+        b = math.modN(b)
+    Field.is_valid(b, true)
+    super(Buff.big(b, 32), 32)
   }
 
   get buff () : Buff {
@@ -83,110 +59,111 @@ export class Field extends Uint8Array {
       : this
   }
 
-  gt (big : FieldValue) : boolean {
-    const x = new Field(big)
+  gt (value : FieldValue) : boolean {
+    const x = new Field(value)
     return x.big > this.big
   }
 
-  lt (big : FieldValue) : boolean {
-    const x = new Field(big)
+  lt (value : FieldValue) : boolean {
+    const x = new Field(value)
     return x.big < this.big
   }
 
-  eq (big : FieldValue) : boolean {
-    const x = new Field(big)
+  eq (value : FieldValue) : boolean {
+    const x = new Field(value)
     return x.big === this.big
   }
 
-  ne (big : FieldValue) : boolean {
-    const x = new Field(big)
+  ne (value : FieldValue) : boolean {
+    const x = new Field(value)
     return x.big !== this.big
   }
 
-  add (big : FieldValue) : Field {
-    const x = new Field(big)
+  add (value : FieldValue) : Field {
+    const x = Field.mod(value)
+    const a = math.ecc.add(this.big, x.big)
     return new Field(this.big + x.big)
   }
 
-  sub (big : FieldValue) : Field {
-    const x = new Field(big)
+  sub (value : FieldValue) : Field {
+    const x = Field.mod(value)
+    const a = math.ecc.sub(this.big, x.big)
     return new Field(this.big - x.big)
   }
 
-  mul (big : FieldValue) : Field {
-    const x = new Field(big)
+  mul (value : FieldValue) : Field {
+    const x = Field.mod(value)
+    const a = math.ecc.mul(this.big, x.big)
     return new Field(this.big * x.big)
   }
 
-  pow (big : FieldValue) : Field {
-    const x = new Field(big)
-    const n = Field.mod(x.big, Field.N - 1n)
-    const p = Field.pow(this.big, n)
-    return new Field(p)
+  pow (value : FieldValue) : Field {
+    const x = Field.mod(value)
+    const a = math.ecc.pow(this.big, x.big)
+    return new Field(a)
   }
 
-  div (big : FieldValue) : Field {
-    const x = new Field(big)
-    const d = Field.pow(x.big, Field.N - 2n)
-    return new Field(this.big * d)
+  div (value : FieldValue) : Field {
+    const x = Field.mod(value)
+    const a = math.ecc.div(this.big, x.big)
+    return new Field(a)
   }
 
   negate () : Field {
-    return new Field(Field.N - this.big)
+    const n = math.ecc.neg(this.big)
+    return new Field(n)
   }
 
   generate () : Point {
-    const point = NoblePoint.BASE.multiply(this.big)
+    const G = secp256k1.ProjectivePoint.BASE
+    const point = G.multiply(this.big)
     return Point.import(point)
   }
 }
 
 export class Point {
-  static P = secp.CURVE.p
-  static N = secp.CURVE.n
-  static G = secp.CURVE.Gx
+  static P = math.CONST.P
+  static G = math.CONST.G
 
-  static validate (x : PointValue) : boolean {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      x = new Point(x)
-      return true
-    } catch { return false }
+  static is_valid (value : PointValue, throws ?: boolean) : boolean {
+    const x = (value instanceof Point)
+      ? value.x.big
+      : normalizePoint(value).slice(1).big
+    return assert.on_curve(x, throws)
   }
 
-  static normalize (x : PointValue) : ECPoint {
-    let bytes = normalizePoint(x)
-    if (bytes.length === 32) {
-      bytes = bytes.prepend(0x02)
+  static from_x (bytes : Bytes) : Point {
+    let cp = normalizePoint(bytes)
+    if (cp.length === 32) {
+      cp = cp.prepend(0x02)
     }
-    return NoblePoint.fromHex(bytes.hex)
+    assert.size(cp, 33)
+    const { x, y } = NoblePoint.fromHex(cp.hex)
+    assert.on_curve(x, true)
+    return new Point(x, y)
   }
 
   static generate (value : FieldValue) : Point {
-    return new Field(value).generate()
+    return Field.mod(value).point
   }
 
   static import (point : Point | ECPoint) : Point {
+    // console.log(point)
     const p = (point instanceof Point)
       ? { x: point.x.big, y: point.y.big }
       : { x: point.x, y: point.y }
     return new Point(p.x, p.y)
   }
 
-  readonly __p : ECPoint
+  readonly _p : ECPoint
 
-  constructor (x : PointValue, y ?: bigint) {
-    this.__p = (
-      typeof x === 'bigint' &&
-      typeof y === 'bigint'
-    )
-      ? new NoblePoint(x, y, 1n)
-      : Point.normalize(x)
+  constructor (x : bigint, y : bigint) {
+    this._p = new NoblePoint(x, y, 1n)
     this.p.assertValidity()
   }
 
   get p () : ECPoint {
-    return this.__p
+    return this._p
   }
 
   get x () : Buff {
@@ -218,13 +195,8 @@ export class Point {
   }
 
   eq (value : PointValue) : boolean {
-    return (value instanceof Point)
-      ? this.p.equals(new NoblePoint(value.x.big, value.y.big, 1n))
-      : (value instanceof Uint8Array)
-        ? this.x.big === Buff.raw(value).big
-        : (typeof value === 'number')
-          ? BigInt(value) === this.x.big
-          : value === this.x.big
+    const p = (value instanceof Point) ? value : Point.from_x(value)
+    return this.x.big === p.x.big && this.y.big === p.y.big
   }
 
   add (x : PointValue) : Point {
@@ -281,11 +253,15 @@ function normalizePoint (value : FieldValue | PointValue) : Buff {
   }
   if (
     value instanceof Uint8Array ||
-    typeof value === 'string'   ||
-    typeof value === 'number'   ||
-    typeof value === 'bigint'
+    typeof value === 'string'
   ) {
     return Buff.bytes(value)
   }
-  throw TypeError('Invalid input type:' + typeof value)
+  if (
+    typeof value === 'number' ||
+    typeof value === 'bigint'
+  ) {
+    return Buff.bytes(value, 32)
+  }
+  throw new TypeError(`Unknown type: ${typeof value}`)
 }

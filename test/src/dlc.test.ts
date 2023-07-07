@@ -1,29 +1,27 @@
-import { Buff, Hash } from '@cmdcode/buff-utils'
-import * as ECC  from '../../src/ecc.js'
+import { Test } from 'tape'
+import { Buff, sha256 } from '@cmdcode/buff-utils'
+import { Field, Point, util } from '../../src/index.js'
 
-const { Field, Point } = ECC
 const ec = new TextEncoder()
 
-export default async function dlcTest(t) {
+export default async function dlcTest(t : Test) {
   t.test('Testing ECC Discrete Log Signatures', async t => {
 
     // Define some dummy message.
-    const m1 = new Uint8Array(32)
-    const m2 = new Uint8Array(32)
-    m1.set(ec.encode('cloudy day'))
-    m2.set(ec.encode('bitcoin transaction'))
+    const m1 = Buff.str('cloudy day')
+    const m2 = Buff.str('bitcoin sighash')
 
     // Setup our (a/A), (k/R), and (sk/sR) keypairs.
-    const a  = new Field(Buff.random(32))
+    const a  = Field.mod(util.random(32))
     const A  = Point.import(a.point)
-    const k  = new Field(Buff.random(32))
+    const k  = Field.mod(util.random(32))
     const R  = Point.import(k.point)
-    const sk = new Field(Buff.random(32))
+    const sk = Field.mod(util.random(32))
     const sR = Point.import(sk.point)
 
     // Create our hashed message digest comitting to R.
-    const hmR = await Hash.sha256(Uint8Array.of(...m1, ...R.x))
-    const hsR = await Hash.sha256(Uint8Array.of(...m2, ...sR.x))
+    const hmR = sha256(Buff.join([ m1, R.x ]))
+    const hsR = sha256(Buff.join([ m2, sR.x ]))
 
     // This signature proof can be used as a public key.
     const siG = R.sub(A.mul(hmR))

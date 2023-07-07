@@ -1,42 +1,40 @@
+import { secp256k1 } from '@noble/curves/secp256k1'
+import { Field, mod, pow }  from '@noble/curves/abstract/modular'
+import { PointData } from './types.js'
+
+export {
+  mod,
+  pow,
+  pow2,
+  invert
+} from '@noble/curves/abstract/modular'
+
+export const curve = secp256k1.CURVE
+
+const N = curve.n
+const P = curve.p
+
+const G : PointData = { x: curve.Gx, y: curve.Gy }
+
 const _0n = BigInt(0)
 const _1n = BigInt(1)
+const _2n = BigInt(2)
+const _3n = BigInt(3)
+const _4n = BigInt(4)
 
-export function mod (a : bigint, b : bigint) : bigint {
-  const result = a % b
-  return result >= _0n ? result : b + result
+export const CONST = { N, P, G, _0n, _1n, _2n, _3n, _4n }
+
+export const ecc   = Field(N, 32, true)
+export const Point = secp256k1.ProjectivePoint
+
+export const modN = (x : bigint) : bigint => mod(x, N)
+export const modP = (x : bigint) : bigint => mod(x, P)
+
+export const powN = (x : bigint, exp : bigint) : bigint => pow(x, exp, N)
+
+export const on_curve = (x : bigint) : boolean => {
+  return typeof x === 'bigint' && _0n < x && x < P
 }
-
-export function floor (a : bigint, b : bigint) : bigint {
-  return a / b
-}
-
-export function pow (
-  num : bigint,
-  exp : bigint,
-  modulo ?: bigint
-) : bigint {
-  const is_mod = (typeof modulo === 'bigint')
-  switch (true) {
-    case (exp < _0n):
-      throw new Error('Exponent must be greater than zero.')
-    case (is_mod && modulo < _1n):
-      throw new Error('Modulo must be greater than zero.')
-    case (is_mod && modulo === _1n):
-      return _0n
-    default:
-      break
-  }
-
-  let ans = _1n
-
-  while (exp > _0n) {
-    if ((exp & _1n) === _1n) {
-      ans *= num
-      ans = is_mod ? mod(ans, modulo) : ans
-    }
-    num *= num
-    num = is_mod ? mod(num, modulo) : num
-    exp >>= _1n
-  }
-  return ans
+export const in_field = (x : bigint) : boolean => {
+  return typeof x === 'bigint' && _0n < x && x < N
 }
