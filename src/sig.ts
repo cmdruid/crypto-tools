@@ -1,5 +1,6 @@
 import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { Field, Point } from './ecc.js'
+import * as math        from './math.js'
 import * as assert      from './assert.js'
 
 import {
@@ -13,6 +14,8 @@ import {
   signer_defaults,
   SignerConfig
 } from './config.js'
+
+const { _0n } = math.CONST
 
 export function sign (
   message : Bytes,
@@ -79,29 +82,29 @@ export function verify (
    */
   const { throws } = signer_defaults(config)
   // Normalize the message into bytes.
-  const m = Buff.bytes(message)
+  const msg = Buff.bytes(message)
   // Convert signature into a stream object.
-  const stream = Buff.bytes(signature).stream
+  const sig = Buff.bytes(signature)
   // Check if the signature size is at least 64 bytes.
-  if (stream.size < 64) {
-    return fail('Signature length is too small: ' + String(stream.size), throws)
+  if (sig.length < 64) {
+    return fail('Signature length is too small: ' + String(sig.length), throws)
   }
   // Assert that the pubkey is 32 bytes.
   assert.size(pubkey, 32)
   // Lift the pubkey to point P.
   const P  = Point.from_x(pubkey)
   // Let rx equal first 32 bytes of signature.
-  const rx = stream.read(32)
+  const rx = sig.subarray(0, 32)
   // Lift rx to point R.
   const R  = Point.from_x(rx)
   // Let s equal next 32 bytes of signature.
-  const s  = stream.read(32)
+  const s  = sig.subarray(32, 64)
   // Lift s to point sG.
-  const sG = new Field(s).point
+  const sG = Field.mod(s).point
   // Let the challenge equal hash('BIP0340/challenge' || R || P || m).
-  const ch = digest('BIP0340/challenge', [ R.x, P.x, m ])
+  const ch = digest('BIP0340/challenge', [ R.x, P.x, msg ])
   // Let c equal the field value of challenge mod N.
-  const c  = new Field(ch)
+  const c  = Field.mod(ch)
   // Let eP equal point P * c
   const eP = P.mul(c.big)
   // Let r = sG - eP.
@@ -113,11 +116,15 @@ export function verify (
   }
 
   // Reject if R value is infinite.
-  if (R.x.big === 0n) {
+  if (R.x.big === _0n) {
     return fail('Signature R value is infinite!', throws)
   }
 
-  // Return if x coordinate of R value equals r.
+  // Reject if x coordinate of R value does not equal r.
+  if (R.x.big !== r.x.big) {
+    return fail(`Signature is invalid! R: ${R.x.hex} r:${r.x.hex}`, throws)
+  }
+
   return R.x.big === r.x.big
 }
 

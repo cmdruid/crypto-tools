@@ -1,6 +1,6 @@
-import { secp256k1 } from '@noble/curves/secp256k1'
-import { Field, mod, pow }  from '@noble/curves/abstract/modular'
-import { PointData } from './types.js'
+import { secp256k1 }       from '@noble/curves/secp256k1'
+import { Field, mod, pow } from '@noble/curves/abstract/modular'
+import { PointData }       from './types.js'
 
 export {
   mod,

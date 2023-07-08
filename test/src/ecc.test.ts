@@ -14,22 +14,22 @@ const b = util.random(32)
 const fa = new Field(a)
 const fb = new Field(b)
 
-const tiny_add     = util.mod_bytes(ecc.privateAdd(a.raw, b.raw) as Uint8Array)
-const noble_add    = util.mod_bytes(math.ecc.add(a.big, b.big))
+const tiny_add     = Buff.raw(ecc.privateAdd(a.raw, b.raw) as Uint8Array)
+const noble_add    = Buff.big(math.ecc.add(a.big, b.big))
 const field_add    = fa.add(fb)
 
-const tiny_sub     = util.mod_bytes(ecc.privateSub(a.raw, b.raw) as Uint8Array)
-const noble_sub    = util.mod_bytes(math.ecc.sub(a.big, b.big))
+const tiny_sub     = Buff.raw(ecc.privateSub(a.raw, b.raw) as Uint8Array)
+const noble_sub    = Buff.big(math.ecc.sub(a.big, b.big))
 const field_sub    = fa.sub(fb)
 
-const tiny_neg     = util.mod_bytes(ecc.privateNegate(a.raw) as Uint8Array)
-const noble_neg    = util.mod_bytes(math.ecc.neg(a.big))
+const tiny_neg     = Buff.raw(ecc.privateNegate(a.raw) as Uint8Array)
+const noble_neg    = Buff.big(math.ecc.neg(a.big))
 const field_neg    = fa.negate()
 
-const noble_mul    = util.mod_bytes(math.ecc.mul(a.big, b.big))
+const noble_mul    = Buff.big(math.ecc.mul(a.big, b.big))
 const field_mul    = fa.mul(fb)
 
-const noble_div    = util.mod_bytes(math.ecc.div(a.big, b.big))
+const noble_div    = Buff.big(math.ecc.div(a.big, b.big))
 const field_div    = fa.div(fb)
 
 const tiny_pt_a    = ecc.pointFromScalar(a.raw) as Uint8Array

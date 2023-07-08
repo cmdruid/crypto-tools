@@ -3,7 +3,11 @@ import { Field }         from './ecc.js'
 import { hmac512 }       from './hash.js'
 import { pow }           from './math.js'
 
-import { sign, recover, verify } from './sig.js'
+import {
+  sign,
+  recover,
+  verify
+} from './sig.js'
 
 import {
   getSharedKey,
@@ -34,7 +38,9 @@ export class Signer {
   }
 
   get pubkey () : string {
-    return this._secret.point.x.hex
+    return (this.xonly)
+      ? this._secret.point.x.hex
+      : this._secret.point.hex
   }
 
   get xonly () : boolean {

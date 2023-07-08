@@ -82,19 +82,19 @@ export class Field extends Uint8Array {
   add (value : FieldValue) : Field {
     const x = Field.mod(value)
     const a = math.ecc.add(this.big, x.big)
-    return new Field(this.big + x.big)
+    return new Field(a)
   }
 
   sub (value : FieldValue) : Field {
     const x = Field.mod(value)
     const a = math.ecc.sub(this.big, x.big)
-    return new Field(this.big - x.big)
+    return new Field(a)
   }
 
   mul (value : FieldValue) : Field {
     const x = Field.mod(value)
     const a = math.ecc.mul(this.big, x.big)
-    return new Field(this.big * x.big)
+    return new Field(a)
   }
 
   pow (value : FieldValue) : Field {
@@ -110,27 +110,21 @@ export class Field extends Uint8Array {
   }
 
   negate () : Field {
-    const n = math.ecc.neg(this.big)
-    return new Field(n)
+    // const n = math.ecc.neg(this.big)
+    return new Field(Field.N - this.big)
   }
 
   generate () : Point {
-    const G = secp256k1.ProjectivePoint.BASE
-    const point = G.multiply(this.big)
+    const base  = secp256k1.ProjectivePoint.BASE
+    const point = base.multiply(this.big)
     return Point.import(point)
   }
 }
 
 export class Point {
-  static P = math.CONST.P
-  static G = math.CONST.G
-
-  static is_valid (value : PointValue, throws ?: boolean) : boolean {
-    const x = (value instanceof Point)
-      ? value.x.big
-      : normalizePoint(value).slice(1).big
-    return assert.on_curve(x, throws)
-  }
+  static P    = math.CONST.P
+  static G    = math.CONST.G
+  static base = secp256k1.ProjectivePoint.BASE
 
   static from_x (bytes : Bytes) : Point {
     let cp = normalizePoint(bytes)
@@ -138,13 +132,16 @@ export class Point {
       cp = cp.prepend(0x02)
     }
     assert.size(cp, 33)
-    const { x, y } = NoblePoint.fromHex(cp.hex)
-    assert.on_curve(x, true)
-    return new Point(x, y)
+    const point = NoblePoint.fromHex(cp.hex)
+    point.assertValidity()
+    // assert.on_curve(point.x, true)
+    return new Point(point.x, point.y)
   }
 
   static generate (value : FieldValue) : Point {
-    return Field.mod(value).point
+    const field = Field.mod(value)
+    const point = Point.base.multiply(field.big)
+    return Point.import(point)
   }
 
   static import (point : Point | ECPoint) : Point {
@@ -214,7 +211,7 @@ export class Point {
   mul (value : PointValue) : Point {
     return (value instanceof Point)
       ? Point.import(this.p.multiply(value.x.big))
-      : Point.import(this.p.multiply(normalizeField(value)))
+      : Point.import(this.p.multiply(Field.mod(value).big))
   }
 
   negate () : Point {
