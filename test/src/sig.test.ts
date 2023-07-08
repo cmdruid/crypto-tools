@@ -6,9 +6,7 @@ import { noble, sig, util } from '../../src/index.js'
 export default async function (t : Test) {
   t.test('Test signing/validation of signatures.', async t => {
     const message = util.random(32)
-    console.log('message:', message.hex)
     const sec_key = noble.schnorr.utils.randomPrivateKey()
-    console.log('seckey:', Buff.raw(sec_key).hex)
 
     const tiny_pub  = Buff.raw(ecc.pointFromScalar(sec_key) as Uint8Array).slice(1)
     const noble_pub = Buff.raw(noble.schnorr.getPublicKey(sec_key))

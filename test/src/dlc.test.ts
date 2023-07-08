@@ -1,6 +1,6 @@
 import { Test } from 'tape'
-import { Buff, sha256 } from '@cmdcode/buff-utils'
-import { Field, Point, util } from '../../src/index.js'
+import { Buff } from '@cmdcode/buff-utils'
+import { Field, Point, sha256, util } from '../../src/index.js'
 
 const ec = new TextEncoder()
 
