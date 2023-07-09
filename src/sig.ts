@@ -1,14 +1,10 @@
-import { Buff, Bytes }  from '@cmdcode/buff-utils'
-import { Field, Point } from './ecc.js'
-import * as math        from './math.js'
-import * as assert      from './assert.js'
-
-import {
-  fail,
-  getSharedCode,
-  digest,
-  xonly_pub
-} from './utils.js'
+import { Buff, Bytes }   from '@cmdcode/buff-utils'
+import { Field, Point }  from './ecc.js'
+import { digest }        from './hash.js'
+import { xonly_pub }     from './utils.js'
+import * as assert       from './assert.js'
+import * as math         from './math.js'
+import { getSharedCode } from './keys.js'
 
 import {
   signer_defaults,
@@ -87,7 +83,7 @@ export function verify (
   const sig = Buff.bytes(signature)
   // Check if the signature size is at least 64 bytes.
   if (sig.length < 64) {
-    return fail('Signature length is too small: ' + String(sig.length), throws)
+    return assert.fail('Signature length is too small: ' + String(sig.length), throws)
   }
   // Assert that the pubkey is 32 bytes.
   assert.size(pubkey, 32)
@@ -112,17 +108,17 @@ export function verify (
 
   // Reject if R value has an odd Y coordinate.
   if (R.hasOddY) {
-    return fail('Signature R value has odd Y coordinate!', throws)
+    return assert.fail('Signature R value has odd Y coordinate!', throws)
   }
 
   // Reject if R value is infinite.
   if (R.x.big === _0n) {
-    return fail('Signature R value is infinite!', throws)
+    return assert.fail('Signature R value is infinite!', throws)
   }
 
   // Reject if x coordinate of R value does not equal r.
   if (R.x.big !== r.x.big) {
-    return fail(`Signature is invalid! R: ${R.x.hex} r:${r.x.hex}`, throws)
+    return assert.fail(`Signature is invalid! R: ${R.x.hex} r:${r.x.hex}`, throws)
   }
 
   return R.x.big === r.x.big

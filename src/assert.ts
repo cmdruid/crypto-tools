@@ -1,8 +1,18 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
-import { fail }  from './utils.js'
 import { CONST } from './math.js'
 
 const { N, P, _0n } = CONST
+
+export function fail (
+  error  : string,
+  throws = false
+) : boolean {
+  if (throws) {
+    throw new Error(error)
+  } else {
+    return false
+  }
+}
 
 export function size (
   input   : Bytes,

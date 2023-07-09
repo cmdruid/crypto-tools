@@ -1,8 +1,14 @@
-import { Test }     from 'tape'
-import vector_tests from './tweak.vectors.json' assert { type: 'json' }
-
-import { noble, Field, Point, sig, util } from '../../src/index.js'
+import { Test } from 'tape'
 import { Buff } from '@cmdcode/buff-utils'
+
+import {
+  ecc,
+  noble,
+  Field,
+  Point
+} from '../../src/index.js'
+
+import vector_tests from './tweak.vectors.json' assert { type: 'json' }
 
 const { sec_vectors } = vector_tests
 
@@ -26,12 +32,12 @@ export default function tweakTests(t : Test) {
       t.equal(tweaked_sec.hex, tweakedPrivkey, 'The tweaked private keys should match.')
 
       const tweaked_pub = pub_key.add(tweak).x.hex
-      const target_pub  = util.getPublicKey(tweakedPrivkey, true)
+      const target_pub  = ecc.getPublicKey(tweakedPrivkey, true)
       t.equal(tweaked_pub, target_pub.hex, 'The tweaked public keys should match.')
 
-      const utils_sig   = sig.sign(message, tweaked_sec)
+      const utils_sig   = ecc.sign(message, tweaked_sec)
       const noble_valid = noble.schnorr.verify(utils_sig, message, tweaked_pub)
-      const utils_valid = sig.verify(utils_sig, message, tweaked_pub, { throws: true })
+      const utils_valid = ecc.verify(utils_sig, message, tweaked_pub, { throws: true })
 
       if (!noble_valid) {
         console.log('utils sig:', utils_sig.hex)

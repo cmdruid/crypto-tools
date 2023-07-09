@@ -80,3 +80,16 @@ export function hmac (
       throw new Error('Unrecognized format:' + String(type))
   }
 }
+
+export function hashtag (tag : string) : Buff {
+  const hash = Buff.str(tag).digest
+  return Buff.join([ hash, hash ])
+}
+
+export function digest (
+  tag  : string,
+  data : Bytes[] = []
+) : Buff {
+  const hash = hashtag(tag)
+  return Buff.join([ hash, ...data ]).digest
+}

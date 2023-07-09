@@ -12,7 +12,7 @@ import {
 import {
   getSharedKey,
   getSharedCode
-} from './utils.js'
+} from './keys.js'
 
 import {
   signer_defaults,
