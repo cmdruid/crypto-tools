@@ -33,11 +33,11 @@ const noble_div    = Buff.big(math.ecc.div(a.big, b.big))
 const field_div    = fa.div(fb)
 
 const tiny_pt_a    = ecc.pointFromScalar(a.raw) as Uint8Array
-const noble_pt_a   = math.Point.BASE.multiply(a.big)
+const noble_pt_a   = math.point.P.BASE.multiply(a.big)
 const field_pt_a   = fa.point
 
 const tiny_pt_b    = ecc.pointFromScalar(b.raw) as Uint8Array
-const noble_pt_b   = math.Point.BASE.multiply(b.big)
+const noble_pt_b   = math.point.P.BASE.multiply(b.big)
 const field_pt_b   = fb.point
 
 const tiny_pt_add  = ecc.pointAdd(tiny_pt_a, tiny_pt_b) as Uint8Array
