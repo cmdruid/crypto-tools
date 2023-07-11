@@ -81,15 +81,15 @@ export function hmac (
   }
 }
 
-export function hashtag (tag : string) : Buff {
+export function taghash (tag : string) : Buff {
   const hash = Buff.str(tag).digest
   return Buff.join([ hash, hash ])
 }
 
 export function digest (
-  tag  : string,
-  data : Bytes[] = []
+  tag : string,
+  ...data : Bytes[]
 ) : Buff {
-  const hash = hashtag(tag)
+  const hash = taghash(tag)
   return Buff.join([ hash, ...data ]).digest
 }

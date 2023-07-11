@@ -3,7 +3,7 @@ import { Field, Point } from './ecc.js'
 import { random }       from './utils.js'
 
 import {
-  hashtag,
+  taghash,
   hmac512
 } from './hash.js'
 
@@ -54,7 +54,7 @@ export function getSharedCode (
   peer_pub : Bytes,
   tag   = 'ecdh/code'
 ) : Buff {
-  const hash = hashtag(tag)
+  const hash = taghash(tag)
   const sec  = getSecretKey(self_sec)
   const pub  = getPublicKey(sec)
   const peer = Buff.bytes(peer_pub)

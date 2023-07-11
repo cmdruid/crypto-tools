@@ -122,9 +122,11 @@ export class Field extends Uint8Array {
 }
 
 export class Point {
-  static P    = math.CONST.P
-  static G    = math.CONST.G
-  static base = secp256k1.ProjectivePoint.BASE
+  static P     = math.CONST.P
+  static G     = math.CONST.G
+  static curve = secp256k1.CURVE
+  static base  = Point.import(secp256k1.ProjectivePoint.BASE)
+  static zero  = Point.import(secp256k1.ProjectivePoint.ZERO)
 
   static from_x (bytes : Bytes) : Point {
     let cp = normalizePoint(bytes)
@@ -140,7 +142,7 @@ export class Point {
 
   static generate (value : FieldValue) : Point {
     const field = Field.mod(value)
-    const point = Point.base.multiply(field.big)
+    const point = Point.base.mul(field.big)
     return Point.import(point)
   }
 
@@ -154,7 +156,10 @@ export class Point {
 
   readonly _p : ECPoint
 
-  constructor (x : bigint, y : bigint) {
+  constructor (
+    x : bigint,
+    y : bigint
+  ) {
     this._p = new NoblePoint(x, y, 1n)
     this.p.assertValidity()
   }
@@ -181,6 +186,14 @@ export class Point {
 
   get hex () : string {
     return this.buff.hex
+  }
+
+  get is_zero () : boolean {
+    return this.p.equals(Point.zero.p)
+  }
+
+  get is_valid () : boolean {
+    try { this.p.assertValidity(); return true } catch { return false }
   }
 
   get hasEvenY () : boolean {

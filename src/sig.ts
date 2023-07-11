@@ -56,7 +56,7 @@ export function sign (
   // For taproot: If R has an odd Y coordinate, return negated version of k'.
   const k = (xonly) ? kp.negated.big : kp.big
   // Let c equal the tagged hash('BIP0340/challenge' || R || P || m) mod n.
-  const ch = digest('BIP0340/challenge', [ R.x.raw, P.x.raw, m ])
+  const ch = digest('BIP0340/challenge', R.x.raw, P.x.raw, m)
   const c  = Field.mod(ch)
   // Let s equal (k + ed) mod n.
   const s  = Field.mod(k + (c.big * d))
@@ -98,7 +98,7 @@ export function verify (
   // Lift s to point sG.
   const sG = Field.mod(s).point
   // Let the challenge equal hash('BIP0340/challenge' || R || P || m).
-  const ch = digest('BIP0340/challenge', [ R.x, P.x, msg ])
+  const ch = digest('BIP0340/challenge', R.x, P.x, msg)
   // Let c equal the field value of challenge mod N.
   const c  = Field.mod(ch)
   // Let eP equal point P * c
@@ -134,8 +134,8 @@ export function recover (
   const msg   = Buff.bytes(message)
   const pub   = Buff.bytes(pub_key)
   const seed  = getSharedCode(rec_key, pub_key, 'ecdh/recovery')
-  const nonce = digest('BIP0340/nonce', [ seed, message ])
-  const chal  = digest('BIP0340/challenge', [ sig.slice(0, 32), xonly_pub(pub), msg ])
+  const nonce = digest('BIP0340/nonce', seed, message)
+  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), xonly_pub(pub), msg)
   const c = new Field(chal)
   const k = new Field(nonce).negated
   const s = new Field(sig.slice(32, 64))
@@ -156,12 +156,12 @@ function compute_nonce (
     n = getSharedCode(secret, recovery, 'ecdh/recovery')
   } else {
     // Hash the auxiliary data according to BIP 0340.
-    const a = digest('BIP0340/aux', [ aux ?? Buff.random(32) ])
+    const a = digest('BIP0340/aux', aux)
     // Let t equal the byte-wise xor of (d) and (a).
     const t = Buff.bytes(secret).big ^ a.big
     // The nonce seed is our xor secret key and public key.
     n = Buff.join([ t, pubkey ])
   }
   // Return our nonce as a tagged hash of the seed value and message.
-  return digest('BIP0340/nonce', [ n, Buff.bytes(message) ])
+  return digest('BIP0340/nonce', n, Buff.bytes(message))
 }

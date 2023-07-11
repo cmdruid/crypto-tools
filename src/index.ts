@@ -11,6 +11,7 @@ export * from './config.js'
 export * from './ecc.js'
 export * from './hash.js'
 
+export * as assert from './assert.js'
 export * as math   from './math.js'
 export * as util   from './utils.js'
 

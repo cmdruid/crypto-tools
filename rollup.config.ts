@@ -7,9 +7,9 @@ import terser      from '@rollup/plugin-terser'
 const libraryName = 'cryptoUtils'
 
 const treeshake = {
-	moduleSideEffects: false,
-	propertyReadSideEffects: false,
-	tryCatchDeoptimization: false
+	moduleSideEffects       : false,
+	propertyReadSideEffects : false,
+	tryCatchDeoptimization  : false
 }
 
 const onwarn = (warning) => {
@@ -28,15 +28,14 @@ const onwarn = (warning) => {
 
 const tsConfig = { 
   compilerOptions: {
-    declaration: false,
-    declarationDir: null,
-    declarationMap: false
+    declaration    : false,
+    declarationDir : null,
+    declarationMap : false
   }
 }
 
 const nodeConfig = {
   input: 'src/index.ts',
-  onwarn,
   output: [
     {
       file: 'dist/main.cjs',
@@ -52,12 +51,12 @@ const nodeConfig = {
   ],
   plugins: [ typescript(tsConfig), nodeResolve(), commonjs() ],
   strictDeprecations: true,
-  treeshake
+  treeshake,
+  onwarn,
 }
 
 const browserConfig = {
   input: 'src/index.ts',
-  onwarn,
   output: [
     {
       file: 'dist/bundle.min.js',
@@ -76,7 +75,8 @@ const browserConfig = {
     commonjs() 
   ],
   strictDeprecations: true,
-  treeshake
+  treeshake,
+  onwarn,
 }
 
 export default [ nodeConfig, browserConfig ]

@@ -1,7 +1,7 @@
-import { Buff, Bytes }   from '@cmdcode/buff-utils'
-import { Field }         from './ecc.js'
-import { hmac512 }       from './hash.js'
-import { pow }           from './math.js'
+import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { Field }       from './ecc.js'
+import { hmac512 }     from './hash.js'
+import { pow }         from './math.js'
 
 import {
   sign,

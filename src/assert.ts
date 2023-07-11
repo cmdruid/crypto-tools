@@ -26,6 +26,16 @@ export function size (
   return true
 }
 
+export function min_value (
+  bytes : Bytes,
+  min   : bigint
+) : void {
+  const val = Buff.bytes(bytes).big
+  if (val < min) {
+    throw new TypeError(`Bytes integer value is too low: ${val} < ${min}`)
+  }
+}
+
 export function exists <T> (
   input  ?: T
 ) : asserts input is T {
