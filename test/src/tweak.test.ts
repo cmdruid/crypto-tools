@@ -8,7 +8,7 @@ import {
   Point
 } from '../../src/index.js'
 
-import vector_tests from './tweak.vectors.json' assert { type: 'json' }
+import vector_tests from './vectors/tweak.vectors.json' assert { type: 'json' }
 
 const { sec_vectors } = vector_tests
 

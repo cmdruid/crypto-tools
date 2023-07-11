@@ -5,6 +5,8 @@ import * as sign from './sig.js'
 
 export const noble = { secp, schnorr }
 
+export { derive } from './derive.js'
+
 export * from './config.js'
 export * from './ecc.js'
 export * from './hash.js'

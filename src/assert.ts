@@ -53,3 +53,54 @@ export function in_field (
   }
   return true
 }
+
+export function valid_chain (
+  path  : string,
+  code ?: Bytes
+) : void {
+  if (code === undefined) {
+    if (!path.startsWith('m')) {
+      throw new Error('You need to specify a chain-code for a non-root path.')
+    }
+  } else {
+    if (Buff.bytes(code).length !== 32) {
+      throw new Error('Chain code must be 32 bytes!')
+    }
+  }
+}
+
+export function valid_path (path : string) : void {
+  const regex = /^(m)?(\/)?(\w+'?\/)*\w+'?$/
+  if (path.match(regex) === null) {
+    throw new Error('Provided path string is invalid: ' + path)
+  }
+}
+
+export function valid_hash (hash : string) : void {
+  const regex = /^[0-9a-fA-F]{64}$/
+  if (hash.match(regex) === null) {
+    throw new Error('Provided hash string is invalid: ' + hash)
+  }
+}
+
+export function valid_index (index : number) : void {
+  if (index > 0x80000000) {
+    throw new TypeError('Index value must not exceed 31 bits.')
+  }
+}
+
+export function valid_pubkey (pubkey : Bytes) : void {
+  const key = Buff.bytes(pubkey)
+  if (key.length !== 33) {
+    throw new TypeError('Index value must not exceed 31 bits.')
+  }
+}
+
+export function valid_derive_state (
+  hardened   : boolean,
+  is_private : boolean
+) : void {
+  if (hardened && !is_private) {
+    throw new Error('Cannot derive hardedened paths when is_private is false!')
+  }
+}
