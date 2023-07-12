@@ -9,10 +9,7 @@ import {
   verify
 } from './sig.js'
 
-import {
-  getSharedKey,
-  getSharedCode
-} from './keys.js'
+import * as ecc from './keys.js'
 
 import {
   signer_defaults,
@@ -48,11 +45,11 @@ export class Signer {
   }
 
   getSharedKey (pubkey : Bytes) : string {
-    return getSharedKey(this._secret, pubkey).hex
+    return ecc.get_shared_key(this._secret, pubkey).hex
   }
 
   getSharedCode (pubkey : Bytes) : string {
-    return getSharedCode(this._secret, pubkey).hex
+    return ecc.get_shared_code(this._secret, pubkey).hex
   }
 
   hmac (msg : Bytes) : string {

@@ -1,5 +1,7 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
-import { CONST } from './math.js'
+import { CONST }       from './math.js'
+import { is_valid }    from './point.js'
+import { PointData }   from './types.js'
 
 const { N, P, _0n } = CONST
 
@@ -62,6 +64,12 @@ export function in_field (
     fail('x value is not in the field!', throws)
   }
   return true
+}
+
+export function valid_point (p : any) : asserts p is PointData {
+  if (!is_valid(p)) {
+    throw new TypeError('Point is invalid!')
+  }
 }
 
 export function valid_chain (

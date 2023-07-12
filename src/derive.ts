@@ -1,9 +1,9 @@
 import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { hmac512 }      from './hash.js'
 import { Field, Point } from './ecc.js'
-import { getPublicKey } from './keys.js'
 import { HDKey }        from './types.js'
 import * as assert      from './assert.js'
+import * as ecc         from './keys.js'
 
 type Tweak = [ tweak: Bytes, hardened: boolean ]
 
@@ -63,7 +63,7 @@ export function derive (
     // Format our bytes based on path state.
     const bytes = (hardened)
       ? Buff.join([ 0x00, key, data ])
-      : Buff.join([ getPublicKey(key), data ])
+      : Buff.join([ ecc.get_public_key(key), data ])
 
     const [ tweak, next_code ] = generate_code(code, bytes)
 

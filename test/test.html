@@ -13,7 +13,7 @@
       const { sha256, sign, verify, utils } = window.cryptoUtils
       const privKey   = utils.getRandom()
       const message   = utils.getRandom()
-      const pubkey    = utils.getPublicKey(privKey, true)
+      const pubkey    = utils.get_public_key(privKey, true)
       const signature = await sign(privKey, message)
       const isValid   = verify(signature, message, pubkey)
       console.log('Signature is valid:', isValid)

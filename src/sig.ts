@@ -1,10 +1,9 @@
-import { Buff, Bytes }   from '@cmdcode/buff-utils'
-import { Field, Point }  from './ecc.js'
-import { digest }        from './hash.js'
-import { xonly_pub }     from './utils.js'
-import * as assert       from './assert.js'
-import * as math         from './math.js'
-import { getSharedCode } from './keys.js'
+import { Buff, Bytes }  from '@cmdcode/buff-utils'
+import { Field, Point } from './ecc.js'
+import { digest }       from './hash.js'
+import * as assert      from './assert.js'
+import * as math        from './math.js'
+import * as ecc         from './keys.js'
 
 import {
   signer_defaults,
@@ -133,9 +132,9 @@ export function recover (
   const sig   = Buff.bytes(signature)
   const msg   = Buff.bytes(message)
   const pub   = Buff.bytes(pub_key)
-  const seed  = getSharedCode(rec_key, pub_key, 'ecdh/recovery')
+  const seed  = ecc.get_shared_code(rec_key, pub_key, 'ecdh/recovery')
   const nonce = digest('BIP0340/nonce', seed, message)
-  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), xonly_pub(pub), msg)
+  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), ecc.parse_x(pub), msg)
   const c = new Field(chal)
   const k = new Field(nonce).negated
   const s = new Field(sig.slice(32, 64))
@@ -153,7 +152,7 @@ function compute_nonce (
   if (nonce !== undefined) {
     n = Buff.bytes(nonce)
   } else if (recovery !== undefined) {
-    n = getSharedCode(secret, recovery, 'ecdh/recovery')
+    n = ecc.get_shared_code(secret, recovery, 'ecdh/recovery')
   } else {
     // Hash the auxiliary data according to BIP 0340.
     const a = digest('BIP0340/aux', aux)
