@@ -2,6 +2,7 @@ import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { secp256k1 }   from '@noble/curves/secp256k1'
 import { CONST }       from './math.js'
 import { PointData }   from './types.js'
+import { parse_x }     from './utils.js'
 
 const { _1n } = CONST
 
@@ -78,13 +79,11 @@ export function eq (
   a : PointData | null,
   b : PointData | null
 ) : boolean {
-  if (a === null && a === null) {
+  if (a === null && b === null) {
     return true
   }
   if (a !== null && b !== null) {
-    if (a.x === b.x && a.y === b.y) {
-      return true
-    }
+    return (a.x === b.x && a.y === b.y)
   }
   return false
 }
@@ -113,8 +112,12 @@ export function gen (
   return { x: pt.x, y: pt.y }
 }
 
-export function lift_x (b : Bytes) : PointData {
-  const buff  = Buff.bytes(b)
+export function lift_x (
+  bytes : Bytes,
+  xonly = false
+) : PointData {
+  if (xonly) bytes = parse_x(bytes)
+  const buff  = Buff.bytes(bytes)
   const point = ECPoint.fromHex(buff.hex)
   point.assertValidity()
   return { x: point.x, y: point.y }

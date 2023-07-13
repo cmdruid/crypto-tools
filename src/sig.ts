@@ -1,6 +1,7 @@
 import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { Field, Point } from './ecc.js'
 import { digest }       from './hash.js'
+import { parse_x }      from './utils.js'
 import * as assert      from './assert.js'
 import * as math        from './math.js'
 import * as ecc         from './keys.js'
@@ -134,7 +135,7 @@ export function recover (
   const pub   = Buff.bytes(pub_key)
   const seed  = ecc.get_shared_code(rec_key, pub_key, 'ecdh/recovery')
   const nonce = digest('BIP0340/nonce', seed, message)
-  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), ecc.parse_x(pub), msg)
+  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), parse_x(pub), msg)
   const c = new Field(chal)
   const k = new Field(nonce).negated
   const s = new Field(sig.slice(32, 64))

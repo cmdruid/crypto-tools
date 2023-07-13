@@ -32,7 +32,7 @@ export default function tweakTests(t : Test) {
       t.equal(tweaked_sec.hex, tweakedPrivkey, 'The tweaked private keys should match.')
 
       const tweaked_pub = pub_key.add(tweak).x.hex
-      const target_pub  = ecc.get_public_key(tweakedPrivkey, true)
+      const target_pub  = ecc.get_pubkey(tweakedPrivkey, true)
       t.equal(tweaked_pub, target_pub.hex, 'The tweaked public keys should match.')
 
       const utils_sig   = ecc.sign(message, tweaked_sec)

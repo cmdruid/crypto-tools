@@ -11,7 +11,7 @@ export default async function (t : Test) {
       const message = util.random(32)
       const sec_key = util.random(32)
 
-      const utils_pub = ecc.get_public_key(sec_key, true)
+      const utils_pub = ecc.get_pubkey(sec_key, true)
       const utils_sig = ecc.sign(message, sec_key)
       const is_valid  = ecc.verify(utils_sig, message, utils_pub, { throws : false })
 

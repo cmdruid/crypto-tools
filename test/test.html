@@ -5,19 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test</title>
-    <script src="../../dist/bundle.min.js"></script>
+    <script src="../../dist/browser.js"></script>
   </head>
   <body>
     <script type="module">
-      console.log(window.cryptoUtils)
-      const { sha256, sign, verify, utils } = window.cryptoUtils
-      const privKey   = utils.getRandom()
-      const message   = utils.getRandom()
-      const pubkey    = utils.get_public_key(privKey, true)
-      const signature = await sign(privKey, message)
-      const isValid   = verify(signature, message, pubkey)
+      console.log(window.crypto_utils)
+      const { ecc, sha256, util } = window.crypto_utils
+      const sec_key   = ecc.gen_seckey()
+      const message   = sha256(util.random())
+      const pubkey    = ecc.get_pubkey(sec_key, true)
+      const signature = await ecc.sign(message, sec_key)
+      const isValid   = ecc.verify(signature, message, pubkey)
       console.log('Signature is valid:', isValid)
-      console.log(sha256('deadbeef'))
+      console.log('message:', message.hex)
     </script>
   </body>
 </html>

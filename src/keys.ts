@@ -21,27 +21,21 @@ export function is_even_pub (pubkey : Bytes) : boolean {
   }
 }
 
-export function parse_x (pubkey : Bytes) : Buff {
-  const key = Buff.bytes(pubkey)
-  switch (key.length) {
-    case 32:
-      return key
-    case 33:
-      return key.slice(1, 33)
-    default:
-      throw new Error(`Invalid key length: ${key.length}`)
-  }
+export function gen_seckey (
+  even_y ?: boolean
+) : Buff {
+  return get_seckey(random(32), even_y)
 }
 
-export function gen_secret_key () : Buff {
-  return get_secret_key(random(32))
+export function get_seckey (
+  secret : Bytes,
+  even_y = false
+) : Buff {
+  const sec = Field.mod(secret)
+  return (even_y) ? sec.negated.buff : sec.buff
 }
 
-export function get_secret_key (secret : Bytes) : Buff {
-  return Field.mod(secret).buff
-}
-
-export function get_public_key (
+export function get_pubkey (
   seckey : Bytes,
   xonly  = false
 ) : Buff {
@@ -49,20 +43,22 @@ export function get_public_key (
   return (xonly) ? p.x : p.buff
 }
 
-export function get_pair_keys (
-  secret : Bytes,
-  xonly ?: boolean
+export function get_keypair (
+  secret  : Bytes,
+  xonly  ?: boolean,
+  even_y ?: boolean
 ) : [ Buff, Buff ] {
-  const sec = get_secret_key(secret)
-  const pub = get_public_key(sec, xonly)
+  const sec = get_seckey(secret, even_y)
+  const pub = get_pubkey(sec, xonly)
   return [ sec, pub ]
 }
 
-export function gen_pair_keys (
-  xonly ?: boolean
+export function gen_keypair (
+  xonly  ?: boolean,
+  even_y ?: boolean
 ) : [ Buff, Buff ] {
-  const sec = gen_secret_key()
-  return get_pair_keys(sec, xonly)
+  const sec = random(32)
+  return get_keypair(sec, xonly, even_y)
 }
 
 export function get_shared_key (
@@ -81,8 +77,8 @@ export function get_shared_code (
   tag   = 'ecdh/code'
 ) : Buff {
   const hash = taghash(tag)
-  const sec  = get_secret_key(self_sec)
-  const pub  = get_public_key(sec)
+  const sec  = get_seckey(self_sec)
+  const pub  = get_pubkey(sec)
   const peer = Buff.bytes(peer_pub)
   // Derive a linked key (from the cold storage key).
   const link = get_shared_key(sec, peer)

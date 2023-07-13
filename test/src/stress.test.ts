@@ -15,7 +15,7 @@ export default async function (t : Test) {
 
       const tiny_pub  = Buff.raw(tiny.pointFromScalar(sec_key) as Uint8Array).slice(1)
       const noble_pub = Buff.raw(noble.schnorr.getPublicKey(sec_key))
-      const utils_pub = ecc.get_public_key(sec_key, true)
+      const utils_pub = ecc.get_pubkey(sec_key, true)
 
       const tiny_sig  = Buff.raw(tiny.signSchnorr(message, sec_key))
       const noble_sig = Buff.raw(noble.schnorr.sign(message, sec_key))

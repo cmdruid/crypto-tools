@@ -1,4 +1,4 @@
-import { Buff } from '@cmdcode/buff-utils'
+import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { ExtendedKey } from './types.js'
 
 export function random (size ?: number) : Buff {
@@ -17,6 +17,18 @@ export function increment_buffer (buffer : Uint8Array) : Uint8Array {
     }
   }
   throw TypeError('Unable to increment buffer: ' + buffer.toString())
+}
+
+export function parse_x (pubkey : Bytes) : Buff {
+  const key = Buff.bytes(pubkey)
+  switch (key.length) {
+    case 32:
+      return key
+    case 33:
+      return key.slice(1, 33)
+    default:
+      throw new Error(`Invalid key length: ${key.length}`)
+  }
 }
 
 export function parse_extended_key (

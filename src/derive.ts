@@ -63,7 +63,7 @@ export function derive (
     // Format our bytes based on path state.
     const bytes = (hardened)
       ? Buff.join([ 0x00, key, data ])
-      : Buff.join([ ecc.get_public_key(key), data ])
+      : Buff.join([ ecc.get_pubkey(key), data ])
 
     const [ tweak, next_code ] = generate_code(code, bytes)
 

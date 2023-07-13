@@ -1,14 +1,10 @@
-import { Point } from '../src/ecc.js'
-import { math, util, assert } from '../src/index.js'
+import { ecc, sha256, util } from '../dist/module.mjs'
 
-const { point } = math
-const rand = util.random(32)
+const sec_key   = ecc.gen_seckey()
+const message   = sha256(util.random())
+const pubkey    = ecc.get_pubkey(sec_key, true)
+const signature = ecc.sign(message, sec_key)
+const isValid   = ecc.verify(signature, message, pubkey)
 
-const pt1 = math.point.gen(rand)
-const pt2 = math.point.gen(rand)
-const pt3 = math.point.add(pt1, pt2)
-
-assert.valid_pt(pt3)
-
-console.log(pt3)
-
+console.log('Signature is valid:', isValid)
+console.log('message:', message.hex)
