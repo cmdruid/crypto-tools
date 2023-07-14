@@ -21,14 +21,23 @@ export function increment_buffer (buffer : Uint8Array) : Uint8Array {
 
 export function parse_x (pubkey : Bytes) : Buff {
   const key = Buff.bytes(pubkey)
-  switch (key.length) {
-    case 32:
-      return key
-    case 33:
-      return key.slice(1, 33)
-    default:
-      throw new Error(`Invalid key length: ${key.length}`)
+  if (key.length === 32) return key
+  if (key.length === 33) return key.slice(1, 33)
+  throw new TypeError(`Invalid key length: ${key.length}`)
+}
+
+export function normalize_x (
+  pubkey : Bytes,
+  xonly  = false
+) : Buff {
+  const key = Buff.bytes(pubkey)
+  if (key.length === 32) {
+    return key.prepend(0x02)
+  } else if (key.length === 33) {
+    if (xonly) key[0] = 0x02
+    return key
   }
+  throw new TypeError(`Invalid key size: ${key.length}`)
 }
 
 export function parse_extended_key (

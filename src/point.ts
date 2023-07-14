@@ -2,7 +2,7 @@ import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { secp256k1 }   from '@noble/curves/secp256k1'
 import { CONST }       from './math.js'
 import { PointData }   from './types.js'
-import { parse_x }     from './utils.js'
+import { normalize_x } from './utils.js'
 
 const { _1n } = CONST
 
@@ -116,8 +116,7 @@ export function lift_x (
   bytes : Bytes,
   xonly = false
 ) : PointData {
-  if (xonly) bytes = parse_x(bytes)
-  const buff  = Buff.bytes(bytes)
+  const buff  = normalize_x(bytes, xonly)
   const point = ECPoint.fromHex(buff.hex)
   point.assertValidity()
   return { x: point.x, y: point.y }
