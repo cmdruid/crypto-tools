@@ -1,11 +1,6 @@
-import { Buff, Bytes }  from '@cmdcode/buff-utils'
-import { Field, Point } from './ecc.js'
-import { random }       from './utils.js'
-
-import {
-  taghash,
-  hmac512
-} from './hash.js'
+import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { Field }       from './ecc.js'
+import { random }      from './utils.js'
 
 export function is_even_pub (pubkey : Bytes) : boolean {
   const pub = Buff.bytes(pubkey)
@@ -59,32 +54,4 @@ export function gen_keypair (
 ) : [ Buff, Buff ] {
   const sec = random(32)
   return get_keypair(sec, xonly, even_y)
-}
-
-export function get_shared_key (
-  seckey : Bytes,
-  pubkey : Bytes
-) : Buff {
-  const P  = Point.from_x(pubkey)
-  const sp = Field.mod(seckey)
-  const sh = P.mul(sp)
-  return sh.buff
-}
-
-export function get_shared_code (
-  self_sec : Bytes,
-  peer_pub : Bytes,
-  tag   = 'ecdh/code'
-) : Buff {
-  const hash = taghash(tag)
-  const sec  = get_seckey(self_sec)
-  const pub  = get_pubkey(sec)
-  const peer = Buff.bytes(peer_pub)
-  // Derive a linked key (from the cold storage key).
-  const link = get_shared_key(sec, peer)
-  // Sort the keys lexographically.
-  const keys = [ pub.hex, peer.hex ]
-  keys.sort()
-  // Use the linked key to produce a 512-bit HMAC code.
-  return hmac512(link, Buff.join([ hash, ...keys ]))
 }

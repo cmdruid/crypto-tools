@@ -3,15 +3,16 @@ import { Field }       from './ecc.js'
 import { hmac512 }     from './hash.js'
 import { pow }         from './math.js'
 
+import * as ecdh from './ecdh.js'
+
 import {
   sign,
   recover,
   verify
 } from './sig.js'
 
-import * as ecc from './keys.js'
-
 import {
+  SharedConfig,
   signer_defaults,
   SignerConfig,
   SignerState
@@ -45,11 +46,11 @@ export class Signer {
   }
 
   getSharedKey (pubkey : Bytes) : string {
-    return ecc.get_shared_key(this._secret, pubkey).hex
+    return ecdh.get_shared_key(this._secret, pubkey).hex
   }
 
-  getSharedCode (pubkey : Bytes) : string {
-    return ecc.get_shared_code(this._secret, pubkey).hex
+  getSharedCode (pubkey : Bytes, config ?: SharedConfig) : string {
+    return ecdh.get_shared_code(this._secret, pubkey, config).hex
   }
 
   hmac (msg : Bytes) : string {

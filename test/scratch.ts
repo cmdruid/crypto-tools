@@ -1,17 +1,12 @@
-import { ecc, sha256, util } from '../dist/module.mjs'
+import { Buff } from '@cmdcode/buff-utils'
+import { ecc, ecdh, util } from '../src/index.js'
 
-const sec_key   = ecc.gen_seckey()
-const message   = sha256(util.random())
-const pubkey    = ecc.get_pubkey(sec_key, true)
-const signature = ecc.sign(message, sec_key)
-const isValid   = ecc.verify(signature, message, pubkey)
+const msg = Buff.str('the weather is sunny!')
+const [ a_sec, a_pub ] = ecc.get_keypair(util.random(32))
+const [ b_sec, b_pub ] = ecc.get_keypair(util.random(32))
 
-console.log('Signature is valid:', isValid)
-console.log('message:', message.hex)
+const a_shared = ecdh.get_shared_code(a_sec, b_pub, { aux: msg })
+const b_shared = ecdh.get_shared_code(b_sec, a_pub, { aux: msg })
 
-console.log(pubkey.hex)
-const newkey = util.normalize_x(pubkey)
-const xonly  = ecc.parse_x(newkey)
-
-console.log(newkey.hex)
-console.log(xonly.hex)
+console.log('a code:', a_shared.hex)
+console.log('b code:', b_shared.hex)

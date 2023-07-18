@@ -18,6 +18,7 @@ export * from './hash.js'
 export * from './types.js'
 
 export * as assert from './assert.js'
+export * as ecdh   from './ecdh.js'
 export * as math   from './math.js'
 export * as point  from './point.js'
 export * as util   from './utils.js'
