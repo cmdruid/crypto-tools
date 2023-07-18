@@ -12,8 +12,8 @@ import {
 } from './hash.js'
 
 import {
-  SharedConfig,
-  shared_defaults
+  CodeOptions,
+  code_config
 } from './config.js'
 
 export function get_shared_key (
@@ -27,11 +27,11 @@ export function get_shared_key (
 }
 
 export function get_shared_code (
-  self_sec : Bytes,
-  peer_pub : Bytes,
-  config  ?: SharedConfig
+  self_sec  : Bytes,
+  peer_pub  : Bytes,
+  options  ?: CodeOptions
 ) : Buff {
-  const opt  = shared_defaults(config)
+  const opt  = code_config(options)
   const sec  = get_seckey(self_sec, opt.even_y)
   const pub  = get_pubkey(sec, opt.xonly)
   const hash = taghash(opt.tag)

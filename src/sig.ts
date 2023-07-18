@@ -7,22 +7,22 @@ import * as math        from './math.js'
 import * as ecdh        from './ecdh.js'
 
 import {
-  signer_defaults,
-  SignerConfig
+  sign_config,
+  SignOptions
 } from './config.js'
 
 const { _0n } = math.CONST
 
 export function sign (
-  message : Bytes,
-  secret  : Bytes,
-  config ?: SignerConfig
+  message  : Bytes,
+  secret   : Bytes,
+  options ?: SignOptions
 ) : Buff {
   /**
    * Implementation of signature algorithm as specified in BIP0340.
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
-  const opt = signer_defaults(config)
+  const opt = sign_config(options)
   const { adaptor, tweak, xonly } = opt
 
   // Normalize our message into bytes.
@@ -41,7 +41,7 @@ export function sign (
   // Let d equal d' (negate if needed).
   const d = (xonly) ? dp.negated.big : dp.big
   // Compute our nonce value.
-  const n = compute_nonce(Buff.big(d, 32), P.x, m, config)
+  const n = compute_nonce(Buff.big(d, 32), P.x, m, opt)
   // Let k' equal our nonce mod N.
   let kp = Field.mod(n)
   // If adaptor present, apply to k'.
@@ -70,13 +70,13 @@ export function verify (
   signature : Bytes,
   message   : Bytes,
   pubkey    : Bytes,
-  config   ?: SignerConfig
+  options  ?: SignOptions
 ) : boolean {
    /**
    * Implementation of verify algorithm as specified in BIP0340.
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
-  const { throws } = signer_defaults(config)
+  const { throws } = sign_config(options)
   // Normalize the message into bytes.
   const msg = Buff.bytes(message)
   // Convert signature into a stream object.
@@ -143,12 +143,12 @@ export function recover (
 }
 
 function compute_nonce (
-  secret  : Bytes,
-  pubkey  : Bytes,
-  message : Bytes,
-  config ?: SignerConfig
+  secret   : Bytes,
+  pubkey   : Bytes,
+  message  : Bytes,
+  options ?: SignOptions
 ) : Buff {
-  const { aux, nonce, recovery } = signer_defaults(config)
+  const { aux, nonce, recovery } = sign_config(options)
   let n : Buff
   if (nonce !== undefined) {
     n = Buff.bytes(nonce)

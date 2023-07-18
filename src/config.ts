@@ -1,14 +1,9 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 
-export type SignerConfig = Partial<SignerOptions>
-export type SharedConfig = Partial<SharedOptions>
+export type SignOptions = Partial<SignConfig>
+export type CodeOptions = Partial<CodeConfig>
 
-export interface SignerState {
-  recovery ?: Bytes
-  xonly     : boolean
-}
-
-export interface SignerOptions {
+export interface SignConfig {
   aux       : Bytes
   adaptor  ?: Bytes
   nonce    ?: Bytes
@@ -18,33 +13,33 @@ export interface SignerOptions {
   xonly     : boolean
 }
 
-export interface SharedOptions {
+export interface CodeConfig {
   aux    ?: Bytes
   even_y  : boolean
   tag     : string
   xonly   : boolean
 }
 
-export const SIGNER_DEFAULTS : SignerOptions = {
+const SIGN_DEFAULTS : SignConfig = {
   aux    : Buff.random(32),
   throws : false,
   xonly  : true
 }
 
-export const SHARED_DEFAULTS : SharedOptions = {
+const CODE_DEFAULTS : CodeConfig = {
   xonly  : false,
   even_y : false,
   tag    : 'ecdh/shared'
 }
 
-export function signer_defaults (
-  config : SignerConfig = {}
-) : SignerOptions {
-  return { ...SIGNER_DEFAULTS, ...config  }
+export function sign_config (
+  config : SignOptions = {}
+) : SignConfig {
+  return { ...SIGN_DEFAULTS, ...config  }
 }
 
-export function shared_defaults (
-  config : SharedConfig = {}
-) : SharedOptions {
-  return { ...SHARED_DEFAULTS, ...config  }
+export function code_config (
+  config : CodeOptions = {}
+) : CodeConfig {
+  return { ...CODE_DEFAULTS, ...config  }
 }
