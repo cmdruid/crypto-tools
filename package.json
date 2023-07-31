@@ -8,15 +8,14 @@
     "utils",
     "library"
   ],
-  "version": "2.2.9",
+  "version": "2.2.10",
   "type": "module",
   "main": "./dist/main.cjs",
   "unpkg": "./dist/browser.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     "import": "./dist/module.mjs",
-    "require": "./dist/main.cjs",
-    "types": "./dist/types/index.d.ts"
+    "require": "./dist/main.cjs"
   },
   "repository": {
     "type": "git",
