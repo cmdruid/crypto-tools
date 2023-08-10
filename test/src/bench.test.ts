@@ -1,5 +1,6 @@
-import { Test }      from 'tape'
-import { ecc, util } from '../../src/index.js'
+import { Test } from 'tape'
+
+import { keys, sig, util } from '../../src/index.js'
 
 export default async function (t : Test) {
   t.test('Bench test of signature validation.', async t => {
@@ -11,9 +12,9 @@ export default async function (t : Test) {
       const message = util.random(32)
       const sec_key = util.random(32)
 
-      const utils_pub = ecc.get_pubkey(sec_key, true)
-      const utils_sig = ecc.sign(message, sec_key)
-      const is_valid  = ecc.verify(utils_sig, message, utils_pub, { throws : false })
+      const utils_pub = keys.get_pubkey(sec_key, true)
+      const utils_sig = sig.sign(message, sec_key)
+      const is_valid  = sig.verify(utils_sig, message, utils_pub, { throws : false })
 
       results.push([ i, is_valid, 'Our signature should be valid.' ])
     }

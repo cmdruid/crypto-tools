@@ -1,7 +1,7 @@
-import { Buff, Bytes }     from '@cmdcode/buff-utils'
-import { secp256k1 }       from '@noble/curves/secp256k1'
-import { Field, mod, pow } from '@noble/curves/abstract/modular'
-import { PointData }       from './types.js'
+import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { secp256k1 }   from '@noble/curves/secp256k1'
+import { mod, pow }    from '@noble/curves/abstract/modular'
+import { PointData }   from './types.js'
 
 export {
   mod,
@@ -24,8 +24,6 @@ const _3n = BigInt(3)
 const _4n = BigInt(4)
 
 export const CONST = { N, P, G, _0n, _1n, _2n, _3n, _4n }
-
-export const ecc   = Field(N, 32, true)
 
 export const modN = (x : bigint) : bigint => mod(x, N)
 export const modP = (x : bigint) : bigint => mod(x, P)

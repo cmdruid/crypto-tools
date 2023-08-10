@@ -2,7 +2,7 @@ import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { secp256k1 }   from '@noble/curves/secp256k1'
 import { CONST }       from './math.js'
 import { PointData }   from './types.js'
-import { normalize_x } from './utils.js'
+import { normalize_x } from './keys.js'
 
 const { _1n } = CONST
 
@@ -32,6 +32,12 @@ export function is_valid (
     pt.assertValidity()
     return true
   } catch { return false }
+}
+
+export function assert_valid (p : any) : asserts p is PointData {
+  if (!is_valid(p)) {
+    throw new Error('ECC point is invalid: ' + String(p))
+  }
 }
 
 export function negate (

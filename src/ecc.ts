@@ -1,6 +1,8 @@
 import { Buff, Bytes }   from '@cmdcode/buff-utils'
 import { secp256k1 }     from '@noble/curves/secp256k1'
 import { ProjPointType } from '@noble/curves/abstract/weierstrass'
+import { Field as NFD }  from '@noble/curves/abstract/modular'
+
 import * as math         from './math.js'
 import * as assert       from './assert.js'
 
@@ -8,7 +10,10 @@ type ECPoint    = ProjPointType<bigint>
 type FieldValue = string | number | bigint | Uint8Array | Field
 type PointValue = string | number | bigint | Uint8Array | Point
 
+const NobleField = NFD(secp256k1.CURVE.n, 32, true)
 const NoblePoint = secp256k1.ProjectivePoint
+
+export const fd = NobleField
 
 export class Field extends Uint8Array {
   static N = secp256k1.CURVE.n
@@ -81,31 +86,31 @@ export class Field extends Uint8Array {
 
   add (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = math.ecc.add(this.big, x.big)
+    const a = fd.add(this.big, x.big)
     return new Field(a)
   }
 
   sub (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = math.ecc.sub(this.big, x.big)
+    const a = fd.sub(this.big, x.big)
     return new Field(a)
   }
 
   mul (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = math.ecc.mul(this.big, x.big)
+    const a = fd.mul(this.big, x.big)
     return new Field(a)
   }
 
   pow (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = math.ecc.pow(this.big, x.big)
+    const a = fd.pow(this.big, x.big)
     return new Field(a)
   }
 
   div (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = math.ecc.div(this.big, x.big)
+    const a = fd.div(this.big, x.big)
     return new Field(a)
   }
 
@@ -123,7 +128,7 @@ export class Field extends Uint8Array {
 
 export class Point {
   static P     = math.CONST.P
-  static G     = math.CONST.G
+  static G     = new Point(math.CONST.G.x, math.CONST.G.y)
   static curve = secp256k1.CURVE
   static base  = secp256k1.ProjectivePoint.BASE
 
@@ -144,6 +149,8 @@ export class Point {
     const point = Point.base.multiply(field.big)
     return Point.import(point)
   }
+
+  static mul = Point.generate
 
   static import (point : Point | ECPoint) : Point {
     // console.log(point)

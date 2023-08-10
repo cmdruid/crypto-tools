@@ -1,20 +1,8 @@
 import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { Field, Point } from './ecc.js'
 
-import {
-  get_seckey,
-  get_pubkey
-}  from './keys.js'
-
-import {
-  taghash,
-  hmac512
-} from './hash.js'
-
-import {
-  CodeOptions,
-  code_config
-} from './config.js'
+import { taghash, hmac512 }       from './hash.js'
+import { get_seckey, get_pubkey } from './keys.js'
 
 export function get_shared_key (
   self_sec : Bytes,
@@ -27,24 +15,19 @@ export function get_shared_key (
 }
 
 export function get_shared_code (
-  self_sec  : Bytes,
-  peer_pub  : Bytes,
-  options  ?: CodeOptions
+  self_sec : Bytes,
+  peer_pub : Bytes,
+  message  : Bytes,
+  prefix   = 'ecdh/hmac512'
 ) : Buff {
-  const opt  = code_config(options)
-  const sec  = get_seckey(self_sec, opt.even_y)
-  const pub  = get_pubkey(sec, opt.xonly)
-  const hash = taghash(opt.tag)
+  const sec  = get_seckey(self_sec)
+  const pub  = get_pubkey(sec)
   const peer = Buff.bytes(peer_pub)
-  // Derive a linked key (from the cold storage key).
-  const link = get_shared_key(sec, peer)
-  // Sort the keys lexographically.
-  const keys = [ pub.hex, peer.hex ]
-  keys.sort()
-  if (opt.aux !== undefined) {
-    const aux = Buff.bytes(opt.aux)
-    keys.push(aux.hex)
-  }
-  // Use the linked key to produce a 512-bit HMAC code.
-  return hmac512(link, Buff.join([ hash, ...keys ]))
+  const tag  = taghash(prefix)
+  // Derive a shared key.
+  const shared = get_shared_key(sec, peer_pub)
+  // Sort the pub keys lexographically.
+  const pubs = [ pub.hex, peer.hex ].sort()
+  // Use the shared key to sign a SHA512 digest.
+  return hmac512(shared, Buff.join([ ...tag, ...pubs, message ]))
 }

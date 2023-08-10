@@ -1,8 +1,7 @@
 import { Test } from 'tape'
 import { Buff } from '@cmdcode/buff-utils'
-import { Field, Point, sha256, util } from '../../src/index.js'
 
-const ec = new TextEncoder()
+import { Field, Point, hash, util } from '../../src/index.js'
 
 export default async function dlcTest(t : Test) {
   t.test('Testing ECC Discrete Log Signatures', async t => {
@@ -20,8 +19,8 @@ export default async function dlcTest(t : Test) {
     const sR = Point.import(sk.point)
 
     // Create our hashed message digest comitting to R.
-    const hmR = sha256(Buff.join([ m1, R.x ]))
-    const hsR = sha256(Buff.join([ m2, sR.x ]))
+    const hmR = hash.sha256(Buff.join([ m1, R.x ]))
+    const hsR = hash.sha256(Buff.join([ m2, sR.x ]))
 
     // This signature proof can be used as a public key.
     const siG = R.sub(A.mul(hmR))

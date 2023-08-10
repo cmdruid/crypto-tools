@@ -1,10 +1,11 @@
-import { Buff, Bytes }  from '@cmdcode/buff-utils'
-import { Field, Point } from './ecc.js'
-import { digest }       from './hash.js'
-import { parse_x }      from './utils.js'
+import { Buff, Bytes }    from '@cmdcode/buff-utils'
+import { Field, Point }   from './ecc.js'
+import { get_shared_key } from './ecdh.js'
+import { digest }         from './hash.js'
+import { parse_x }        from './keys.js'
+
 import * as assert      from './assert.js'
 import * as math        from './math.js'
-import * as ecdh        from './ecdh.js'
 
 import {
   sign_config,
@@ -133,7 +134,7 @@ export function recover (
   const sig   = Buff.bytes(signature)
   const msg   = Buff.bytes(message)
   const pub   = Buff.bytes(pub_key)
-  const seed  = ecdh.get_shared_code(rec_key, pub_key, { tag: 'ecdh/recovery' })
+  const seed  = get_shared_key(rec_key, pub_key)
   const nonce = digest('BIP0340/nonce', seed, message)
   const chal  = digest('BIP0340/challenge', sig.slice(0, 32), parse_x(pub), msg)
   const c = new Field(chal)
@@ -153,7 +154,7 @@ function compute_nonce (
   if (nonce !== undefined) {
     n = Buff.bytes(nonce)
   } else if (recovery !== undefined) {
-    n = ecdh.get_shared_code(secret, recovery, { tag: 'ecdh/recovery' })
+    n = get_shared_key(secret, recovery)
   } else {
     // Hash the auxiliary data according to BIP 0340.
     const a = digest('BIP0340/aux', aux)

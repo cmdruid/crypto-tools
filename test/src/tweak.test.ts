@@ -2,8 +2,9 @@ import { Test } from 'tape'
 import { Buff } from '@cmdcode/buff-utils'
 
 import {
-  ecc,
+  keys,
   noble,
+  sig,
   Field,
   Point
 } from '../../src/index.js'
@@ -32,12 +33,12 @@ export default function tweakTests(t : Test) {
       t.equal(tweaked_sec.hex, tweakedPrivkey, 'The tweaked private keys should match.')
 
       const tweaked_pub = pub_key.add(tweak).x.hex
-      const target_pub  = ecc.get_pubkey(tweakedPrivkey, true)
+      const target_pub  = keys.get_pubkey(tweakedPrivkey, true)
       t.equal(tweaked_pub, target_pub.hex, 'The tweaked public keys should match.')
 
-      const utils_sig   = ecc.sign(message, tweaked_sec)
+      const utils_sig   = sig.sign(message, tweaked_sec)
       const noble_valid = noble.schnorr.verify(utils_sig, message, tweaked_pub)
-      const utils_valid = ecc.verify(utils_sig, message, tweaked_pub, { throws: true })
+      const utils_valid = sig.verify(utils_sig, message, tweaked_pub, { throws: true })
 
       if (!noble_valid) {
         console.log('utils sig:', utils_sig.hex)

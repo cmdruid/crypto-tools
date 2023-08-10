@@ -52,11 +52,7 @@ rules:
           after     : true
 
 ignorePatterns:
-  - build
-  - contrib
   - coverage
   - dist
   - test
   - rollup.config.ts
-  - src/class
-  - src/escrow
