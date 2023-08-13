@@ -2,7 +2,7 @@ import { Test }  from 'tape'
 import { Buff }  from '@cmdcode/buff-utils'
 import * as tiny from 'tiny-secp256k1'
 
-import { keys, sig, noble, util } from '../../src/index.js'
+import { keys, signer, noble, util } from '../../src/index.js'
 
 export default async function (t : Test) {
   t.test('Test signing/validation of signatures.', async t => {
@@ -15,15 +15,15 @@ export default async function (t : Test) {
 
     const tiny_sig  = Buff.raw(tiny.signSchnorr(message, sec_key))
     const noble_sig = noble.schnorr.sign(message, sec_key)
-    const utils_sig = sig.sign(message, sec_key, { throws : true })
+    const utils_sig = signer.sign(message, sec_key, { throws : true })
 
     const tiny_check    = noble.schnorr.verify(tiny_sig, message, tiny_pub)
     const noble_check   = tiny.verifySchnorr(message, noble_pub, noble_sig)
     const tiny_valid    = tiny.verifySchnorr(message, utils_pub, utils_sig)
     const noble_valid   = noble.schnorr.verify(utils_sig, message, utils_pub)
-    const utils_valid_1 = sig.verify(tiny_sig, message, tiny_pub, { throws : true })
-    const utils_valid_2 = sig.verify(noble_sig, message, noble_pub, { throws : true })
-    const utils_valid_3 = sig.verify(utils_sig, message, utils_pub, { throws : true })
+    const utils_valid_1 = signer.verify(tiny_sig, message, tiny_pub, { throws : true })
+    const utils_valid_2 = signer.verify(noble_sig, message, noble_pub, { throws : true })
+    const utils_valid_3 = signer.verify(utils_sig, message, utils_pub, { throws : true })
 
     t.plan(9)
     t.equal(utils_pub.hex, noble_pub.hex, 'Our pubkey should match tiny pubkey.')

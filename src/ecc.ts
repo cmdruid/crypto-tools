@@ -2,6 +2,7 @@ import { Buff, Bytes }   from '@cmdcode/buff-utils'
 import { secp256k1 }     from '@noble/curves/secp256k1'
 import { ProjPointType } from '@noble/curves/abstract/weierstrass'
 import { Field as NFD }  from '@noble/curves/abstract/modular'
+import { _N, _P, _G }    from './const.js'
 
 import * as math         from './math.js'
 import * as assert       from './assert.js'
@@ -10,13 +11,13 @@ type ECPoint    = ProjPointType<bigint>
 type FieldValue = string | number | bigint | Uint8Array | Field
 type PointValue = string | number | bigint | Uint8Array | Point
 
-const NobleField = NFD(secp256k1.CURVE.n, 32, true)
+const NobleField = NFD(_N, 32, true)
 const NoblePoint = secp256k1.ProjectivePoint
 
 export const fd = NobleField
 
 export class Field extends Uint8Array {
-  static N = secp256k1.CURVE.n
+  static N = _N
 
   static mod (x : FieldValue) : Field {
     return new Field(x)
@@ -127,15 +128,20 @@ export class Field extends Uint8Array {
 }
 
 export class Point {
-  static P     = math.CONST.P
-  static G     = new Point(math.CONST.G.x, math.CONST.G.y)
+  static P     = _P
+  static G     = new Point(_G.x, _G.y)
   static curve = secp256k1.CURVE
   static base  = secp256k1.ProjectivePoint.BASE
 
-  static from_x (bytes : Bytes) : Point {
+  static from_x (
+    bytes : Bytes,
+    even_y = false
+  ) : Point {
     let cp = normalizePoint(bytes)
     if (cp.length === 32) {
       cp = cp.prepend(0x02)
+    } else if (even_y) {
+      cp[0] = 0x02
     }
     assert.size(cp, 33)
     const point = NoblePoint.fromHex(cp.hex)
@@ -200,6 +206,12 @@ export class Point {
 
   get hasOddY () : boolean {
     return !this.p.hasEvenY()
+  }
+
+  get negated () : Point {
+    return (this.hasOddY)
+      ? this.negate()
+      : this
   }
 
   eq (value : PointValue) : boolean {

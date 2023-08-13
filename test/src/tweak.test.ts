@@ -4,7 +4,7 @@ import { Buff } from '@cmdcode/buff-utils'
 import {
   keys,
   noble,
-  sig,
+  signer,
   Field,
   Point
 } from '../../src/index.js'
@@ -36,9 +36,9 @@ export default function tweakTests(t : Test) {
       const target_pub  = keys.get_pubkey(tweakedPrivkey, true)
       t.equal(tweaked_pub, target_pub.hex, 'The tweaked public keys should match.')
 
-      const utils_sig   = sig.sign(message, tweaked_sec)
+      const utils_sig   = signer.sign(message, tweaked_sec)
       const noble_valid = noble.schnorr.verify(utils_sig, message, tweaked_pub)
-      const utils_valid = sig.verify(utils_sig, message, tweaked_pub, { throws: true })
+      const utils_valid = signer.verify(utils_sig, message, tweaked_pub, { throws: true })
 
       if (!noble_valid) {
         console.log('utils sig:', utils_sig.hex)

@@ -1,7 +1,5 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
-import { CONST }       from './math.js'
-
-const { N, P, _0n } = CONST
+import { _N, _P, _0n } from './const.js'
 
 export function fail (
   error  : string,
@@ -48,7 +46,7 @@ export function on_curve (
   x       : bigint,
   throws ?: boolean
 ) : boolean {
-  if (!(typeof x === 'bigint' && _0n < x && x < P)) {
+  if (!(typeof x === 'bigint' && _0n < x && x < _P)) {
     fail('x value is not on the curve!', throws)
   }
   return true
@@ -58,7 +56,7 @@ export function in_field (
   x       : bigint,
   throws ?: boolean
 ) : boolean {
-  if (!(typeof x === 'bigint' && _0n < x && x < N)) {
+  if (!(typeof x === 'bigint' && _0n < x && x < _N)) {
     fail('x value is not in the field!', throws)
   }
   return true

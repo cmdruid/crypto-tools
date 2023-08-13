@@ -2,7 +2,7 @@ import { Test }   from 'tape'
 import { derive } from '../../src/index.js'
 
 import test_vectors from './vectors/derive.vectors.json' assert { type: "json" }
-import { parse_extended_key } from '../../src/keys.js'
+import { parse_ext_key } from '../../src/keys.js'
 
 export default async function (t : Test) {
   const results : [ boolean, string ][] = []
@@ -15,7 +15,7 @@ export default async function (t : Test) {
 
       const [ key ] = derive(path, seed)
 
-      const { key: target } = parse_extended_key(xprvTarget)
+      const { key: target } = parse_ext_key(xprvTarget)
 
       results.push([
         key.hex === target, 

@@ -1,18 +1,16 @@
 import { Buff, Bytes }    from '@cmdcode/buff-utils'
+import { _0n }            from './const.js'
 import { Field, Point }   from './ecc.js'
 import { get_shared_key } from './ecdh.js'
 import { digest }         from './hash.js'
-import { parse_x }        from './keys.js'
+import { normalize_32 }   from './keys.js'
 
-import * as assert      from './assert.js'
-import * as math        from './math.js'
+import * as assert from './assert.js'
 
 import {
   sign_config,
   SignOptions
 } from './config.js'
-
-const { _0n } = math.CONST
 
 export function sign (
   message  : Bytes,
@@ -136,7 +134,7 @@ export function recover (
   const pub   = Buff.bytes(pub_key)
   const seed  = get_shared_key(rec_key, pub_key)
   const nonce = digest('BIP0340/nonce', seed, message)
-  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), parse_x(pub), msg)
+  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), normalize_32(pub), msg)
   const c = new Field(chal)
   const k = new Field(nonce).negated
   const s = new Field(sig.slice(32, 64))
