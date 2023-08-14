@@ -2,9 +2,8 @@ import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { hmac512 }      from './hash.js'
 import { Field, Point } from './ecc.js'
 import { get_pubkey }   from './keys.js'
-import { HDKey }        from './types.js'
 
-import * as assert      from './assert.js'
+import * as assert from './assert.js'
 
 type Tweak = [ tweak: Bytes, hardened: boolean ]
 
@@ -12,74 +11,78 @@ const INT_REGEX  = /^[0-9]{0,10}$/,
       STR_REGEX  = /^[0-9a-zA-Z_&?=]{64}$/
 
 export function derive (
-  key_path    : string,
-  key_data    : Bytes,
+  chain_path  : string,
+  chain_key   : Bytes,
   chain_code ?: Bytes,
   is_private  = false
-) : HDKey {
+) : [ key : Buff, code : Buff ] {
   // Assert the key path is valid.
-  assert.valid_path(key_path)
+  assert.valid_path(chain_path)
   // Check if this is the master path.
-  const is_m = key_path.startsWith('m')
+  const is_m = chain_path.startsWith('m')
   // Assert no conflicts between path and chain.
-  assert.valid_chain(key_path, chain_code)
+  assert.valid_chain(chain_path, chain_code)
   // Prepare the chain code.
   let code = (chain_code !== undefined)
     ? Buff.bytes(chain_code)
     : Buff.str('Bitcoin seed')
-
   // Prepare the key data.
-  let key = Buff.bytes(key_data)
-
+  let key = Buff.bytes(chain_key)
+  // If this is a master path:
   if (is_m) {
+    // Generate the root.
     const root = generate_code(code, key)
     key  = Buff.raw(root[0])
     code = Buff.raw(root[1])
     is_private = true
   }
 
-  // If private key:
-  if (is_private) {
-    // Assert key length is 32 bytes.
-    assert.size(key, 32, true)
-  } else {
-    // Else, public key may be 32 or 33 bytes (thanks taproot).
-    if (key.length === 33) {
-      // Prefix 32 byte keys with an even parity.
-      key = key.slice(1)
-    }
-    // Public key must be 33 bytes past this point.
-    assert.size(key, 33)
-  }
-
   // Derive paths for key tweaking.
-  const paths = parse_path(key_path)
+  const paths = parse_path(chain_path)
 
   // For each path segment:
-  for (const path of paths) {
-    // Extract the path data.
-    const [ data, hardened ] = path
-    // Assert valid key state.
-    assert.valid_derive_state(hardened, is_private)
+  for (const [ tweak, is_hardened ] of paths) {
     // Format our bytes based on path state.
-    const bytes = (hardened)
-      ? Buff.join([ 0x00, key, data ])
-      : Buff.join([ get_pubkey(key), data ])
-
-    const [ tweak, next_code ] = generate_code(code, bytes)
-
+    const bytes = compute_tweak(key, tweak, is_hardened, is_private)
+    // Compute the next chaincode iteration.
+    const [ next_key, next_code ] = generate_code(code, bytes)
+    // Set the current code to the new value.
     code = Buff.raw(next_code)
-
+    // Set the new key as an added tweak of the current key.
     if (is_private) {
-      key = Field.mod(key).add(tweak).buff
+      key = Field.mod(key).add(next_key).buff
       assert.in_field(key.big, true)
     } else {
-      key = Point.from_x(key).add(tweak).buff
+      key = Point.from_x(key).add(next_key).buff
       assert.on_curve(key.slice(1).big)
     }
   }
 
   return [ key, code ]
+}
+
+function compute_tweak (
+  key   : Bytes,
+  tweak : Bytes,
+  is_hardened = false,
+  is_private  = false
+) : Buff {
+  // Assert the deriviation state is valid.
+  assert.valid_derive_state(is_hardened, is_private)
+  // Assert the key size is valid.
+  if (is_private) {
+    assert.size(key, 32)
+  } else {
+    assert.size(key, 33)
+  }
+  // Return our tweak based on the input and state.
+  if (is_hardened && is_private) {
+    return Buff.join([ 0x00, key, tweak ])
+  } else if (is_private) {
+    return Buff.join([ get_pubkey(key, false), tweak ])
+  } else {
+    return Buff.join([ key, tweak ])
+  }
 }
 
 function parse_path (
@@ -95,22 +98,22 @@ function parse_path (
   }
 
   for (let path of paths) {
-      let hardened = false
+      let is_hardened = false
 
     if (path.slice(-1) === '\'') {
-      hardened = true
+      is_hardened = true
       path = path.slice(0, -1)
     }
 
     if (path.match(INT_REGEX) !== null) {
       let index = parseInt(path, 10)
       assert.valid_index(index)
-      if (hardened) index += 0x80000000
-      tweaks.push([ Buff.num(index, 4), hardened ])
+      if (is_hardened) index += 0x80000000
+      tweaks.push([ Buff.num(index, 4), is_hardened ])
     } else if (path.match(STR_REGEX) !== null) {
       let index = Buff.str(path)
-      if (hardened) index = index.prepend(0x80)
-      tweaks.push([ index.digest, hardened ])
+      if (is_hardened) index = index.prepend(0x80)
+      tweaks.push([ index.digest, is_hardened ])
     } else {
       throw new Error('Invalid path segment:' + path)
     }

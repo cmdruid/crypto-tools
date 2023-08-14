@@ -1,5 +1,5 @@
-import { Test }   from 'tape'
-import { derive } from '../../src/index.js'
+import { Test } from 'tape'
+import { hd }   from '../../src/index.js'
 
 import test_vectors from './vectors/derive.vectors.json' assert { type: "json" }
 import { parse_ext_key } from '../../src/keys.js'
@@ -13,7 +13,7 @@ export default async function (t : Test) {
     for (let j = 0; j < vectors.length; j++) {
       const [ path, xprvTarget ] = vectors[j]
 
-      const [ key ] = derive(path, seed)
+      const [ key ] = hd.derive(path, seed)
 
       const { key: target } = parse_ext_key(xprvTarget)
 
