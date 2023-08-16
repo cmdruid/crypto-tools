@@ -1,99 +1,92 @@
-import { Buff, Bytes }  from '@cmdcode/buff-utils'
-import { hmac512 }      from './hash.js'
-import { Field, Point } from './ecc.js'
-import { get_pubkey }   from './keys.js'
+import { Buff, Bytes }   from '@cmdcode/buff-utils'
+import { Field, Point }  from './ecc.js'
+import { get_pubkey }    from './keys.js'
+import { HDKey, ExtKey } from './types.js'
+
+import { hash160, hmac512 } from './hash.js'
 
 import * as assert from './assert.js'
 
-type Tweak = [ tweak: Bytes, hardened: boolean ]
+type Tweak = [ tweak: Buff, is_hardened: boolean ]
 
-const INT_REGEX  = /^[0-9]{0,10}$/,
-      STR_REGEX  = /^[0-9a-zA-Z_&?=]{64}$/
+const INT_REGEX = /^[0-9]{0,10}$/,
+      STR_REGEX = /^[0-9a-zA-Z_&?=]{64}$/
 
 export function derive (
-  chain_path  : string,
-  chain_key   : Bytes,
+  path        : string,
+  input_key   : Bytes,
   chain_code ?: Bytes,
   is_private  = false
-) : [ key : Buff, code : Buff ] {
-  // Assert the key path is valid.
-  assert.valid_path(chain_path)
-  // Check if this is the master path.
-  const is_m = chain_path.startsWith('m')
+) : HDKey {
   // Assert no conflicts between path and chain.
-  assert.valid_chain(chain_path, chain_code)
+  assert.valid_chain(path, chain_code)
+  // Prepare the input key.
+  const key = Buff.bytes(input_key)
   // Prepare the chain code.
   let code = (chain_code !== undefined)
     ? Buff.bytes(chain_code)
     : Buff.str('Bitcoin seed')
-  // Prepare the key data.
-  let key = Buff.bytes(chain_key)
+  // Init our keypair variables.
+  let prev   : Buff | null = null,
+      seckey : Buff | null = null,
+      pubkey : Buff
   // If this is a master path:
-  if (is_m) {
+  if (path.startsWith('m')) {
     // Generate the root.
     const root = generate_code(code, key)
-    key  = Buff.raw(root[0])
-    code = Buff.raw(root[1])
-    is_private = true
+    code   = root[1]
+    seckey = root[0]
+    pubkey = get_pubkey(seckey, false)
+  } else if (is_private) {
+    // Set seckey and pubkey.
+    assert.size(input_key, 32)
+    seckey = key
+    pubkey = get_pubkey(seckey, false)
+  } else {
+    // Set just the pubkey.
+    assert.size(key, 33)
+    pubkey = key
   }
-
   // Derive paths for key tweaking.
-  const paths = parse_path(chain_path)
-
+  const tweaks = parse_tweaks(path)
   // For each path segment:
-  for (const [ tweak, is_hardened ] of paths) {
+  for (const [ tweak, is_hardened ] of tweaks) {
     // Format our bytes based on path state.
-    const bytes = compute_tweak(key, tweak, is_hardened, is_private)
+    const bytes = (is_hardened && seckey !== null)
+      ? Buff.join([ 0x00, seckey, tweak ])
+      : Buff.join([ pubkey, tweak ])
     // Compute the next chaincode iteration.
     const [ next_key, next_code ] = generate_code(code, bytes)
     // Set the current code to the new value.
     code = Buff.raw(next_code)
-    // Set the new key as an added tweak of the current key.
-    if (is_private) {
-      key = Field.mod(key).add(next_key).buff
-      assert.in_field(key.big, true)
+    // Store the current pubkey as prev value.
+    prev = pubkey
+    // Check if we are working with a secret key:
+    if (seckey !== null) {
+      // Update the keypair with the added tweak.
+      seckey = Field.mod(seckey).add(next_key).buff
+      pubkey = get_pubkey(seckey, false)
+      assert.in_field(seckey.big, true)
     } else {
-      key = Point.from_x(key).add(next_key).buff
-      assert.on_curve(key.slice(1).big)
+      // Update the pubkey with the added tweak.
+      pubkey = Point.from_x(pubkey).add(next_key).buff
+      assert.on_curve(pubkey.slice(1).big, true)
     }
   }
 
-  return [ key, code ]
+  return { seckey, pubkey, code, path, prev }
 }
 
-function compute_tweak (
-  key   : Bytes,
-  tweak : Bytes,
-  is_hardened = false,
-  is_private  = false
-) : Buff {
-  // Assert the deriviation state is valid.
-  assert.valid_derive_state(is_hardened, is_private)
-  // Assert the key size is valid.
-  if (is_private) {
-    assert.size(key, 32)
-  } else {
-    assert.size(key, 33)
-  }
-  // Return our tweak based on the input and state.
-  if (is_hardened && is_private) {
-    return Buff.join([ 0x00, key, tweak ])
-  } else if (is_private) {
-    return Buff.join([ get_pubkey(key, false), tweak ])
-  } else {
-    return Buff.join([ key, tweak ])
-  }
-}
-
-function parse_path (
-  fullpath : string
+export function parse_tweaks (
+  keypath : string
 ) : Tweak[] {
+  // Assert the key path is valid.
+  assert.valid_path(keypath)
   const tweaks : Tweak[] = []
 
-  let paths = fullpath.split('/')
+  let paths = keypath.split('/')
 
   if (paths[0] === 'm' || paths[0] === '') {
-    // Remove invalid characters.
     paths = paths.slice(1)
   }
 
@@ -122,16 +115,66 @@ function parse_path (
   return tweaks
 }
 
-function generate_code (
-  chain : Uint8Array,
-  data  : Uint8Array
-) : Uint8Array[] {
-  /* Perform a SHA-512 operation on the provided key,
-   * then an HMAC signing operation using the chain code.
-   */
+export function generate_code (
+  chain : Bytes,
+  data  : Bytes
+) : Buff[] {
+  /* Perform an HMAC-512 operation on the provided key. */
   const I  = hmac512(chain, data),
         IL = I.slice(0, 32),
         IR = I.slice(32)
   // Return each half of the hashed result in an array.
   return [ IL, IR ]
+}
+
+export function encode_extkey (
+  hdkey : HDKey,
+  key_prefix ?: number
+) : string {
+  const { seckey, pubkey, code, prev, path } = hdkey
+  const prefix = (typeof key_prefix === 'number')
+    ? Buff.num(key_prefix, 4)
+    : (seckey !== null) ? 0x0488ade4 : 0x0488b21e
+  const tweaks = parse_tweaks(path)
+  const tprev  = tweaks.at(-1)
+  const depth  = Buff.num(tweaks.length, 1)
+  const fprint = (prev !== null) ? hash160(prev).slice(0, 4) : Buff.num(0, 4)
+  const index  = (tprev !== undefined) ? tprev[0].slice(-4, 4) : Buff.num(0, 4)
+  const key    = (seckey !== null) ? seckey.prepend(0x00) : pubkey
+  return Buff.join([ prefix, depth, fprint, index, code, key ]).tob58chk()
+}
+
+export function parse_extkey (
+  keystr : string,
+  path   : string = ''
+) : HDKey {
+  const { code, type, key } = decode_extkey(keystr)
+  const is_private = (type === 0)
+  const input_key  = (is_private) ? key : Buff.join([ type, key ])
+  return derive(path, input_key, code, is_private)
+}
+
+export function decode_extkey (
+  keystr : string
+) : ExtKey {
+  /* Import a Base58 formatted string as a
+    * BIP32 (extended) KeyLink object.
+    */
+  const buffer = Buff.b58chk(keystr).stream
+
+  const prefix = buffer.read(4).num,  // Version prefix.
+        depth  = buffer.read(1).num,  // Parse depth ([0x00] for master).
+        fprint = buffer.read(4).num,  // Parent key reference (0x00000000 for master).
+        index  = buffer.read(4).num,  // Key index.
+        code   = buffer.read(32).hex, // Chaincode.
+        type   = buffer.read(1).num,  // Key type (or parity).
+        key    = buffer.read(32).hex, // 32-byte key.
+        seckey = (type === 0) ? key : undefined,
+        pubkey = (type === 0) ? get_pubkey(key).hex : Buff.join([ type, key ]).hex
+
+  if (buffer.size > 0) {
+    throw new TypeError('Unparsed data remaining in buffer!')
+  }
+
+  return { prefix, depth, fprint, index, code, type, key, seckey, pubkey }
 }

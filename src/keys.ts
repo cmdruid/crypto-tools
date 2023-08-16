@@ -1,7 +1,6 @@
 import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { Field, Point } from './ecc.js'
 import { random }       from './utils.js'
-import { ExtendedKey }  from './types.js'
 
 export function is_even_pub (pubkey : Bytes) : boolean {
   const pub = Buff.bytes(pubkey)
@@ -102,29 +101,4 @@ export function normalize_33 (
     return key
   }
   throw new TypeError(`Invalid key size: ${key.length}`)
-}
-
-export function parse_ext_key (
-  keydata : string
-) : ExtendedKey {
-  /* Import a Base58 formatted string as a
-    * BIP32 (extended) KeyLink object.
-    */
-  const buffer = Buff.b58chk(keydata).stream
-
-  const data = {
-    prefix : buffer.read(4).num,  // Version prefix.
-    depth  : buffer.read(1).num,  // Parse depth ([0x00] for master).
-    fprint : buffer.read(4).num,  // Parent key reference (0x00000000 for master).
-    index  : buffer.read(4).num,  // Key index.
-    code   : buffer.read(32).hex, // Chaincode.
-    type   : buffer.read(1).num,  // Key type (or parity).
-    key    : buffer.read(32).hex  // 32-byte key.
-  }
-
-  if (buffer.size > 0) {
-    throw new TypeError('Unparsed data remaining in buffer!')
-  }
-
-  return data
 }
