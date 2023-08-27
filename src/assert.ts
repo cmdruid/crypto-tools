@@ -35,10 +35,13 @@ export function min_value (
 }
 
 export function exists <T> (
-  input  ?: T
-) : asserts input is T {
+  input ?: T | null
+) : asserts input is NonNullable<T> {
   if (typeof input === 'undefined') {
     throw new TypeError('Input is undefined!')
+  }
+  if (input === null) {
+    throw new TypeError('Input is null!')
   }
 }
 
@@ -79,7 +82,7 @@ export function valid_chain (
 
 export function valid_path (path : string) : void {
   const regex = /^(m)?(\/)?(\w+'?\/)*\w+'?$/
-  if (path.match(regex) === null) {
+  if (path !== '' && path.match(regex) === null) {
     throw new Error('Provided path string is invalid: ' + path)
   }
 }
@@ -110,5 +113,15 @@ export function valid_derive_state (
 ) : void {
   if (hardened && !is_private) {
     throw new Error('Cannot derive hardedened paths when is_private is false!')
+  }
+}
+
+export function min_byte_value (
+  bytes : Bytes,
+  min   : bigint
+) : void {
+  const val = Buff.bytes(bytes).big
+  if (val < min) {
+    throw new TypeError(`Bytes integer value is too low: ${val} < ${min}`)
   }
 }

@@ -40,7 +40,7 @@ export function sign (
   // Let d equal d' (negate if needed).
   const d = (xonly) ? dp.negated.big : dp.big
   // Compute our nonce value.
-  const n = compute_nonce(Buff.big(d, 32), P.x, m, opt)
+  const n = gen_nonce(m, Buff.big(d, 32), P.x, opt)
   // Let k' equal our nonce mod N.
   let kp = Field.mod(n)
   // If adaptor present, apply to k'.
@@ -141,10 +141,10 @@ export function recover (
   return s.sub(k).div(c).buff
 }
 
-function compute_nonce (
+export function gen_nonce (
+  message  : Bytes,
   secret   : Bytes,
   pubkey   : Bytes,
-  message  : Bytes,
   options ?: SignOptions
 ) : Buff {
   const { aux, nonce, recovery } = sign_config(options)

@@ -1,6 +1,7 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 
-export type SignOptions = Partial<SignConfig>
+export type SignOptions   = Partial<SignConfig>
+export type SignerOptions = Partial<SignerConfig>
 
 export interface SignConfig {
   aux       : Bytes
@@ -10,6 +11,12 @@ export interface SignConfig {
   tweak    ?: Bytes
   throws    : boolean
   xonly     : boolean
+}
+
+export interface SignerConfig extends SignConfig {
+  hd_code ?: Bytes
+  hd_path ?: string
+  rec_key ?: Bytes
 }
 
 const SIGN_DEFAULTS : SignConfig = {

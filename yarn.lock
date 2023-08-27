@@ -193,10 +193,10 @@
     "@babel/helper-validator-identifier" "^7.22.5"
     to-fast-properties "^2.0.0"
 
-"@cmdcode/buff-utils@^1.11.10":
-  version "1.11.10"
-  resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.11.10.tgz#1577d6f40183f50e26a77fa1abc197f0b4db6000"
-  integrity sha512-pppXoi3KXBuJ2MGUJheSqB57ruVbhq0nkbs613gfjJjFkYlXh9qofspzIIK+QUZ8gwKhmBcZsGqFjrnDc4RNFw==
+"@cmdcode/buff-utils@^1.12.4":
+  version "1.12.4"
+  resolved "https://registry.yarnpkg.com/@cmdcode/buff-utils/-/buff-utils-1.12.4.tgz#ec6d9e47c312023024404d1c00d827a50549a502"
+  integrity sha512-nftOvZk0XgWioftxEF2QZA64S83aeUIcPtTsBAqpWsz/woEPxxzGheJG0WcNRffddeT7Ww3dqgAjpu5JOEyXVw==
 
 "@esbuild-kit/cjs-loader@^2.4.2":
   version "2.4.2"
