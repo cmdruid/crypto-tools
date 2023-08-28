@@ -3,14 +3,18 @@ import { _0n }            from './const.js'
 import { Field, Point }   from './ecc.js'
 import { get_shared_key } from './ecdh.js'
 import { digest }         from './hash.js'
-import { normalize_32 }   from './keys.js'
 
-import * as assert from './assert.js'
+import {
+  get_pubkey,
+  normalize_32
+} from './keys.js'
 
 import {
   sign_config,
   SignOptions
 } from './config.js'
+
+import * as assert from './assert.js'
 
 export function sign (
   message  : Bytes,
@@ -144,10 +148,10 @@ export function recover (
 export function gen_nonce (
   message  : Bytes,
   secret   : Bytes,
-  pubkey   : Bytes,
+  pubkey  ?: Bytes,
   options ?: SignOptions
 ) : Buff {
-  const { aux, nonce, recovery } = sign_config(options)
+  const { aux, nonce, recovery, xonly } = sign_config(options)
   let n : Buff
   if (nonce !== undefined) {
     n = Buff.bytes(nonce)
@@ -159,7 +163,7 @@ export function gen_nonce (
     // Let t equal the byte-wise xor of (d) and (a).
     const t = Buff.bytes(secret).big ^ a.big
     // The nonce seed is our xor secret key and public key.
-    n = Buff.join([ t, pubkey ])
+    n = Buff.join([ t, pubkey ?? get_pubkey(secret, xonly) ])
   }
   // Return our nonce as a tagged hash of the seed value and message.
   return digest('BIP0340/nonce', n, Buff.bytes(message))
