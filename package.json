@@ -8,7 +8,7 @@
     "utils",
     "library"
   ],
-  "version": "2.3.24",
+  "version": "2.3.25",
   "type": "module",
   "exports": {
     ".": {
