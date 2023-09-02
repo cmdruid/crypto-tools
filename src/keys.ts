@@ -90,14 +90,14 @@ export function gen_keypair (
   return get_keypair(sec, x_only, even_y)
 }
 
-export function normalize_32 (pubkey : Bytes) : Buff {
+export function convert_32 (pubkey : Bytes) : Buff {
   const key = Buff.bytes(pubkey)
   if (key.length === 32) return key
   if (key.length === 33) return key.slice(1, 33)
   throw new TypeError(`Invalid key length: ${key.length}`)
 }
 
-export function normalize_33 (
+export function convert_33 (
   pubkey : Bytes,
   even_y = false
 ) : Buff {

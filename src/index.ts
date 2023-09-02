@@ -2,6 +2,8 @@ import { secp256k1 as secp, schnorr } from '@noble/curves/secp256k1'
 
 export const noble = { secp, schnorr }
 
+export { Signer } from './signer.js'
+
 export * from './config.js'
 export * from './ecc.js'
 export * from './types.js'

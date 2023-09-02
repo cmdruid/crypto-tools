@@ -1,6 +1,10 @@
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { _N, _P, _0n } from './const.js'
 
+export function ok (value : unknown, message ?: string) : asserts value {
+  if (value === false) throw new Error(message ?? 'Assertion failed!')
+}
+
 export function fail (
   error  : string,
   throws = false
@@ -113,15 +117,5 @@ export function valid_derive_state (
 ) : void {
   if (hardened && !is_private) {
     throw new Error('Cannot derive hardedened paths when is_private is false!')
-  }
-}
-
-export function min_byte_value (
-  bytes : Bytes,
-  min   : bigint
-) : void {
-  const val = Buff.bytes(bytes).big
-  if (val < min) {
-    throw new TypeError(`Bytes integer value is too low: ${val} < ${min}`)
   }
 }

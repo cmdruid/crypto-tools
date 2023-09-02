@@ -19,8 +19,16 @@ export const fd = NobleField
 export class Field extends Uint8Array {
   static N = _N
 
+  static add (x : FieldValue[]) : Field {
+    return x.map(e => Field.mod(e)).reduce((p, n) => p.add(n))
+  }
+
   static mod (x : FieldValue) : Field {
     return new Field(x)
+  }
+
+  static mul (x : FieldValue[]) : Field {
+    return x.map(e => Field.mod(e)).reduce((p, n) => p.mul(n))
   }
 
   static is_valid (value : Bytes, throws ?: boolean) : boolean {
@@ -29,8 +37,7 @@ export class Field extends Uint8Array {
   }
 
   constructor (x : FieldValue) {
-    let b = normalizeField(x)
-        b = math.modN(b)
+    const b = math.modN(normalizeField(x))
     Field.is_valid(b, true)
     super(Buff.big(b, 32), 32)
   }

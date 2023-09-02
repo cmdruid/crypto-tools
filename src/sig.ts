@@ -3,18 +3,14 @@ import { _0n }            from './const.js'
 import { Field, Point }   from './ecc.js'
 import { get_shared_key } from './ecdh.js'
 import { digest }         from './hash.js'
+import { MusignContext }  from './types.js'
 
-import {
-  get_pubkey,
-  normalize_32
-} from './keys.js'
-
-import {
-  sign_config,
-  SignOptions
-} from './config.js'
+import { get_pubkey, convert_32 }   from './keys.js'
+import { sign_config, SignOptions } from './config.js'
 
 import * as assert from './assert.js'
+
+const MSG_MIN_VALUE = 0xFFn ** 24n
 
 export function sign (
   message  : Bytes,
@@ -42,9 +38,9 @@ export function sign (
   // Let P equal d' * G
   const P = dp.point
   // Let d equal d' (negate if needed).
-  const d = (xonly) ? dp.negated.big : dp.big
+  const d = (xonly) ? dp.negated : dp
   // Compute our nonce value.
-  const n = gen_nonce(m, Buff.big(d, 32), P.x, opt)
+  const n = gen_nonce(m, d, opt)
   // Let k' equal our nonce mod N.
   let kp = Field.mod(n)
   // If adaptor present, apply to k'.
@@ -62,7 +58,7 @@ export function sign (
   const ch = digest('BIP0340/challenge', R.x.raw, P.x.raw, m)
   const c  = Field.mod(ch)
   // Let s equal (k + ed) mod n.
-  const s  = Field.mod(k + (c.big * d))
+  const s  = Field.mod(k + (c.big * d.big))
   // Convert R if xonly.
   const rx = (xonly) ? R.x.raw : R.raw
   // Return (R || s) as a signature
@@ -138,7 +134,7 @@ export function recover (
   const pub   = Buff.bytes(pub_key)
   const seed  = get_shared_key(rec_key, pub_key)
   const nonce = digest('BIP0340/nonce', seed, message)
-  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), normalize_32(pub), msg)
+  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), convert_32(pub), msg)
   const c = new Field(chal)
   const k = new Field(nonce).negated
   const s = new Field(sig.slice(32, 64))
@@ -148,23 +144,70 @@ export function recover (
 export function gen_nonce (
   message  : Bytes,
   secret   : Bytes,
-  pubkey  ?: Bytes,
   options ?: SignOptions
 ) : Buff {
-  const { aux, nonce, recovery, xonly } = sign_config(options)
+  const { aux, nonce, nonce_tweaks = [], recovery, xonly } = sign_config(options)
   let n : Buff
   if (nonce !== undefined) {
     n = Buff.bytes(nonce)
   } else if (recovery !== undefined) {
     n = get_shared_key(secret, recovery)
   } else {
+    const seed = (aux === null) ? Buff.num(0, 32) : aux
     // Hash the auxiliary data according to BIP 0340.
-    const a = digest('BIP0340/aux', aux)
+    const a = digest('BIP0340/aux', seed ?? Buff.random(32))
     // Let t equal the byte-wise xor of (d) and (a).
     const t = Buff.bytes(secret).big ^ a.big
     // The nonce seed is our xor secret key and public key.
-    n = Buff.join([ t, pubkey ?? get_pubkey(secret, xonly) ])
+    n = Buff.join([ t, get_pubkey(secret, xonly) ])
   }
-  // Return our nonce as a tagged hash of the seed value and message.
-  return digest('BIP0340/nonce', n, Buff.bytes(message))
+  // Compute our nonce as a tagged hash of the seed value and message.
+  let sn = Field.mod(digest('BIP0340/nonce', n, Buff.bytes(message)))
+  // Apply any internal tweaks that are specified.
+  nonce_tweaks.forEach(e => { sn = sn.add(e).negated })
+  return sn.buff
+}
+
+export function musign (
+  context  : MusignContext,
+  secret   : Bytes,
+  options ?: SignOptions
+) : Buff {
+  // Configure our signing environment.
+  const {
+    key_tweaks   = [],
+    nonce_seeds  = [],
+    nonce_tweaks = [],
+    nonce_coeffs = []
+  } = context
+  // Assert that signing context is valid.
+  assert.ok(key_tweaks.length  >= 1)
+  assert.ok(nonce_seeds.length >= 1)
+  assert.ok(nonce_seeds.length >= nonce_coeffs.length)
+  // Configure internal nonce generation.
+  const opt = { aux: null, ...options }
+  // Generate our secret nonce values.
+  let sns = nonce_seeds.map(n => {
+    assert.min_value(n, MSG_MIN_VALUE)
+    return Field.mod(gen_nonce(n, secret, opt)).negated
+  })
+  // Define our pub key, pub nonce and tweak values.
+  const pub = get_pubkey(secret, true)
+      , pns = sns.map(e => get_pubkey(e, true))
+      , k_t = key_tweaks.map(e => Field.mod(e))
+      , n_t = nonce_tweaks.map(e => Field.mod(e))
+  // Apply external tweaks and coefficient to nonce values.
+  sns = sns.map((n, i) => {
+    n = n_t.reduce((pre, nxt) => pre.mul(nxt), n)
+    const coeff = nonce_coeffs.at(i) ?? null
+    return (coeff !== null) ? n.mul(coeff) : n
+  })
+  // Define our signature value.
+  let sig = Field.mod(secret).negated
+  // Apply key tweaks to our signature value.
+  sig = k_t.reduce((pre, nxt) => pre.mul(nxt), sig)
+  // Add our nonce values to the signature value.
+  sig = sns.reduce((pre, nxt) => pre.add(nxt), sig)
+  // Return the combined values as a signature.
+  return Buff.join([ sig, pub, ...pns ])
 }

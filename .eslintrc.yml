@@ -32,6 +32,11 @@ rules:
       align:
         beforeColon : true
         afterColon  : true
+  comma-style:
+    - "error"
+    - "last"
+    - exceptions:
+        VariableDeclaration: true
   "@typescript-eslint/indent": off
   "@typescript-eslint/return-await": [ 1, "in-try-catch" ]
   "@typescript-eslint/no-base-to-string": off
