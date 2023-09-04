@@ -8,18 +8,58 @@
     "utils",
     "library"
   ],
-  "version": "2.4.2",
+  "version": "2.4.3",
   "type": "module",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/module.mjs"
+        "default": "./dist/index.js"
       },
       "require": {
         "types": "./dist/index.d.ts",
         "default": "./dist/main.cjs"
       }
+    },
+    "./ecc": {
+      "import": "./dist/ecc.js",
+      "types": "./dist/ecc.d.ts",
+      "default": "./dist/ecc.js"
+    },
+    "./ecdh": {
+      "import": "./dist/ecdh.js",
+      "types": "./dist/ecdh.d.ts",
+      "default": "./dist/ecdh.js"
+    },
+    "./hash": {
+      "import": "./dist/hash.js",
+      "types": "./dist/hash.d.ts",
+      "default": "./dist/hash.js"
+    },
+    "./keys": {
+      "import": "./dist/keys.js",
+      "types": "./dist/keys.d.ts",
+      "default": "./dist/keys.js"
+    },
+    "./math": {
+      "import": "./dist/math.js",
+      "types": "./dist/math.d.ts",
+      "default": "./dist/math.js"
+    },
+    "./pt": {
+      "import": "./dist/point.js",
+      "types": "./dist/point.d.ts",
+      "default": "./dist/point.js"
+    },
+    "./proof": {
+      "import": "./dist/proof.js",
+      "types": "./dist/proof.d.ts",
+      "default": "./dist/proof.js"
+    },
+    "./signer": {
+      "import": "./dist/sig.js",
+      "types": "./dist/sig.d.ts",
+      "default": "./dist/sig.js"
     }
   },
   "types": "./dist/index.d.ts",
