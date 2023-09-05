@@ -1,24 +1,27 @@
-# Crypto Tools
+# @cmdcode/crypto-tools
 
-Modern cryptography tools for the plebian developer.
+A modern suite of cryptography tools, built for the plebian developer.
 
-Features:
+* All tools are written in typescript and simple to use.
+* Methods return a [Buff] object for quick conversion between formats.
+* Library works in both node and the browser.
+* Uses the well-audited [@noble/curves]() for fast ecc operations.
 
 ```ts
 import {
-  ecdh,    // Basic tools for using the Elliptic-Curve Diffe-Hellman protocol.
+  ecdh,    // Basic methods for using the Elliptic-Curve Diffe-Hellman protocol.
   hash,    // Includes sha256, sha512, hmac, ripemd, tagged hashing, and more.
   hd,      // BIP-0032 based key derivation tool, with support for non-numeric paths.
   keys,    // A suite of tools for generating and tweaking secp256k1 key pairs.
   math,    // Bigint-based ecc math library, with added field and point arithmetic.
   signer,  // BIP-0340 'schnorr' based signing library with an extensive API.
   tree,    // A basic suite of tools for creating merkle trees and validating proofs.
-  Field,   // A custom uint8 array class with built-in secp2561 field operations.
-  Point    // A custom uint8 array class with built-in secp2561 point operations.
+  Field,   // A feature-rich uint8 array class with built-in math operations.
+  Point    // A secp2561 point object with built-in math operations.
 } from '@cmdcode/crypto-tools'
 ```
 
-All methods are fully-typed and simple to use. More documentation coming soon!  
+More documentation coming soon!  
 
 ## How to Import
 
@@ -75,6 +78,17 @@ const { sign_msg, verify_sig } = signer
 import { sign_msg, verify_sig } from '@cmdcode/crypto-tools/signer'
 ```
 
+Many methods will commonly return a `Buff` object, which can be used in place of a standard `Uint8Array` and offers a number of quick convertion methods.
+
+```ts
+const seckey = get_seckey('deadbeef'.repeat(4))
+console.log('secret buff :', seckey)
+console.log('secret hex  :', seckey.hex)
+console.log('secret big  :', seckey.big)
+```
+
+You can read more about the `Buff` API [here](https://github.com/cmdruid/buffer).
+
 ## ECDH Tool
 
 Derive a shared secret from between two keys, using Elliptic-Curve Diffe-Hellman protocol.
@@ -128,9 +142,15 @@ import {
 
 > Note : The derivation tool also supports using non-numeric characters in the derivation path.
 
+Examples:
+
+```ts
+
+```
+
 ## KeyPair Tools
 
-Methods for working with cryptographic keys on the secp256k1 curve.
+Methods for working with key pairs on the secp256k1 curve.
 
 ```ts
 import {
@@ -147,9 +167,15 @@ import {
 } from '@cmdcode/crypto-tools/keys'
 ```
 
+Examples:
+
+```ts
+
+```
+
 ## Math Library
 
-A bigint math library for performing arithmetic used in field and point operations.
+A bigint math library for performing arithmetic and field / point operations.
 
 ```ts
 import {
@@ -172,7 +198,7 @@ import {
 
 ## Proofing Tools
 
-A simplified data proofing system, compatible with nostr NIP-01 signed events.
+A simplified data proofing system, compatible with Nostr NIP-01 signed events.
 
 ```ts
 import {
@@ -183,6 +209,30 @@ import {
   create_event,    // Convert a proof into a NIP-01 nostr note.
   parse_config     // Parse the proof configuration from params.
 } from '@cmdcode/crypto-tools/proof'
+
+interface KeyLink {
+  prev   : Buff | null  // Previous code in the path.
+  seckey : Buff | null  // The current derived secret, if any.
+  pubkey : Buff         // The current derived public key.
+  path   : string       // The derivation path in use.
+  code   : Buff         // The current chain code.
+}
+```
+
+Examples:
+
+```ts
+// Create a proof
+const data  = { name : 'bob', key : 'abcd' }
+const proof = create_proof(bob)
+console.log('proof:', proof)
+// Verify a proof
+
+// Parse a proof into a ProofData object
+
+// Convert a proof into a nostr note.
+const event = create_event(proof)
+console.log('event:', '')
 ```
 
 ## Signature Tools
@@ -196,6 +246,33 @@ import {
   gen_nonce,   // Generate a nonce for a given message.
   recover_key  // Recover the secret key from a signature using ECDH recovery.
 } from '@cmdcode/crypto-tools/signer'
+```
+
+The `sign_msg`, `verify_msg`, and `gen_nonce` methods are configurable through an options object:
+
+```ts
+export interface SignConfig {
+  // Specify the aux data to use as a seed. Default is random.
+  aux          ?: Bytes | null
+  // Apply an adaptor tweak to the nonce value.
+  adaptor      ?: Bytes
+  // Replace the generated nonce with a custom nonce. 
+  nonce        ?: Bytes
+  // Apply tweaks to the nonce value during generation.
+  nonce_tweaks ?: Bytes[]
+  // Specify a public key to be used in ECDH key recovery.
+  recovery     ?: Bytes
+  // Apply tweaks to the signature value during signing.
+  key_tweaks   ?: Bytes[]
+  // If validation fails, throw an error instead of returning false.
+  throws        : boolean
+  // Keys used in the signing operation should be negated for even-ness.
+  xonly         : boolean
+}
+```
+Examples:
+```ts
+
 ```
 
 ## Field & Point
