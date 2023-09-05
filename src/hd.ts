@@ -1,23 +1,22 @@
-import { Buff, Bytes }   from '@cmdcode/buff-utils'
-import { Field, Point }  from './ecc.js'
-import { get_pubkey }    from './keys.js'
-import { HDKey, ExtKey } from './types.js'
-
+import { Buff, Bytes }      from '@cmdcode/buff-utils'
+import { Field, Point }     from './ecc.js'
 import { hash160, hmac512 } from './hash.js'
+import { get_pubkey }       from './keys.js'
+import { KeyLink, ExtKey }  from './types.js'
 
 import * as assert from './assert.js'
 
-type Tweak = [ tweak: Buff, is_hardened: boolean ]
+type KeyTweak = [ tweak: Buff, is_hardened: boolean ]
 
 const INT_REGEX = /^[0-9]{0,10}$/,
       STR_REGEX = /^[0-9a-zA-Z_&?=]{64}$/
 
-export function derive (
+export function derive_key (
   path        : string,
   input_key   : Bytes,
   chain_code ?: Bytes,
   is_private  = false
-) : HDKey {
+) : KeyLink {
   // Assert no conflicts between path and chain.
   assert.valid_chain(path, chain_code)
   // Prepare the input key.
@@ -79,10 +78,10 @@ export function derive (
 
 export function parse_tweaks (
   keypath : string
-) : Tweak[] {
+) : KeyTweak[] {
   // Assert the key path is valid.
   assert.valid_path(keypath)
-  const tweaks : Tweak[] = []
+  const tweaks : KeyTweak[] = []
 
   let paths = keypath.split('/')
 
@@ -116,11 +115,11 @@ export function parse_tweaks (
 }
 
 export function generate_code (
-  chain : Bytes,
-  data  : Bytes
+  chain_code : Bytes,
+  chain_data : Bytes
 ) : Buff[] {
   /* Perform an HMAC-512 operation on the provided key. */
-  const I  = hmac512(chain, data),
+  const I  = hmac512(chain_code, chain_data),
         IL = I.slice(0, 32),
         IR = I.slice(32)
   // Return each half of the hashed result in an array.
@@ -128,10 +127,10 @@ export function generate_code (
 }
 
 export function encode_extkey (
-  hdkey : HDKey,
+  key_link    : KeyLink,
   key_prefix ?: number
 ) : string {
-  const { seckey, pubkey, code, prev, path } = hdkey
+  const { seckey, pubkey, code, prev, path } = key_link
   const prefix = (typeof key_prefix === 'number')
     ? Buff.num(key_prefix, 4)
     : (seckey !== null) ? 0x0488ade4 : 0x0488b21e
@@ -144,23 +143,23 @@ export function encode_extkey (
   return Buff.join([ prefix, depth, fprint, index, code, key ]).to_b58chk()
 }
 
-export function parse_extkey (
-  keystr : string,
+export function derive_extkey (
+  keyhex : string,
   path   : string = ''
-) : HDKey {
-  const { code, type, key } = decode_extkey(keystr)
+) : KeyLink {
+  const { code, type, key } = parse_extkey(keyhex)
   const is_private = (type === 0)
   const input_key  = (is_private) ? key : Buff.join([ type, key ])
-  return derive(path, input_key, code, is_private)
+  return derive_key(path, input_key, code, is_private)
 }
 
-export function decode_extkey (
-  keystr : string
+export function parse_extkey (
+  keyhex : string
 ) : ExtKey {
   /* Import a Base58 formatted string as a
     * BIP32 (extended) KeyLink object.
     */
-  const buffer = Buff.b58chk(keystr).stream
+  const buffer = Buff.b58chk(keyhex).stream
 
   const prefix = buffer.read(4).num,  // Version prefix.
         depth  = buffer.read(1).num,  // Parse depth ([0x00] for master).

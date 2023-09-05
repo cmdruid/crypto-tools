@@ -15,15 +15,15 @@ export default async function () {
 
     const tiny_sig  = Buff.raw(tiny.signSchnorr(message, sec_key))
     const noble_sig = noble.schnorr.sign(message, sec_key)
-    const utils_sig = signer.sign(message, sec_key, { throws : true })
+    const utils_sig = signer.sign_msg(message, sec_key, { throws : true })
 
     const tiny_check    = noble.schnorr.verify(tiny_sig, message, tiny_pub)
     const noble_check   = tiny.verifySchnorr(message, noble_pub, noble_sig)
     const tiny_valid    = tiny.verifySchnorr(message, utils_pub, utils_sig)
     const noble_valid   = noble.schnorr.verify(utils_sig, message, utils_pub)
-    const utils_valid_1 = signer.verify(tiny_sig, message, tiny_pub, { throws : true })
-    const utils_valid_2 = signer.verify(noble_sig, message, noble_pub, { throws : true })
-    const utils_valid_3 = signer.verify(utils_sig, message, utils_pub, { throws : true })
+    const utils_valid_1 = signer.verify_sig(tiny_sig, message, tiny_pub, { throws : true })
+    const utils_valid_2 = signer.verify_sig(noble_sig, message, noble_pub, { throws : true })
+    const utils_valid_3 = signer.verify_sig(utils_sig, message, utils_pub, { throws : true })
 
     t.plan(9)
     t.equal(utils_pub.hex, noble_pub.hex, 'Our pubkey should match tiny pubkey.')

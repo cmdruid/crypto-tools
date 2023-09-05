@@ -4,12 +4,12 @@ import { Field, Point }   from './ecc.js'
 import { get_shared_key } from './ecdh.js'
 import { digest }         from './hash.js'
 
-import { get_pubkey, convert_32 }   from './keys.js'
-import { sign_config, SignOptions } from './config.js'
+import { get_pubkey, convert_32b } from './keys.js'
+import { get_config, SignOptions } from './config.js'
 
 import * as assert from './assert.js'
 
-export function sign (
+export function sign_msg (
   message  : Bytes,
   secret   : Bytes,
   options ?: SignOptions
@@ -18,7 +18,7 @@ export function sign (
    * Implementation of signature algorithm as specified in BIP0340.
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
-  const opt = sign_config(options)
+  const opt = get_config(options)
   const { adaptor, tweak, xonly } = opt
 
   // Normalize our message into bytes.
@@ -62,7 +62,7 @@ export function sign (
   return Buff.join([ rx, s.raw ])
 }
 
-export function verify (
+export function verify_sig (
   signature : Bytes,
   message   : Bytes,
   pubkey    : Bytes,
@@ -72,7 +72,7 @@ export function verify (
    * Implementation of verify algorithm as specified in BIP0340.
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
-  const { throws } = sign_config(options)
+  const { throws } = get_config(options)
   // Normalize the message into bytes.
   const msg = Buff.bytes(message)
   // Convert signature into a stream object.
@@ -120,7 +120,7 @@ export function verify (
   return R.x.big === r.x.big
 }
 
-export function recover (
+export function recover_key (
   signature : Bytes,
   message   : Bytes,
   pub_key   : Bytes,
@@ -131,7 +131,7 @@ export function recover (
   const pub   = Buff.bytes(pub_key)
   const seed  = get_shared_key(rec_key, pub_key)
   const nonce = digest('BIP0340/nonce', seed, message)
-  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), convert_32(pub), msg)
+  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), convert_32b(pub), msg)
   const c = new Field(chal)
   const k = new Field(nonce).negated
   const s = new Field(sig.slice(32, 64))
@@ -143,7 +143,7 @@ export function gen_nonce (
   secret   : Bytes,
   options ?: SignOptions
 ) : Buff {
-  const { aux, nonce, nonce_tweaks = [], recovery, xonly } = sign_config(options)
+  const { aux, nonce, nonce_tweaks = [], recovery, xonly } = get_config(options)
   let n : Buff
   if (nonce !== undefined) {
     n = Buff.bytes(nonce)

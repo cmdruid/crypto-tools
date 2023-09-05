@@ -14,10 +14,10 @@ export default function () {
       for (let j = 0; j < vectors.length; j++) {
         const [ path, xprvTarget ] = vectors[j]
 
-        const hdkey = hd.derive(path, seed)
+        const hdkey = hd.derive_key(path, seed)
         const { seckey } = hdkey
         const xprv = hd.encode_extkey(hdkey)
-        const { key: target } = hd.decode_extkey(xprvTarget)
+        const { key: target } = hd.parse_extkey(xprvTarget)
 
         results.push([
           seckey?.hex === target && xprv === xprvTarget, 

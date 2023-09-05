@@ -36,9 +36,9 @@ export default function () {
       const target_pub  = keys.get_pubkey(tweakedPrivkey, true)
       t.equal(tweaked_pub, target_pub.hex, 'The tweaked public keys should match.')
 
-      const utils_sig   = signer.sign(message, tweaked_sec)
+      const utils_sig   = signer.sign_msg(message, tweaked_sec)
       const noble_valid = noble.schnorr.verify(utils_sig, message, tweaked_pub)
-      const utils_valid = signer.verify(utils_sig, message, tweaked_pub, { throws: true })
+      const utils_valid = signer.verify_sig(utils_sig, message, tweaked_pub, { throws: true })
 
       if (!noble_valid) {
         console.log('utils sig:', utils_sig.hex)

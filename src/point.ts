@@ -2,7 +2,7 @@ import { Buff, Bytes } from '@cmdcode/buff-utils'
 import { secp256k1 }   from '@noble/curves/secp256k1'
 import { _1n }         from './const.js'
 import { PointData }   from './types.js'
-import { convert_33 }  from './keys.js'
+import { convert_33b } from './keys.js'
 
 const ECPoint = secp256k1.ProjectivePoint
 
@@ -118,7 +118,7 @@ export function lift_x (
   bytes : Bytes,
   xonly = false
 ) : PointData {
-  const buff  = convert_33(bytes, xonly)
+  const buff  = convert_33b(bytes, xonly)
   const point = ECPoint.fromHex(buff.hex)
   point.assertValidity()
   return { x: point.x, y: point.y }

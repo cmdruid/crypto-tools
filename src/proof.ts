@@ -1,10 +1,14 @@
 import { Buff, Bytes }  from '@cmdcode/buff-utils'
 import { get_pubkey }   from './keys.js'
-import { sign, verify } from './sig.js'
 import { SignOptions }  from './config.js'
 
 import * as assert from './assert.js'
 import * as util   from './util.js'
+
+import {
+  sign_msg,
+  verify_sig
+} from './sig.js'
 
 import {
   Literal,
@@ -36,7 +40,7 @@ export function create_proof <T> (
   // Compute the proof id from the image.
   const pid = Buff.json(img).digest
   // Compute a signature for the given id.
-  const sig = sign(pid, seckey, options)
+  const sig = sign_msg(pid, seckey, options)
   // Return proof as a hex string (with optional query string).
   return Buff.join([ ref, pub, pid, sig ]).hex + encode_params(params)
 }
@@ -94,7 +98,7 @@ export function verify_proof <T> (
     return assert.fail('Proof hash does not equal proof id!', throws)
   }
   // Check if the signature is invalid.
-  if (!verify(sig, pid, pub)) {
+  if (!verify_sig(sig, pid, pub)) {
     return assert.fail('Proof signature is invalid!', throws)
   }
   // If all other tests pass, then the proof is valid.

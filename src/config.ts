@@ -18,7 +18,7 @@ const SIGN_DEFAULTS : SignConfig = {
   xonly  : true
 }
 
-export function sign_config (
+export function get_config (
   config : SignOptions = {}
 ) : SignConfig {
   return { ...SIGN_DEFAULTS, ...config  }

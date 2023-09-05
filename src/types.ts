@@ -4,7 +4,7 @@ export type Literal = (string | number | boolean | null)
 
 export interface PointData { x : bigint, y : bigint }
 
-export interface HDKey {
+export interface KeyLink {
   prev   : Buff | null
   seckey : Buff | null
   pubkey : Buff

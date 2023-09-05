@@ -1,7 +1,6 @@
 import { Buff, Bytes }   from '@cmdcode/buff-utils'
 import { secp256k1 }     from '@noble/curves/secp256k1'
 import { ProjPointType } from '@noble/curves/abstract/weierstrass'
-import { Field as NFD }  from '@noble/curves/abstract/modular'
 import { _N, _P, _G }    from './const.js'
 
 import * as math         from './math.js'
@@ -11,10 +10,7 @@ type ECPoint    = ProjPointType<bigint>
 type FieldValue = string | number | bigint | Uint8Array | Field
 type PointValue = string | number | bigint | Uint8Array | Point
 
-const NobleField = NFD(_N, 32, true)
 const NoblePoint = secp256k1.ProjectivePoint
-
-export const fd = NobleField
 
 export class Field extends Uint8Array {
   static N = _N
@@ -37,7 +33,7 @@ export class Field extends Uint8Array {
   }
 
   constructor (x : FieldValue) {
-    const b = math.modN(normalizeField(x))
+    const b = math.mod_n(normalizeField(x))
     Field.is_valid(b, true)
     super(Buff.big(b, 32), 32)
   }
@@ -94,31 +90,31 @@ export class Field extends Uint8Array {
 
   add (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = fd.add(this.big, x.big)
+    const a = math.fd.add(this.big, x.big)
     return new Field(a)
   }
 
   sub (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = fd.sub(this.big, x.big)
+    const a = math.fd.sub(this.big, x.big)
     return new Field(a)
   }
 
   mul (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = fd.mul(this.big, x.big)
+    const a = math.fd.mul(this.big, x.big)
     return new Field(a)
   }
 
   pow (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = fd.pow(this.big, x.big)
+    const a = math.fd.pow(this.big, x.big)
     return new Field(a)
   }
 
   div (value : FieldValue) : Field {
     const x = Field.mod(value)
-    const a = fd.div(this.big, x.big)
+    const a = math.fd.div(this.big, x.big)
     return new Field(a)
   }
 

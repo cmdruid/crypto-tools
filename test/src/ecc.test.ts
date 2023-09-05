@@ -1,41 +1,41 @@
-import test      from 'tape'
-import { Buff }  from '@cmdcode/buff-utils'
+import test       from 'tape'
+import { Buff }   from '@cmdcode/buff-utils'
+import { Field }  from '../../src/ecc.js'
+import { random } from '../../src/util.js'
 
 import * as tiny from 'tiny-secp256k1'
-import * as ecc  from '../../src/index.js'
+import * as math from '../../src/math.js'
 
-const { Field } = ecc
-
-const a = ecc.util.random(32)
-const b = ecc.util.random(32)
+const a = random(32)
+const b = random(32)
 
 const fa = new Field(a)
 const fb = new Field(b)
 
 const tiny_add     = Buff.raw(tiny.privateAdd(a.raw, b.raw) as Uint8Array)
-const noble_add    = Buff.big(ecc.fd.add(a.big, b.big))
+const noble_add    = Buff.big(math.fd.add(a.big, b.big))
 const field_add    = fa.add(fb)
 
 const tiny_sub     = Buff.raw(tiny.privateSub(a.raw, b.raw) as Uint8Array)
-const noble_sub    = Buff.big(ecc.fd.sub(a.big, b.big))
+const noble_sub    = Buff.big(math.fd.sub(a.big, b.big))
 const field_sub    = fa.sub(fb)
 
 const tiny_neg     = Buff.raw(tiny.privateNegate(a.raw) as Uint8Array)
-const noble_neg    = Buff.big(ecc.fd.neg(a.big))
+const noble_neg    = Buff.big(math.fd.neg(a.big))
 const field_neg    = fa.negate()
 
-const noble_mul    = Buff.big(ecc.fd.mul(a.big, b.big))
+const noble_mul    = Buff.big(math.fd.mul(a.big, b.big))
 const field_mul    = fa.mul(fb)
 
-const noble_div    = Buff.big(ecc.fd.div(a.big, b.big))
+const noble_div    = Buff.big(math.fd.div(a.big, b.big))
 const field_div    = fa.div(fb)
 
 const tiny_pt_a    = tiny.pointFromScalar(a.raw) as Uint8Array
-const noble_pt_a   = ecc.pt.Noble.BASE.multiply(a.big)
+const noble_pt_a   = math.pt.Noble.BASE.multiply(a.big)
 const field_pt_a   = fa.point
 
 const tiny_pt_b    = tiny.pointFromScalar(b.raw) as Uint8Array
-const noble_pt_b   = ecc.pt.Noble.BASE.multiply(b.big)
+const noble_pt_b   = math.pt.Noble.BASE.multiply(b.big)
 const field_pt_b   = fb.point
 
 const tiny_pt_add  = tiny.pointAdd(tiny_pt_a, tiny_pt_b) as Uint8Array

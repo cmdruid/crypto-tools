@@ -1,12 +1,23 @@
 {
-  "name": "@cmdcode/crypto-utils",
-  "description": "Simple library for using secp256k1 cryptography.",
+  "name": "@cmdcode/crypto-tools",
+  "description": "A modern cryptography library for the plebian developer.",
   "author": "Christopher Scott",
   "license": "CC-BY-1.0",
   "keywords": [
     "crypto",
-    "utils",
-    "library"
+    "tools",
+    "library",
+    "secp256k1",
+    "ecdh",
+    "schnorr",
+    "bip340",
+    "bip32",
+    "hash",
+    "hmac",
+    "sha256",
+    "bitcoin",
+    "nostr",
+    "signatures"
   ],
   "version": "2.4.6",
   "type": "module",
@@ -51,11 +62,6 @@
       "types": "./dist/math.d.ts",
       "default": "./dist/math.js"
     },
-    "./pt": {
-      "import": "./dist/point.js",
-      "types": "./dist/point.d.ts",
-      "default": "./dist/point.js"
-    },
     "./proof": {
       "import": "./dist/proof.js",
       "types": "./dist/proof.d.ts",
@@ -65,6 +71,11 @@
       "import": "./dist/sig.js",
       "types": "./dist/sig.d.ts",
       "default": "./dist/sig.js"
+    },
+    "./util": {
+      "import": "./dist/util.js",
+      "types": "./dist/util.d.ts",
+      "default": "./dist/util.js"
     }
   },
   "types": "./dist/index.d.ts",

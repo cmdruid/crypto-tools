@@ -13,8 +13,8 @@ export default async function () {
       const sec_key = util.random(32)
 
       const utils_pub = keys.get_pubkey(sec_key, true)
-      const utils_sig = signer.sign(message, sec_key)
-      const is_valid  = signer.verify(utils_sig, message, utils_pub, { throws : false })
+      const utils_sig = signer.sign_msg(message, sec_key)
+      const is_valid  = signer.verify_sig(utils_sig, message, utils_pub, { throws : false })
 
       results.push([ i, is_valid, 'Our signature should be valid.' ])
     }
