@@ -4,7 +4,8 @@ env:
   es2021            : true
 
 extends:
-  - standard-with-typescript
+  - eslint:recommended
+  - plugin:@typescript-eslint/recommended
 
 overrides           : []
 
@@ -13,6 +14,8 @@ parserOptions:
   sourceType        : "module"
   project:
    - tsconfig.json
+
+root: true
 
 rules:
   semi               : [ 2, "never" ]
@@ -55,6 +58,8 @@ rules:
         arrow:
           before    : true
           after     : true
+  "@typescript-eslint/key-spacing": off
+  "@typescript-eslint/consistent-type-imports": off
 
 ignorePatterns:
   - coverage

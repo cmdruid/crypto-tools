@@ -1,9 +1,8 @@
-import { Buff, Bytes } from '@cmdcode/buff-utils'
-import { Signer }      from './signer.js'
+import { Buff } from '@cmdcode/buff-utils'
+
+export type Literal = (string | number | boolean | null)
 
 export interface PointData { x : bigint, y : bigint }
-
-export type SignerAPI = Signer
 
 export interface HDKey {
   prev   : Buff | null
@@ -25,23 +24,20 @@ export interface ExtKey {
   pubkey  : string
 }
 
-export interface MusignContext {
-  key_tweaks   ?: Bytes[]
-  nonce_seeds  ?: Bytes[]
-  nonce_tweaks ?: Bytes[]
-  nonce_coeffs ?: Array<Bytes | null>
+export interface ProofData {
+  ref    : string
+  pub    : string
+  pid    : string
+  sig    : string
+  params : string[][]
 }
 
-export interface SignerOptions {
-  aux          ?: Bytes | null
-  adaptor      ?: string
-  nonce_tweaks ?: Bytes[]
-  tweak        ?: Bytes
-  throws       ?: boolean
-}
-
-export interface SignerConfig {
-  hd_code  ?: Bytes
-  hd_path  ?: string
-  recovery ?: Bytes
+export interface SignedEvent {
+  pubkey     : string
+  created_at : number
+  id         : string
+  sig        : string
+  kind       : number
+  content    : string
+  tags       : Literal[][]
 }

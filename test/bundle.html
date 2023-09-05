@@ -10,11 +10,11 @@
   <body>
     <script type="module">
       console.log(window.crypto_utils)
-      const { ecc, sha256, util } = window.crypto_utils
-      const sec_key   = ecc.gen_seckey()
+      const { keys, sha256, util } = window.crypto_utils
+      const sec_key   = keys.gen_seckey()
       const message   = sha256(util.random())
-      const pubkey    = ecc.get_pubkey(sec_key, true)
-      const signature = await ecc.sign(message, sec_key)
+      const pubkey    = keys.get_pubkey(sec_key, true)
+      const signature = await keys.sign(message, sec_key)
       const isValid   = ecc.verify(signature, message, pubkey)
       console.log('Signature is valid:', isValid)
       console.log('message:', message.hex)

@@ -1,8 +1,8 @@
-import { Test } from 'tape'
+import test from 'tape'
 import { Field, util } from '../../src/index.js'
 
-export default function secretsTest(t : Test) {
-  t.test('Testing ECDH Shared Secret Derivation', async t => {
+export default function () {
+  test('Testing ECDH Shared Secret Derivation', async t => {
 
     const alice = new Field(util.random(32))
     const Alice = alice.point

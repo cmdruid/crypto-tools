@@ -1,11 +1,11 @@
-import { Test } from 'tape'
+import test from 'tape'
 import { Buff, Bytes } from '@cmdcode/buff-utils'
 
 import * as tiny from 'tiny-secp256k1'
 import * as ecc  from '../../src/index.js'
 
-export default function seq_tweak_tests (t : Test) {
-  t.test('Testing sequential key tweaks', async t => {
+export default function () {
+  test('Testing sequential key tweaks', async t => {
     const seed    = ecc.util.random()
     const tweaks  = generate_tweaks(10)
     const [ seckey, pubkey ] = ecc.keys.get_keypair(seed, true, true)

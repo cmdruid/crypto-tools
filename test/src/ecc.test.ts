@@ -1,4 +1,4 @@
-import { Test }  from 'tape'
+import test      from 'tape'
 import { Buff }  from '@cmdcode/buff-utils'
 
 import * as tiny from 'tiny-secp256k1'
@@ -49,8 +49,8 @@ const tiny_pt_mul  = tiny.pointMultiply(tiny_pt_a, b.raw) as Uint8Array
 const noble_pt_mul = noble_pt_a.multiply(b.big)
 const field_pt_mul = field_pt_a.mul(b)
 
-export default function ECCTest(t : Test) {
-  t.test('Testing ECC Primitives', t => {
+export default function () {
+  test('Testing ECC Primitives', t => {
     t.plan(15)
     // Field Addition
     t.equal(field_add.hex, tiny_add.hex,  'addition should equal tiny scalar.')

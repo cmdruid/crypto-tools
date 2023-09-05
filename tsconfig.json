@@ -1,21 +1,18 @@
 {
   "compilerOptions": {
-    /* Visit https://aka.ms/tsconfig to read more about this file */
-    "module": "ESNext",
     "target": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "rootDir": "./src",
     "outDir": "./dist",
     "sourceMap": true,
     "declaration": true,
-    "declarationDir": "./dist/types",
     "declarationMap": true,
-    "emitDeclarationOnly": true,
     "importHelpers": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": false,
+    "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
     "skipLibCheck": true,
@@ -27,8 +24,11 @@
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false
   },
   "exclude": [ "node_modules", "test", "rollup.config.ts" ],
-  "include": ["src/**/*.ts" ]
+  "include": [ "src/**/*.ts" ]
 }

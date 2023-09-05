@@ -1,0 +1,13 @@
+[
+  {
+    "label"   : "Basic proof vector",
+    "secret"  : "3f93475154d36ac582a68b5cfa0e9b5d3f9f7c4bcc2a336dfb2d18e4ee919df5",
+    "content" : { "title" : "test data", "value" : 2147483648 },
+    "params"  : [
+      [ "kind", "10000"         ],
+      [ "stamp", "1693344267"   ],
+      [ "expires", "1693347867" ]
+    ],
+    "proof"  : "615bb263752642b9b61bd71eda7fbfcc2aa2c01033ce107af6414f583faa604050b39556ca32da248bdee57eef15f274facc839ca820fb2015583befb02ae1e961e568d6c40e278ee4e7460c46c29b9239257e087e769632757255912209669f8a5e8a608dc25e90b388e7c73768e32e585697575e01d30e26226bbe94880af327c20f9bddf698dfaefcb067d90c552335837512e78584189a079deec2b9d7f1?kind=10000&stamp=1693344267&expires=1693347867"
+  }
+]

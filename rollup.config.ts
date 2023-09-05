@@ -12,14 +12,6 @@ const treeshake = {
 
 const onwarn = warning => { throw new Error(warning) }
 
-const tsConfig = { 
-  compilerOptions: {
-    declaration    : false,
-    declarationDir : null,
-    declarationMap : false
-  }
-}
-
 export default {
   input: 'src/index.ts',
   onwarn,
@@ -46,7 +38,7 @@ export default {
       }
     }
   ],
-  plugins: [ typescript(tsConfig), nodeResolve(), commonjs() ],
+  plugins: [ typescript(), nodeResolve(), commonjs() ],
   strictDeprecations: true,
   treeshake
 }

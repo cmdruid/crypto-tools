@@ -1,10 +1,10 @@
-import { Test }  from 'tape'
+import test      from 'tape'
 import { Buff }  from '@cmdcode/buff-utils'
 import * as tiny from 'tiny-secp256k1'
 import { keys, noble, signer, util } from '../../src/index.js'
 
-export default async function (t : Test) {
-  t.test('Stress test of signature validation.', async t => {
+export default async function () {
+  test('Stress test of signature validation.', async t => {
 
     const rounds  = 100
     const results : [ number, boolean, string ][] = []

@@ -141,7 +141,7 @@ export function encode_extkey (
   const fprint = (prev !== null) ? hash160(prev).slice(0, 4) : Buff.num(0, 4)
   const index  = (tprev !== undefined) ? tprev[0].slice(-4, 4) : Buff.num(0, 4)
   const key    = (seckey !== null) ? seckey.prepend(0x00) : pubkey
-  return Buff.join([ prefix, depth, fprint, index, code, key ]).tob58chk()
+  return Buff.join([ prefix, depth, fprint, index, code, key ]).to_b58chk()
 }
 
 export function parse_extkey (

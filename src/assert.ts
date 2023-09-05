@@ -9,11 +9,8 @@ export function fail (
   error  : string,
   throws = false
 ) : boolean {
-  if (throws) {
-    throw new Error(error)
-  } else {
-    return false
-  }
+  if (!throws) return false
+  throw new Error(error)
 }
 
 export function size (
@@ -26,16 +23,6 @@ export function size (
     return fail(`Invalid byte size: ${bytes.hex} !== ${size}`, throws)
   }
   return true
-}
-
-export function min_value (
-  bytes : Bytes,
-  min   : bigint
-) : void {
-  const val = Buff.bytes(bytes).big
-  if (val < min) {
-    throw new TypeError(`Bytes integer value is too low: ${val} < ${min}`)
-  }
 }
 
 export function exists <T> (

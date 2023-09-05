@@ -1,4 +1,4 @@
-import { Test } from 'tape'
+import test     from 'tape'
 import { Buff } from '@cmdcode/buff-utils'
 
 import {
@@ -13,8 +13,8 @@ import vector_tests from './vectors/tweak.vectors.json' assert { type: 'json' }
 
 const { sec_vectors } = vector_tests
 
-export default function tweakTests(t : Test) {
-  t.test('Testing Key tweaking', async t => {
+export default function () {
+  test('Testing Key tweaking', async t => {
 
     t.plan(sec_vectors.length * 6)
 

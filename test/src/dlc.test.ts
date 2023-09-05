@@ -1,10 +1,10 @@
-import { Test } from 'tape'
+import test from 'tape'
 import { Buff } from '@cmdcode/buff-utils'
 
 import { Field, Point, hash, util } from '../../src/index.js'
 
-export default async function dlcTest(t : Test) {
-  t.test('Testing ECC Discrete Log Signatures', async t => {
+export default async function () {
+  test('Testing ECC Discrete Log Signatures', async t => {
 
     // Define some dummy message.
     const m1 = Buff.str('cloudy day')

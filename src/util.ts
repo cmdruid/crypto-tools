@@ -17,3 +17,20 @@ export function increment_buffer (buffer : Uint8Array) : Uint8Array {
   }
   throw TypeError('Unable to increment buffer: ' + buffer.toString())
 }
+
+export function stringify (content : unknown) : string {
+  switch (typeof content) {
+    case 'object':
+      return JSON.stringify(content)
+    case 'string':
+      return content
+    case 'bigint':
+      return content.toString()
+    case 'number':
+      return content.toString()
+    case 'boolean':
+      return String(content)
+    default:
+      throw new TypeError('Content type not supported: ' + typeof content)
+  }
+}

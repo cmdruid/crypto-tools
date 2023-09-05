@@ -13,26 +13,24 @@ export function is_even (p : PointData) : boolean {
   return pa.hasEvenY()
 }
 
-export function is_point (point : any) : point is PointData {
+export function is_point (point ?: unknown) : point is PointData {
+  const p = point as Record<string, unknown>
   return (
-    typeof point   === 'object' &&
-    typeof point.x === 'bigint' &&
-    typeof point.y === 'bigint'
+    (typeof p === 'object' && p !== null) &&
+    (typeof p.x === 'bigint' && typeof p.y === 'bigint')
   )
 }
 
-export function is_valid (
-  p : PointData | null
-) : p is PointData {
-  if (!is_point(p)) return false
-  const pt = new ECPoint(p.x, p.y, _1n)
+export function is_valid (point ?: unknown) : point is PointData {
+  if (!is_point(point)) return false
+  const pt = new ECPoint(point.x, point.y, _1n)
   try {
     pt.assertValidity()
     return true
   } catch { return false }
 }
 
-export function assert_valid (p : any) : asserts p is PointData {
+export function assert_valid (p : unknown) : asserts p is PointData {
   if (!is_valid(p)) {
     throw new Error('ECC point is invalid: ' + String(p))
   }

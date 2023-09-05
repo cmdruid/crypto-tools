@@ -3,14 +3,11 @@ import { _0n }            from './const.js'
 import { Field, Point }   from './ecc.js'
 import { get_shared_key } from './ecdh.js'
 import { digest }         from './hash.js'
-import { MusignContext }  from './types.js'
 
 import { get_pubkey, convert_32 }   from './keys.js'
 import { sign_config, SignOptions } from './config.js'
 
 import * as assert from './assert.js'
-
-const MSG_MIN_VALUE = 0xFFn ** 24n
 
 export function sign (
   message  : Bytes,
@@ -166,48 +163,4 @@ export function gen_nonce (
   // Apply any internal tweaks that are specified.
   nonce_tweaks.forEach(e => { sn = sn.add(e).negated })
   return sn.buff
-}
-
-export function musign (
-  context  : MusignContext,
-  secret   : Bytes,
-  options ?: SignOptions
-) : Buff {
-  // Configure our signing environment.
-  const {
-    key_tweaks   = [],
-    nonce_seeds  = [],
-    nonce_tweaks = [],
-    nonce_coeffs = []
-  } = context
-  // Assert that signing context is valid.
-  assert.ok(key_tweaks.length  >= 1)
-  assert.ok(nonce_seeds.length >= 1)
-  assert.ok(nonce_seeds.length >= nonce_coeffs.length)
-  // Configure internal nonce generation.
-  const opt = { aux: null, ...options }
-  // Generate our secret nonce values.
-  let sns = nonce_seeds.map(n => {
-    assert.min_value(n, MSG_MIN_VALUE)
-    return Field.mod(gen_nonce(n, secret, opt)).negated
-  })
-  // Define our pub key, pub nonce and tweak values.
-  const pub = get_pubkey(secret, true)
-      , pns = sns.map(e => get_pubkey(e, true))
-      , k_t = key_tweaks.map(e => Field.mod(e))
-      , n_t = nonce_tweaks.map(e => Field.mod(e))
-  // Apply external tweaks and coefficient to nonce values.
-  sns = sns.map((n, i) => {
-    n = n_t.reduce((pre, nxt) => pre.mul(nxt), n)
-    const coeff = nonce_coeffs.at(i) ?? null
-    return (coeff !== null) ? n.mul(coeff) : n
-  })
-  // Define our signature value.
-  let sig = Field.mod(secret).negated
-  // Apply key tweaks to our signature value.
-  sig = k_t.reduce((pre, nxt) => pre.mul(nxt), sig)
-  // Add our nonce values to the signature value.
-  sig = sns.reduce((pre, nxt) => pre.add(nxt), sig)
-  // Return the combined values as a signature.
-  return Buff.join([ sig, pub, ...pns ])
 }

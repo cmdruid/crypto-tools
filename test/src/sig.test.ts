@@ -1,11 +1,11 @@
-import { Test }  from 'tape'
+import test      from 'tape'
 import { Buff }  from '@cmdcode/buff-utils'
 import * as tiny from 'tiny-secp256k1'
 
 import { keys, signer, noble, util } from '../../src/index.js'
 
-export default async function (t : Test) {
-  t.test('Test signing/validation of signatures.', async t => {
+export default async function () {
+  test('Test signing/validation of signatures.', async t => {
     const message = util.random(32)
     const sec_key = noble.schnorr.utils.randomPrivateKey()
 
