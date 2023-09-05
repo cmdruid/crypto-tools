@@ -30,8 +30,7 @@ This library is designed to support classic and modern ESM imports, in both a no
 Example install via NPM or yarn:
 
 ```bash
-npm  install @cmdcode/crypto-tools
-yarn add     @cmdcode/crypto-tools
+npm install @cmdcode/crypto-tools || yarn add @cmdcode/crypto-tools
 ```
 
 Classic import into a nodejs project:
@@ -151,7 +150,24 @@ import {
 Examples:
 
 ```ts
-
+import { derive_key, encode_extkey } from '@cmdcode/crypto-tools/hd'
+// Define some sample data.
+const seed = 'fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542'
+const path = "m/0/2147483647'/1/2147483646'/2"
+// Derive the key using the seed and derivation path.
+const key_data = derive_key(path, seed)
+// Resulting key data:
+link: {
+  seckey : 'bb7d39bdb83ecf58f2fd82b6d918341cbef428661ef01ab97c28a4842125ac23',
+  pubkey : '024d902e1a2fc7a8755ab5b694c575fce742c48d9ff192e63df5193e4c7afe1f9c',
+  code   : '9452b549be8cea3ecb7a84bec10dcfd94afe4d129ebfd3b3cb58eedf394ed271',
+  path   : "m/0/2147483647'/1/2147483646'/2",
+  prev   : '02d2b36900396c9282fa14628566582f206a5dd0bcc8d5e892611806cafb0301f0'
+}
+// You can convert the key data into a base58 extended key.
+const extkey = encode_extkey(keylink)
+// Resulting extkey:
+'extkey : xprvA2nrNbFZABcdryreWet9Ea4LvTJcGsqrMzxHx98MMrotbir7yrKCEXw7nadnHM8Dq38EGfSh6dqA9QWTyefMLEcBYJUuekgW4BYPJcr9E7j'
 ```
 
 ## KeyPair Tools
@@ -176,7 +192,12 @@ import {
 Examples:
 
 ```ts
-
+import { gen_seckey, get_pubkey } from '../src/keys.js'
+// Configure a demo keypair and message.
+const seckey = gen_seckey()
+const pubkey = get_pubkey(seckey, true)
+console.log('seckey:', seckey.hex)
+console.log('pubkey:', pubkey.hex)
 ```
 
 ## Math Library
@@ -275,8 +296,19 @@ export interface SignConfig {
 }
 ```
 Examples:
-```ts
 
+```ts
+import { gen_keypair }          from '../src/keys.js'
+import { sign_msg, verify_sig } from '../src/sig.js'
+// Configure a demo keypair and message.
+const [ seckey, pubkey ] = gen_keypair(true)
+const message  = 'abcd1234'.repeat(4)
+// Sign the message, then validate the signature.
+const sig      = sign_msg(message, seckey)
+const is_valid = verify_sig(sig, message, pubkey)
+// Check the console output.
+console.log('signature:', sig.hex)
+console.log('is_valid:', is_valid)
 ```
 
 ## Field & Point
@@ -334,6 +366,8 @@ const r_value   = Field.mod(s_value).point.sub(pubkey.mul(challenge))
 console.log('signature :', R_value.x.hex + s_value.hex)
 console.log('is valid  :', R_value.hex === r_value.hex)
 ```
+
+More documentation regarding the `Field` and `Point` API.
 
 ```ts
 import { Field, Point } from '@cmdcode/crypto-tools/ecc'

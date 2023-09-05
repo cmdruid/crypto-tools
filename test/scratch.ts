@@ -1,16 +1,11 @@
-import { Field, Point } from '../src/ecc.js'
-import { digest }       from '../src/hash.js'
-
-const message   = 'dead'.repeat(16)
-const secret    = 'beef'.repeat(16)
-const pubkey    = Field.mod(secret).negated.point
-const nonce     = digest('BIP0340/nonce', secret, pubkey.x, message)
-const R_value   = Field.mod(nonce).negated.point
-const challenge = digest('BIP0340/challenge', R_value.x, pubkey.x, message)
-const s_value   = Field.mod(secret).negated.mul(challenge).add(nonce)
-
-console.log('signature:', R_value.x.hex + s_value.hex)
-
-const r_value = Field.mod(s_value).point.sub(pubkey.mul(challenge))
-
-console.log('is valid:', R_value.hex === r_value.hex)
+import { gen_keypair }          from '../src/keys.js'
+import { sign_msg, verify_sig } from '../src/sig.js'
+// Configure a demo keypair and message.
+const [ seckey, pubkey ] = gen_keypair(true)
+const message  = 'abcd1234'.repeat(4)
+// Sign the message, then validate the signature.
+const sig      = sign_msg(message, seckey)
+const is_valid = verify_sig(sig, message, pubkey)
+// Check the console output.
+console.log('signature:', sig.hex)
+console.log('is_valid:', is_valid)
