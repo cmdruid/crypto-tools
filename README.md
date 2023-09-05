@@ -1,11 +1,11 @@
-# @cmdcode/crypto-tools
+# crypto-tools
 
 A modern suite of cryptography tools, built for the plebian developer.
 
 * All tools are written in typescript and simple to use.
-* Methods return a [Buff] object for quick conversion between formats.
+* Methods return a [Buff](https://github.com/cmdruid/buffer) object for quick conversion between formats.
 * Library works in both node and the browser.
-* Uses the well-audited [@noble/curves]() for fast ecc operations.
+* Uses the well-audited [@noble/curves](https://github.com/paulmillr/noble-curves) library for fast ecc operations.
 
 ```ts
 import {
@@ -70,26 +70,25 @@ This suite is made up of individual tools.
 Each tool can be unpacked from the main library, or imported and unpacked directly.
 
 ```ts
-// Unpack tool from the main library.
+// Import tool from main library, then unpack methods.
 import { signer } from '@cmdcode/crypto-tools'
-// Unpack methods from tool.
 const { sign_msg, verify_sig } = signer
-// Unpack methods from the tool directly.
+// Import methods from the tool directly.
 import { sign_msg, verify_sig } from '@cmdcode/crypto-tools/signer'
 ```
 
-Many methods will commonly return a `Buff` object, which can be used in place of a standard `Uint8Array` and offers a number of quick convertion methods.
+Many methods will return a `Buff` object, which works in place of a standard `Uint8Array` and offers a number of quick convertion methods.
 
 ```ts
 const seckey = get_seckey('deadbeef'.repeat(4))
-console.log('secret buff :', seckey)
-console.log('secret hex  :', seckey.hex)
-console.log('secret big  :', seckey.big)
+console.log('secret raw :', seckey)
+console.log('secret hex :', seckey.hex)
+console.log('secret big :', seckey.big)
 ```
 
 You can read more about the `Buff` API [here](https://github.com/cmdruid/buffer).
 
-## ECDH Tool
+### ECDH Tool
 
 Derive a shared secret from between two keys, using Elliptic-Curve Diffe-Hellman protocol.
 
@@ -100,7 +99,7 @@ import {
 } from '@cmdcode/crypto-tools/ecdh'
 ```
 
-## Hash Tool
+### Hash Tool
 
 Used for performing SHA-256, SHA-512, HMAC-256, HMAC-512, and other useful hashing methods.
 
