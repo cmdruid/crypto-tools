@@ -1,4 +1,4 @@
-import { Buff } from '@cmdcode/buff-utils'
+import { Buff } from '@cmdcode/buff'
 
 export function random (size ?: number) : Buff {
   return Buff.random(size)

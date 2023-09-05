@@ -1,5 +1,5 @@
 import test     from 'tape'
-import { Buff } from '@cmdcode/buff-utils'
+import { Buff } from '@cmdcode/buff'
 
 import {
   keys,

@@ -1,4 +1,4 @@
-import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { Buff, Bytes } from '@cmdcode/buff'
 import { _N, _P, _0n } from './const.js'
 
 export function ok (value : unknown, message ?: string) : asserts value {

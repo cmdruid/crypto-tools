@@ -3,7 +3,7 @@
 A modern suite of cryptography tools, built for the plebian developer.
 
 * All tools are written in typescript and simple to use.
-* Methods return a [Buff](https://github.com/cmdruid/buffer) object for quick conversion between formats.
+* Methods return a [Buff](https://github.com/cmdruid/buff) object for quick conversion between formats.
 * Library works in both node and the browser.
 * Uses the well-audited [@noble/curves](https://github.com/paulmillr/noble-curves) library for fast ecc operations.
 
@@ -77,7 +77,13 @@ const { sign_msg, verify_sig } = signer
 import { sign_msg, verify_sig } from '@cmdcode/crypto-tools/signer'
 ```
 
-Many methods will return a `Buff` object, which works in place of a standard `Uint8Array` and offers a number of quick convertion methods.
+Many methods will accept a `Bytes` value type, and return a `Buff` object. The `Bytes` type covers any data type that can be converted into raw bytes.
+
+```ts
+type Bytes = 
+```
+
+`Buff` works in place of a standard `Uint8Array` and offers a number of quick convertion methods.
 
 ```ts
 const seckey = get_seckey('deadbeef'.repeat(4))
@@ -86,7 +92,7 @@ console.log('secret hex :', seckey.hex)
 console.log('secret big :', seckey.big)
 ```
 
-You can read more about the `Buff` API [here](https://github.com/cmdruid/buffer).
+You can read more about the `Buff` API [here](https://github.com/cmdruid/buff).
 
 ### ECDH Tool
 
@@ -120,6 +126,7 @@ import {
 Examples:
 
 ```ts
+// Each hash tool is designed to accept an array of bytes.
 // Use the digest tool to create a BIP-0340 standard hash commitment.
 const challenge = digest('BIP0340/challenge', sig, pubkey, msg)
 ```
@@ -254,18 +261,16 @@ export interface SignConfig {
   // Specify the aux data to use as a seed. Default is random.
   aux          ?: Bytes | null
   // Apply an adaptor tweak to the nonce value.
-  adaptor      ?: Bytes
-  // Replace the generated nonce with a custom nonce. 
-  nonce        ?: Bytes
+  adaptors     ?: Bytes[]
   // Apply tweaks to the nonce value during generation.
   nonce_tweaks ?: Bytes[]
   // Specify a public key to be used in ECDH key recovery.
-  recovery     ?: Bytes
+  recovery_key ?: Bytes
   // Apply tweaks to the signature value during signing.
   key_tweaks   ?: Bytes[]
   // If validation fails, throw an error instead of returning false.
   throws        : boolean
-  // Keys used in the signing operation should be negated for even-ness.
+  // If keys during the signing during should be negated for even-ness.
   xonly         : boolean
 }
 ```
@@ -431,7 +436,7 @@ yarn bench
 ## Compiles types and builds a new release in /dist folder.
 yarn build
 ## Runs linting rules using ESLint and Typescript.
-yarn limt
+yarn lint
 ## Runs all TAP tests from the test/src folder.
 yarn test
 ## Full script for generating a new release candidate.

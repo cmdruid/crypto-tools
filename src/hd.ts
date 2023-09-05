@@ -1,4 +1,4 @@
-import { Buff, Bytes }      from '@cmdcode/buff-utils'
+import { Buff, Bytes }      from '@cmdcode/buff'
 import { Field, Point }     from './ecc.js'
 import { hash160, hmac512 } from './hash.js'
 import { get_pubkey }       from './keys.js'

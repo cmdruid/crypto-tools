@@ -1,4 +1,4 @@
-import { Buff, Bytes }  from '@cmdcode/buff-utils'
+import { Buff, Bytes }  from '@cmdcode/buff'
 import { Field, Point } from './ecc.js'
 
 import { taghash, hmac512 }       from './hash.js'

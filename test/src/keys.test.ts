@@ -1,5 +1,5 @@
 import test from 'tape'
-import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { Buff, Bytes } from '@cmdcode/buff'
 
 import * as tiny from 'tiny-secp256k1'
 import * as ecc  from '../../src/index.js'

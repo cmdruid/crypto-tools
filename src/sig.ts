@@ -1,4 +1,4 @@
-import { Buff, Bytes }    from '@cmdcode/buff-utils'
+import { Buff, Bytes }    from '@cmdcode/buff'
 import { _0n }            from './const.js'
 import { Field, Point }   from './ecc.js'
 import { get_shared_key } from './ecdh.js'
@@ -19,18 +19,18 @@ export function sign_msg (
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
   const opt = get_config(options)
-  const { adaptor, tweak, xonly } = opt
+  const { adaptors, key_tweaks, xonly } = opt
 
   // Normalize our message into bytes.
   const m = Buff.bytes(message)
   // Let d' equal the integer value of secret key.
   let dp = Field.mod(secret)
   // If there is a tweak involved, apply it.
-  if (tweak !== undefined) {
+  if (key_tweaks.length > 0) {
     // If xonly, we have to negate here.
     if (xonly) dp = dp.negated
-    // Apply the tweak.
-    dp = dp.add(tweak)
+    // Apply the tweaks.
+    key_tweaks.forEach(t => { dp = dp.add(t) })
   }
   // Let P equal d' * G
   const P = dp.point
@@ -41,11 +41,11 @@ export function sign_msg (
   // Let k' equal our nonce mod N.
   let kp = Field.mod(n)
   // If adaptor present, apply to k'.
-  if (adaptor !== undefined) {
+  if (adaptors.length > 0) {
     // If xonly, we have to negate here.
     if (xonly) kp = kp.negated
     // Apply the tweak.
-    kp = kp.add(adaptor)
+    adaptors.forEach(t => { kp = kp.add(t) })
   }
   // Let R equal k' * G.
   const R = kp.point
@@ -143,12 +143,10 @@ export function gen_nonce (
   secret   : Bytes,
   options ?: SignOptions
 ) : Buff {
-  const { aux, nonce, nonce_tweaks = [], recovery, xonly } = get_config(options)
+  const { aux, nonce_tweaks, recovery_key, xonly } = get_config(options)
   let n : Buff
-  if (nonce !== undefined) {
-    n = Buff.bytes(nonce)
-  } else if (recovery !== undefined) {
-    n = get_shared_key(secret, recovery)
+  if (recovery_key !== undefined) {
+    n = get_shared_key(secret, recovery_key)
   } else {
     const seed = (aux === null) ? Buff.num(0, 32) : aux
     // Hash the auxiliary data according to BIP 0340.

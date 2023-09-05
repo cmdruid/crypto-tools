@@ -1,4 +1,4 @@
-import { Buff, Bytes }   from '@cmdcode/buff-utils'
+import { Buff, Bytes }   from '@cmdcode/buff'
 import { Field, FpSqrt } from '@noble/curves/abstract/modular'
 import { mod, pow }      from '@noble/curves/abstract/modular'
 import { _N, _P, _0n }   from './const.js'

@@ -1,4 +1,4 @@
-import { Buff } from '@cmdcode/buff-utils'
+import { Buff } from '@cmdcode/buff'
 
 const _N  = Buff.hex('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141').big
 

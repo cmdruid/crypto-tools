@@ -1,4 +1,4 @@
-import { Buff, Bytes }   from '@cmdcode/buff-utils'
+import { Buff, Bytes }   from '@cmdcode/buff'
 import { secp256k1 }     from '@noble/curves/secp256k1'
 import { ProjPointType } from '@noble/curves/abstract/weierstrass'
 import { _N, _P, _G }    from './const.js'

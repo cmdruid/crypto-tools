@@ -1,5 +1,5 @@
 import test      from 'tape'
-import { Buff }  from '@cmdcode/buff-utils'
+import { Buff }  from '@cmdcode/buff'
 import * as tiny from 'tiny-secp256k1'
 import { keys, noble, signer, util } from '../../src/index.js'
 

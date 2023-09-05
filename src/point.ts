@@ -1,4 +1,4 @@
-import { Buff, Bytes } from '@cmdcode/buff-utils'
+import { Buff, Bytes } from '@cmdcode/buff'
 import { secp256k1 }   from '@noble/curves/secp256k1'
 import { _1n }         from './const.js'
 import { PointData }   from './types.js'

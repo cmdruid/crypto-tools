@@ -1,4 +1,4 @@
-import { Buff, Bytes }    from '@cmdcode/buff-utils'
+import { Buff, Bytes }    from '@cmdcode/buff'
 import { mod, modN, pow } from './math.js'
 
 export interface Point { x : bigint, y : bigint }
