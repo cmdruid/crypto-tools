@@ -8,7 +8,7 @@
     "utils",
     "library"
   ],
-  "version": "2.4.5",
+  "version": "2.4.6",
   "type": "module",
   "exports": {
     ".": {
@@ -35,6 +35,11 @@
       "import": "./dist/hash.js",
       "types": "./dist/hash.d.ts",
       "default": "./dist/hash.js"
+    },
+    "./hd": {
+      "import": "./dist/hd.js",
+      "types": "./dist/hd.d.ts",
+      "default": "./dist/hd.js"
     },
     "./keys": {
       "import": "./dist/keys.js",
