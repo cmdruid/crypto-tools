@@ -429,95 +429,81 @@ console.log('signature :', R_value.x.hex + s_value.hex)
 console.log('is valid  :', R_value.hex === r_value.hex)
 ```
 
-More documentation regarding the `Field` and `Point` API.
+Documentation for the `Field` API:
 
 ```ts
-import { Field, Point } from '@cmdcode/crypto-tools/ecc'
 // Fields can be created from a variety of types (strings are treated as hex).
 type FieldValue = string | number | bigint | Uint8Array | Field
-// Points can be created from a variety of types (strings are treated as hex).
-type PointValue = string | number | bigint | Uint8Array | Point
+
 // The Field class is an extension of the uint8 data type.
 class Field extends Uint8Array {
   // Prime N reference.
   static N: bigint
-  // Helper method for efficient modulo operations.
+  // Converts a value under secp256k1 field order N. Same as new Field(x).
   static mod(x: bigint, n?: bigint): bigint
-  // Helper method for efficient power operations.
-  static pow(x: bigint, e: bigint, n?: bigint): bigint
   // Normalize input values into bytes.
   static normalize(num: FieldValue): Uint8Array
-  // Validate input values (or throw).
-  static validate(num: bigint): boolean;
-
-  // Accepts a variety of inputs.
-  constructor(x : FieldValue);
-
+  // Checks if value is within the secp256k1 field order N.
+  static is_valid(num: bigint): boolean
   // Convert into a variety of formats.
-  get buff()    : Buff;
-  get raw()     : Uint8Array;
-  get big()     : bigint;
-  get hex()     : string;
-
-  // Return point (or x-only point) object.
-  get point()   : Point;
-  get xpoint()  : Point;
-
-  // Helper attributes.
-  get hasOddY() : boolean;
-  get negated() : Field;
-
+  get buff    : Buff
+  get raw     : Uint8Array
+  get big     : bigint
+  get hex     : string
+  // Return point object.
+  get point   : Point
+  // Checks if the point value of the field has an odd y coordinate.
+  get hasOddY : boolean
+  // Auto-negates the field value if it has an odd y coordiante.
+  get negated : Field
   // All basic operations are available.
-  gt(big: FieldValue)  : boolean;
-  lt(big: FieldValue)  : boolean;
-  eq(big: FieldValue)  : boolean;
-  ne(big: FieldValue)  : boolean;
-  add(big: FieldValue) : Field;
-  sub(big: FieldValue) : Field;
-  mul(big: FieldValue) : Field;
-  pow(big: FieldValue) : Field;
-  div(big: FieldValue) : Field;
-  negate()             : Field;
-  generate()           : Point;
+  gt  (big: FieldValue) : boolean
+  lt  (big: FieldValue) : boolean
+  eq  (big: FieldValue) : boolean
+  ne  (big: FieldValue) : boolean
+  add (big: FieldValue) : Field
+  sub (big: FieldValue) : Field
+  mul (big: FieldValue) : Field
+  pow (big: FieldValue) : Field
+  div (big: FieldValue) : Field
+  negate()              : Field
+  generate()            : Point
 }
+```
+
+Documentation for the `Point` API:
+
+```ts
+// Points can be created from a variety of types (strings are treated as hex).
+type PointValue = string | number | bigint | Uint8Array | Point
 // The Point class stores the x / y coordinates of a point on the secp256k1 curve.
 class Point {
   // Prime N reference.
-  static N: bigint;
-
-  // Validate input values (or throw).
-  static validate(x: PointValue): boolean;
-
-  // Normalize input values into bytes.
-  static normalize(x: PointValue): ECPoint;
-  
+  static P : bigint
+  static G : Point
+  // Create a point from an existing compressed key.
+  static from_x(x: PointValue, xonly ?: boolean) : Point
   // Generate a point from a field (scalar) value.
-  static generate(value: FieldValue): Point;
-
-  // Helper method for importing coordinates.
-  static import(point: Point | ECPoint): Point;
-
+  static generate(value: FieldValue) : Point
+  // Helper method for importing points from Noble library.
+  static import(point: Point | ECPoint) : Point
   // Accepts a varity of x-only and compressed key inputs.
   // Will also accept coordinate data (as bigint). 
-  constructor(x: PointValue, y?: bigint);
-
+  constructor (x: PointValue, y?: bigint)
   // Convert into a variety of formats.
-  get p()    : ECPoint;
-  get x()    : Buff;
-  get y()    : Buff;
-  get buff() : Buff;       // Returns compressed key.
-  get raw()  : Uint8Array; // Returns compressed key.
-  get hex()  : string;     // Returns compressed key.
-
-  // Helper attributes.
-  get hasEvenY(): boolean;
-  get hasOddY(): boolean;
-
+  get x        : Buff       // Return a buff object.
+  get y        : Buff       // Return a buff object.
+  get buff     : Buff       // Returns compressed key as bytes.
+  get hex      : string     // Returns compressed key as hex.
+  get hasEvenY : boolean
+  get hasOddY  : boolean
+  // Auto-negates the point value if it has an odd y coordiante.
+  get negated  : Point
   // Basic math operations available.
-  eq(value: PointValue): boolean;
-  add(x: PointValue): Point;
-  sub(x: PointValue): Point;
-  mul(value: PointValue): Point;
+  eq  (value: PointValue) : boolean
+  add (x: PointValue)     : Point
+  sub (x: PointValue)     : Point
+  mul (value: PointValue) : Point
   negate(): Point;
 }
 ```
