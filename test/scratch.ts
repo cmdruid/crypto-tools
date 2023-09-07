@@ -1,27 +1,15 @@
-import { gen_keypair }          from '../src/keys.js'
+import { Buff } from '@cmdcode/buff'
+import { get_seckey, gen_keypair } from '../src/keys.js'
+import { sign_msg, recover_key }   from '../src/sig.js'
 
-import {
-  create_proof,
-  parse_proof,
-  verify_proof,
-  create_event
-} from '../src/proof.js'
+// Configure hot / cold key-pairs and a message.
+const [ hot_sec, hot_pub ]   = gen_keypair(true)
+const [ cold_sec, cold_pub ] = gen_keypair(true)
+const message = Buff.str('testing ECDH key recovery').digest
+// Sign a message to produce a signature.
+const sig = sign_msg(message, hot_sec, { recovery_key: cold_pub })
+// Use the signature to recovery the secret key.
+const rec_key = recover_key(sig, message, hot_pub, cold_sec)
 
-// Configure a demo keypair and message.
-const [ seckey, pubkey ] = gen_keypair(true)
-
-// Create a proof
-const data   = { name : 'bob', key : 'abcd' }
-const stamp  = Math.floor(Date.now() / 1000)
-const params = [[ 'kind', 10000 ], [ 'stamp', stamp ]]
-const proof  = create_proof(seckey, data, params)
-console.log('proof:', proof)
-// Verify a proof
-const is_valid = verify_proof(proof, data)
-console.log('is_valid:', is_valid)
-// Parse a proof into a ProofData object
-const proof_data = parse_proof(proof)
-console.log('proof data:', proof_data)
-// Convert a proof into a nostr note.
-const event = create_event(proof, data)
-console.log('event:', event)
+console.log('hot secret key :', get_seckey(hot_sec, true).hex)
+console.log('recovered key  :', rec_key.hex)

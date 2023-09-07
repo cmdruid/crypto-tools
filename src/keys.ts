@@ -64,12 +64,13 @@ export function tweak_pubkey (
   return (x_only) ? pub.x : pub.buff
 }
 
-export function negate_seckey (
-  seckey : Bytes,
-  negate : boolean
+export function parse_pubkey (
+  pubkey : Bytes,
+  xonly  : boolean
 ) : Buff {
-  const s = Field.mod(seckey)
-  return (negate) ? s.negate().buff : s.buff
+  return (xonly)
+    ? convert_32b(pubkey)
+    : convert_33b(pubkey)
 }
 
 export function get_keypair (

@@ -1,17 +1,23 @@
-import { Buff, Bytes }  from '@cmdcode/buff'
-import { Field, Point } from './ecc.js'
+import { Buff, Bytes } from '@cmdcode/buff'
+import { Point }       from './ecc.js'
 
-import { taghash, hmac512 }       from './hash.js'
-import { get_seckey, get_pubkey } from './keys.js'
+import {
+  get_pubkey,
+  get_seckey,
+  parse_pubkey
+} from './keys.js'
+
+import { taghash, hmac512 } from './hash.js'
 
 export function get_shared_key (
   self_sec : Bytes,
-  peer_pub : Bytes
+  peer_pub : Bytes,
+  xonly    = false
 ) : Buff {
-  const P  = Point.from_x(peer_pub)
-  const sp = Field.mod(self_sec)
-  const sh = P.mul(sp)
-  return sh.buff
+  const P   = Point.from_x(peer_pub)
+  const sec = get_seckey(self_sec)
+  const shared = P.mul(sec)
+  return (xonly) ? shared.x : shared.buff
 }
 
 export function get_shared_code (
@@ -20,12 +26,11 @@ export function get_shared_code (
   message  : Bytes,
   prefix   = 'ecdh/hmac_512'
 ) : Buff {
-  const sec  = get_seckey(self_sec)
-  const pub  = get_pubkey(sec)
-  const peer = Buff.bytes(peer_pub)
+  const pub  = get_pubkey(self_sec, true)
+  const peer = parse_pubkey(peer_pub, true)
   const tag  = taghash(prefix)
   // Derive a shared key.
-  const shared = get_shared_key(sec, peer_pub)
+  const shared = get_shared_key(self_sec, peer_pub)
   // Sort the pub keys lexographically.
   const pubs = [ pub.hex, peer.hex ].sort()
   // Use the shared key to sign a SHA512 digest.

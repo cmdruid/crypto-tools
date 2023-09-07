@@ -329,6 +329,50 @@ console.log('signature:', sig.hex)
 console.log('is_valid:', is_valid)
 ```
 
+Key recovery allows you to designate another key-pair that can recover your private key from a signature, using ECDH.
+
+```ts
+// Configure two pairs of keys and a test message.
+const [ hot_sec, hot_pub ]   = gen_keypair(true)
+const [ cold_sec, cold_pub ] = gen_keypair(true)
+const message = 'feedcab123'
+// Sign a message with the 'cold' pubkey as an ECDH recovery key.
+const sig = sign_msg(message, hot_sec, { recovery_key: cold_pub })
+```
+
+Under the hood, key recovery will modify the nonce generation so that an ECDH shared secret is used instead of your private key.
+
+```ts
+// Normal BIP-0340 nonce generation.
+let sec_nonce  = taghash('BIP0340/nonce', seckey, pubkey, message)
+// Modified nonce generation for ECDH key recovery:
+let shared_key = ecdh.get_shared_key(seckey, rec_pubkey)
+    sec_nonce  = taghash('BIP0340/nonce', shared_key, pubkey, message)
+```
+
+This allows the 'cold' seckey to compute the shared secret, and thus extract the 'hot' seckey from the signature.
+
+```ts
+// Use the signature and 'cold' seckey to recovery the secret key.
+const rec_key = recover_key(sig, message, hot_pub, cold_sec)
+// The recovered 'hot' seckey will be negated, so we will also negate 
+// the original key in order to compare it with the recovered key.
+console.log('recovered key  :', rec_key.hex)
+`recovered key  : c18d25e25c1b229d14bd97e0daf3e4453765c2e007d9023698458573517ccd55`
+console.log('hot secret key :', get_seckey(hot_sec, true).hex)
+`hot secret key : c18d25e25c1b229d14bd97e0daf3e4453765c2e007d9023698458573517ccd55`
+```
+
+The formula for recovering a secret key via ECDH shared secret signing:
+
+```ts
+R_value   = sig.slice(0, 32)
+s_value   = sig.slice(32, 64)
+sec_nonce = taghash('BIP0340/nonce', shared_key, pubkey, message)
+challenge = taghash('BIP0340/challenge', R_value, pubkey, message)
+sec_key   = (s_value - sec_nonce) / challenge
+```
+
 ## Field & Point
 
 The `Field` and `Point` classes will convert a key or integer value into an object with a feature-rich API. This API is designed to perform complex elliptic curve operations, but in a simple and readable manner.

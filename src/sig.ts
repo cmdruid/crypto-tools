@@ -4,7 +4,12 @@ import { Field, Point }   from './ecc.js'
 import { get_shared_key } from './ecdh.js'
 import { digest }         from './hash.js'
 
-import { get_pubkey, convert_32b } from './keys.js'
+import {
+  get_pubkey,
+  parse_pubkey,
+  get_seckey
+} from './keys.js'
+
 import { get_config, SignOptions } from './config.js'
 
 import * as assert from './assert.js'
@@ -19,7 +24,7 @@ export function sign_msg (
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
   const opt = get_config(options)
-  const { adaptors, key_tweaks, xonly } = opt
+  const { adaptors, key_tweaks } = opt
 
   // Normalize our message into bytes.
   const m = Buff.bytes(message)
@@ -27,15 +32,15 @@ export function sign_msg (
   let dp = Field.mod(secret)
   // If there is a tweak involved, apply it.
   if (key_tweaks.length > 0) {
-    // If xonly, we have to negate here.
-    if (xonly) dp = dp.negated
+    // We have to negate before tweaking.
+    dp = dp.negated
     // Apply the tweaks.
     key_tweaks.forEach(t => { dp = dp.add(t) })
   }
   // Let P equal d' * G
   const P = dp.point
   // Let d equal d' (negate if needed).
-  const d = (xonly) ? dp.negated : dp
+  const d = dp.negated
   // Compute our nonce value.
   const n = gen_nonce(m, d, opt)
   // Let k' equal our nonce mod N.
@@ -43,23 +48,21 @@ export function sign_msg (
   // If adaptor present, apply to k'.
   if (adaptors.length > 0) {
     // If xonly, we have to negate here.
-    if (xonly) kp = kp.negated
+    kp = kp.negated
     // Apply the tweak.
     adaptors.forEach(t => { kp = kp.add(t) })
   }
   // Let R equal k' * G.
   const R = kp.point
   // For taproot: If R has an odd Y coordinate, return negated version of k'.
-  const k = (xonly) ? kp.negated.big : kp.big
+  const k = kp.negated.big
   // Let c equal the tagged hash('BIP0340/challenge' || R || P || m) mod n.
-  const ch = digest('BIP0340/challenge', R.x.raw, P.x.raw, m)
+  const ch = digest('BIP0340/challenge', R.x, P.x, m)
   const c  = Field.mod(ch)
   // Let s equal (k + ed) mod n.
   const s  = Field.mod(k + (c.big * d.big))
-  // Convert R if xonly.
-  const rx = (xonly) ? R.x.raw : R.raw
   // Return (R || s) as a signature
-  return Buff.join([ rx, s.raw ])
+  return Buff.join([ R.x, s.raw ])
 }
 
 export function verify_sig (
@@ -126,16 +129,14 @@ export function recover_key (
   pub_key   : Bytes,
   rec_key   : Bytes
 ) : Buff {
+  const pub   = parse_pubkey(pub_key, true)
   const sig   = Buff.bytes(signature)
-  const msg   = Buff.bytes(message)
-  const pub   = Buff.bytes(pub_key)
-  const seed  = get_shared_key(rec_key, pub_key)
-  const nonce = digest('BIP0340/nonce', seed, message)
-  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), convert_32b(pub), msg)
-  const c = new Field(chal)
-  const k = new Field(nonce).negated
-  const s = new Field(sig.slice(32, 64))
-  return s.sub(k).div(c).buff
+  const s_val = Field.mod(sig.slice(32, 64))
+  const seed  = get_shared_key(rec_key, pub, true)
+  const nonce = digest('BIP0340/nonce', seed, pub, message)
+  const chal  = digest('BIP0340/challenge', sig.slice(0, 32), pub, message)
+  const k     = get_seckey(nonce, true)
+  return s_val.sub(k).div(chal).buff
 }
 
 export function gen_nonce (
@@ -143,10 +144,13 @@ export function gen_nonce (
   secret   : Bytes,
   options ?: SignOptions
 ) : Buff {
-  const { aux, nonce_tweaks, recovery_key, xonly } = get_config(options)
-  let n : Buff
+  const { aux, nonce_tweaks, recovery_key } = get_config(options)
+  const pubkey = get_pubkey(secret, true)
+  let nonce : Buff, shared : Buff
   if (recovery_key !== undefined) {
-    n = get_shared_key(secret, recovery_key)
+    const rec_key = parse_pubkey(recovery_key, true)
+    shared = get_shared_key(secret, rec_key, true)
+    nonce  = Buff.join([ shared, pubkey ])
   } else {
     const seed = (aux === null) ? Buff.num(0, 32) : aux
     // Hash the auxiliary data according to BIP 0340.
@@ -154,10 +158,10 @@ export function gen_nonce (
     // Let t equal the byte-wise xor of (d) and (a).
     const t = Buff.bytes(secret).big ^ a.big
     // The nonce seed is our xor secret key and public key.
-    n = Buff.join([ t, get_pubkey(secret, xonly) ])
+    nonce = Buff.join([ t, get_pubkey(secret, true) ])
   }
   // Compute our nonce as a tagged hash of the seed value and message.
-  let sn = Field.mod(digest('BIP0340/nonce', n, Buff.bytes(message)))
+  let sn = Field.mod(digest('BIP0340/nonce', nonce, message))
   // Apply any internal tweaks that are specified.
   nonce_tweaks.forEach(e => { sn = sn.add(e).negated })
   return sn.buff
