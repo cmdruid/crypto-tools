@@ -79,7 +79,7 @@ import { sign_msg, verify_sig } from '@cmdcode/crypto-tools/signer'
 Many methods will accept a `Bytes` value type, and return a `Buff` object. The `Bytes` type covers any data type that can be converted into raw bytes.
 
 ```ts
-type Bytes = 
+type Bytes = string | number | bigint | Uint8Array | Buff
 ```
 
 `Buff` works in place of a standard `Uint8Array` and offers a number of quick convertion methods.
@@ -125,7 +125,8 @@ import {
 Examples:
 
 ```ts
-// Each hash tool is designed to accept an array of bytes.
+// Each hash tool is designed to accept multiple bytes values.
+const hash = sha256('dead', 'beef')
 // Use the digest tool to create a BIP-0340 standard hash commitment.
 const challenge = digest('BIP0340/challenge', sig, pubkey, msg)
 ```
@@ -157,6 +158,7 @@ const path = "m/0/2147483647'/1/2147483646'/2"
 // Derive the key using the seed and derivation path.
 const key_data = derive_key(path, seed)
 // Resulting key data:
+console.log('link:', key_data)
 link: {
   seckey : 'bb7d39bdb83ecf58f2fd82b6d918341cbef428661ef01ab97c28a4842125ac23',
   pubkey : '024d902e1a2fc7a8755ab5b694c575fce742c48d9ff192e63df5193e4c7afe1f9c',
@@ -236,30 +238,46 @@ import {
   create_event,    // Convert a proof into a NIP-01 nostr note.
   parse_config     // Parse the proof configuration from params.
 } from '@cmdcode/crypto-tools/proof'
-
-interface KeyLink {
-  prev   : Buff | null  // Previous code in the path.
-  seckey : Buff | null  // The current derived secret, if any.
-  pubkey : Buff         // The current derived public key.
-  path   : string       // The derivation path in use.
-  code   : Buff         // The current chain code.
-}
 ```
 
 Examples:
 
 ```ts
-// Create a proof
-const data  = { name : 'bob', key : 'abcd' }
-const proof = create_proof(bob)
-console.log('proof:', proof)
+// Setup a demo keypair and message.
+const [ seckey, pubkey ] = gen_keypair()
+// Create a proof.
+const data   = { name : 'bob', key : 'abcd' }
+const stamp  = Math.floor(Date.now() / 1000)
+const params = [[ 'kind', 10000 ], [ 'stamp', stamp ]]
+const proof  = create_proof(seckey, data, params)
+console.log(proof)
+`e403621bae6dffd75c76b282cc3525da14bf55a4ee3c396279f35f766b4ad079749b45be02446dc32e4eab02be026eef1592a23c209eb8b571f4f78ac6a762405cc802eae19177096334c0d4e53add9c97dc200e3f2e5700bd17aee14beb01e983456c5cb3461f20c8f3d59e8386a0d8ad4c3d6f58cacb9fc85eef514b8fc1007c476558535de220aebc916b0974e8b76dd584ba14b479d947f9ee52c40333c8?kind=10000&stamp=1694095593`
 // Verify a proof
-
+const is_valid = verify_proof(proof, data)
+console.log('is_valid:', is_valid)
+`is_valid : true`
 // Parse a proof into a ProofData object
-
+const proof_data = parse_proof(proof)
+console.log('proof data:', proof_data)
+proof data: {
+  ref: 'e403621bae6dffd75c76b282cc3525da14bf55a4ee3c396279f35f766b4ad079',
+  pub: '749b45be02446dc32e4eab02be026eef1592a23c209eb8b571f4f78ac6a76240',
+  pid: '5cc802eae19177096334c0d4e53add9c97dc200e3f2e5700bd17aee14beb01e9',
+  sig: '83456c5cb3461f20c8f3d59e8386a0d8ad4c3d6f58cacb9fc85eef514b8fc1007c476558535de220aebc916b0974e8b76dd584ba14b479d947f9ee52c40333c8',
+  params: [ [ 'kind', '10000' ], [ 'stamp', '1694095593' ] ]
+}
 // Convert a proof into a nostr note.
-const event = create_event(proof)
-console.log('event:', '')
+const event = create_event(proof, data)
+console.log('event:', event)
+event: {
+  kind: 10000,
+  content: '{"name":"bob","key":"abcd"}',
+  tags: [],
+  pubkey: '749b45be02446dc32e4eab02be026eef1592a23c209eb8b571f4f78ac6a76240',
+  id: '5cc802eae19177096334c0d4e53add9c97dc200e3f2e5700bd17aee14beb01e9',
+  sig: '83456c5cb3461f20c8f3d59e8386a0d8ad4c3d6f58cacb9fc85eef514b8fc1007c476558535de220aebc916b0974e8b76dd584ba14b479d947f9ee52c40333c8',
+  created_at: 1694095593
+}
 ```
 
 ## Signature Tools
