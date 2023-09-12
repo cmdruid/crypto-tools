@@ -24,7 +24,7 @@ export function get_shared_code (
   self_sec : Bytes,
   peer_pub : Bytes,
   message  : Bytes,
-  prefix   = 'ecdh/hmac_512'
+  prefix   = 'ecdh/hmac512'
 ) : Buff {
   const pub  = get_pubkey(self_sec, true)
   const peer = parse_pubkey(peer_pub, true)

@@ -118,17 +118,17 @@ import {
   hmac256,  // Hash and sign a message using HMAC and SHA-256.
   hmac512,  // Hash and sign a message using HMAC and SHA-512.
   taghash,  // Creates a BIP-0340 standard 'tag' hash.
-  digest,   // Hashes an array of data using BIP-0340 standards.
+  hash340,  // Hashes an array of data using BIP-0340 standards.
 } from '@cmdcode/crypto-tools/hash'
 ```
 
 Examples:
 
 ```ts
-// Each hash tool is designed to accept multiple bytes values.
-const hash = sha256('dead', 'beef')
-// Use the digest tool to create a BIP-0340 standard hash commitment.
-const challenge = digest('BIP0340/challenge', sig, pubkey, msg)
+// Each hash tool can accept many byte-compatible values.
+const hash = sha256('fda0', 1024n, new Uint8Array(0), 42)
+// Use the taghash tool to create a BIP-0340 standard hash commitment.
+const challenge = hash340('BIP0340/challenge', sig, pubkey, msg)
 ```
 
 ## HD Tool
@@ -309,7 +309,7 @@ export interface SignConfig {
   key_tweaks   ?: Bytes[]
   // If validation fails, throw an error instead of returning false.
   throws        : boolean
-  // If keys during the signing during should be negated for even-ness.
+  // If keys used during the signing operation should be negated for even-ness.
   xonly         : boolean
 }
 ```
@@ -347,7 +347,7 @@ Under the hood, key recovery will modify the nonce generation so that an ECDH sh
 let sec_nonce  = taghash('BIP0340/nonce', seckey, pubkey, message)
 // Modified nonce generation for ECDH key recovery:
 let shared_key = ecdh.get_shared_key(seckey, rec_pubkey)
-    sec_nonce  = taghash('BIP0340/nonce', shared_key, pubkey, message)
+    sec_nonce  = hash340('BIP0340/nonce', shared_key, pubkey, message)
 ```
 
 This allows the 'cold' seckey to compute the shared secret, and thus extract the 'hot' seckey from the signature.
@@ -368,16 +368,18 @@ The formula for recovering a secret key via ECDH shared secret signing:
 ```ts
 R_value   = sig.slice(0, 32)
 s_value   = sig.slice(32, 64)
-sec_nonce = taghash('BIP0340/nonce', shared_key, pubkey, message)
-challenge = taghash('BIP0340/challenge', R_value, pubkey, message)
+sec_nonce = hash340('BIP0340/nonce', shared_key, pubkey, message)
+challenge = hash340('BIP0340/challenge', R_value, pubkey, message)
 sec_key   = (s_value - sec_nonce) / challenge
 ```
 
-## Field & Point
+## Field
 
-The `Field` and `Point` classes will convert a key or integer value into an object with a feature-rich API. This API is designed to perform complex elliptic curve operations, but in a simple and readable manner.
+The `Field` class will convert a key or integer value into a field value under the secp256k1 curve. This field value includes a built-in API for performing math operations in a simple and readable manner.
 
 Each `Field` object is stored as raw bytes, and they are directly usable as an `Uint8Array`.
+
+**Example:**
 
 ```ts
 import { Field } from '@cmdcode/crypto-tools/ecc'
@@ -393,40 +395,6 @@ console.log('original seckey :', secret.hex)
 console.log('original pubkey :', pubkey.hex)
 console.log('tweaked seckey  :', twk_sec.hex)
 console.log('tweaked pubkey  :', twk_pub.hex)
-```
-
-Each `Point` object is stored as a pair of X / Y bigint values on the secp256k1 curve.
-
-```ts
-import { Point } from '@cmdcode/crypto-tools/ecc'
-
-const _pubkey  = Point.from_x(secret.point.raw)
-const _twk_pub = pubkey.add(tweak)
-
-console.log('imported point  :', _pubkey)
-console.log('imported pubkey :', _pubkey.hex)
-console.log('tweaked  pubkey :', _twk_pub.hex)
-```
-
-Here is simplified example of signing and verifing a BIP-0340 digital signature:
-
-```ts
-import { Field }  from '@cmdcode/crypto-tools/ecc'
-import { digest } from '@cmdcode/crypto-tools/hash'
-// Generate some hex strings to use as a secret key and message.
-const message   = 'dead'.repeat(16)
-const secret    = 'beef'.repeat(16)
-// Compute the pubkey, nonce, and challenge values.
-const pubkey    = Field.mod(secret).negated.point
-const nonce     = digest('BIP0340/nonce', secret, pubkey.x, message)
-const R_value   = Field.mod(nonce).negated.point
-const challenge = digest('BIP0340/challenge', R_value.x, pubkey.x, message)
-// Signature is composed of an R value and S value.
-const s_value   = Field.mod(secret).negated.mul(challenge).add(nonce)
-const r_value   = Field.mod(s_value).point.sub(pubkey.mul(challenge))
-// Print the signature to console and report its validity.
-console.log('signature :', R_value.x.hex + s_value.hex)
-console.log('is valid  :', R_value.hex === r_value.hex)
 ```
 
 Documentation for the `Field` API:
@@ -471,6 +439,25 @@ class Field extends Uint8Array {
 }
 ```
 
+## Point
+
+The `Point` class will convert a key or integer value into a point value under the secp256k1 curve. This point value includes a built-in API for performing math operations in a simple and readable manner.
+
+Each `Point` object contains an `x` coordiante and a `y` coordinate, stored as bigint values.
+
+**Example:**
+
+```ts
+import { Point } from '@cmdcode/crypto-tools/ecc'
+
+const _pubkey  = Point.from_x(secret.point.raw)
+const _twk_pub = pubkey.add(tweak)
+
+console.log('imported point  :', _pubkey)
+console.log('imported pubkey :', _pubkey.hex)
+console.log('tweaked  pubkey :', _twk_pub.hex)
+```
+
 Documentation for the `Point` API:
 
 ```ts
@@ -506,6 +493,29 @@ class Point {
   mul (value: PointValue) : Point
   negate(): Point;
 }
+```
+
+A `Point` can also be generated from a `Field` object, allowing you to perform complex elliptic curve operations using mostly the `Field` class.
+
+Here is simplified example of signing and verifing a BIP-0340 digital signature, using the `Field` class:
+
+```ts
+import { Field }  from '@cmdcode/crypto-tools/ecc'
+import { digest } from '@cmdcode/crypto-tools/hash'
+// Generate some hex strings to use as a secret key and message.
+const message   = 'dead'.repeat(16)
+const secret    = 'beef'.repeat(16)
+// Compute the pubkey, nonce, and challenge values.
+const pubkey    = Field.mod(secret).negated.point
+const nonce     = hash340('BIP0340/nonce', secret, pubkey.x, message)
+const R_value   = Field.mod(nonce).negated.point
+const challenge = hash340('BIP0340/challenge', R_value.x, pubkey.x, message)
+// Signature is composed of an R value and S value.
+const s_value   = Field.mod(secret).negated.mul(challenge).add(nonce)
+const r_value   = Field.mod(s_value).point.sub(pubkey.mul(challenge))
+// Print the signature to console and report its validity.
+console.log('signature :', R_value.x.hex + s_value.hex)
+console.log('is valid  :', R_value.hex === r_value.hex)
 ```
 
 ## Development / Testing
