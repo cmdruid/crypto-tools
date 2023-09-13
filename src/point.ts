@@ -117,9 +117,13 @@ export function lift_x (
   bytes : Bytes,
   xonly = false
 ) : PointData {
-  const key = Buff.bytes(bytes)
-  if (key.length === 32) key.prepend(0x02)
-  if (xonly && key[0] !== 0x02) key[0] = 0x02
+  let key = Buff.bytes(bytes)
+  if (key.length === 32) {
+    key = key.prepend(0x02)
+  }
+  if (xonly && key[0] !== 0x02) {
+    key[0] = 0x02
+  }
   const point = ECPoint.fromHex(key.hex)
   point.assertValidity()
   return { x: point.x, y: point.y }
