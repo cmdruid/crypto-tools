@@ -52,7 +52,7 @@ export function taghash (tag : string) : Buff {
   return Buff.join([ hash, hash ])
 }
 
-export function digest (
+export function hash340 (
   tag : string,
   ...data : Bytes[]
 ) : Buff {
