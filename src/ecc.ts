@@ -32,6 +32,10 @@ export class Field extends Uint8Array {
     return assert.in_field(big, throws)
   }
 
+  static random () {
+    return Field.mod(Buff.random(32))
+  }
+
   constructor (x : FieldValue) {
     const b = math.mod_n(normalizeField(x))
     Field.is_valid(b, true)

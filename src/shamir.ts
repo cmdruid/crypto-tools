@@ -1,3 +1,10 @@
+/** Resources
+ *  - https://github.com/grempe/secrets.js
+ *  - https://github.com/renproject/frost
+ *  - https://github.com/taurusgroup/multi-party-sig
+ *  - https://eprint.iacr.org/2020/852.pdf
+ */
+
 import { Buff, Bytes } from '@cmdcode/buff'
 
 import { _0n, _1n, _N }    from './const.js'

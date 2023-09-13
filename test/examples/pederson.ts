@@ -1,5 +1,5 @@
 import { Buff } from '@cmdcode/buff'
-import { Field, Point } from '../src/index.js'
+import { Field, Point } from '../../src/index.js'
 
 // Suppose a prover P wants to convince a verifier V 
 // that they know x and r such that: C = g^x * h^r

@@ -13,6 +13,7 @@ export {
 export * as pt from './point.js'
 
 export const fd = Field(_N, 32, true)
+export const GF = Field
 
 export const mod_n  = (x : bigint) : bigint => mod(x, _N)
 export const mod_p  = (x : bigint) : bigint => mod(x, _P)
