@@ -111,3 +111,18 @@ export function convert_33b (
   }
   throw new TypeError(`Invalid key size: ${key.length}`)
 }
+
+export function has_key (
+  key  : Bytes,
+  keys : Bytes[]
+) : boolean {
+  const str = keys.map(e => Buff.bytes(e).hex)
+  return str.includes(Buff.bytes(key).hex)
+}
+
+export function sort_keys (keys : Bytes[]) : Buff[] {
+  return keys
+    .map(e => Buff.bytes(e).hex)
+    .sort()
+    .map(e => Buff.hex(e))
+}

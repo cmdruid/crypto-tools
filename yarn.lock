@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@cmdcode/buff@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@cmdcode/buff/-/buff-2.0.2.tgz#754dea4bfefb7e6b3137c9cd636cce6fa78c2cab"
-  integrity sha512-CRYjrhCqcj04iGERQEzPQWhlZQcFO1QM0y+O23ga3/ftB974c2saTdQ6VJNG+OqaV9y+HC7ctQa21PBFRQlT1g==
+"@cmdcode/buff@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@cmdcode/buff/-/buff-2.0.3.tgz#76510797315a8e7ec85c775299f494b96887bbba"
+  integrity sha512-WPwtNvQNqYnpcKb7+/1Tmn8Ec11YpPXL9S31tjwicKQUkNMJtTfLJH4IBxKGAN1OifXYdiGUIZokuF/ZxE+kPg==
 
 "@esbuild-kit/cjs-loader@^2.4.2":
   version "2.4.2"

@@ -25,7 +25,7 @@ export default {
       file: 'dist/module.mjs',
       format: 'es',
       sourcemap: true,
-      minifyInternalExports: false
+      minifyInternalExports: true
     },
     {
       file: 'dist/browser.js',
