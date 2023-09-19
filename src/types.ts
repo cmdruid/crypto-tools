@@ -2,6 +2,14 @@ import { Buff } from '@cmdcode/buff'
 
 export type Literal = (string | number | boolean | null)
 
+export type MerkleTree = Array<string | string[]>
+
+export type MerkleData = [
+  root   : string,
+  target : string | null,
+  path   : string[]
+]
+
 export interface PointData { x : bigint, y : bigint }
 
 export interface KeyLink {
