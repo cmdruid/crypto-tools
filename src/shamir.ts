@@ -68,7 +68,7 @@ export function combine_shares (
     for (let j = 0; j < shares.length; j++) {
       // If the indices are not equal:
       if (i !== j) {
-        // Apply share value to the current ratio.
+        // Apply share values and formula to the current ratio.
         numer = (numer * -shares[j][0]) % _N
         denom = (denom * (shares[i][0] - shares[j][0])) % _N
       }

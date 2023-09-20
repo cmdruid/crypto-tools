@@ -24,18 +24,16 @@ export function sign_msg (
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
   const opt = get_config(options)
-  const { adaptors, key_tweaks } = opt
+  const { adaptor, key_tweak } = opt
 
   // Normalize our message into bytes.
   const m = Buff.bytes(message)
   // Let d' equal the integer value of secret key.
   let dp = Field.mod(secret)
   // If there is a tweak involved, apply it.
-  if (key_tweaks.length > 0) {
-    // We have to negate before tweaking.
-    dp = dp.negated
+  if (key_tweak !== undefined) {
     // Apply the tweaks.
-    key_tweaks.forEach(t => { dp = dp.add(t) })
+    dp = dp.negated.add(key_tweak)
   }
   // Let P equal d' * G
   const P = dp.point
@@ -46,11 +44,9 @@ export function sign_msg (
   // Let k' equal our nonce mod N.
   let kp = Field.mod(n)
   // If adaptor present, apply to k'.
-  if (adaptors.length > 0) {
-    // If xonly, we have to negate here.
-    kp = kp.negated
+  if (adaptor !== undefined) {
     // Apply the tweak.
-    adaptors.forEach(t => { kp = kp.add(t) })
+    kp = kp.negated.add(adaptor)
   }
   // Let R equal k' * G.
   const R = kp.point
@@ -144,7 +140,7 @@ export function gen_nonce (
   secret   : Bytes,
   options ?: SignOptions
 ) : Buff {
-  const { aux, nonce_tweaks, recovery_key } = get_config(options)
+  const { aux, nonce_tweak, recovery_key } = get_config(options)
   const pubkey = get_pubkey(secret, true)
   let nonce : Buff, shared : Buff
   if (recovery_key !== undefined) {
@@ -163,6 +159,8 @@ export function gen_nonce (
   // Compute our nonce as a tagged hash of the seed value and message.
   let sn = Field.mod(hash340('BIP0340/nonce', nonce, message))
   // Apply any internal tweaks that are specified.
-  nonce_tweaks.forEach(e => { sn = sn.add(e).negated })
+  if (nonce_tweak !== undefined) {
+    sn = sn.negated.add(nonce_tweak)
+  }
   return sn.buff
 }

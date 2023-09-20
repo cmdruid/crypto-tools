@@ -4,20 +4,20 @@
   "author": "Christopher Scott",
   "license": "CC-BY-1.0",
   "keywords": [
-    "crypto",
-    "tools",
-    "library",
     "secp256k1",
     "ecdh",
     "schnorr",
+    "shamir",
     "bip340",
     "bip32",
     "hash",
     "hmac",
+    "merkle",
     "sha256",
     "bitcoin",
     "nostr",
-    "signatures"
+    "signatures",
+    "key derivation"
   ],
   "version": "2.4.11",
   "type": "module",
@@ -62,10 +62,20 @@
       "types": "./dist/math.d.ts",
       "default": "./dist/math.js"
     },
+    "./merkle": {
+      "import": "./dist/merkle.js",
+      "types": "./dist/merkle.d.ts",
+      "default": "./dist/merkle.js"
+    },
     "./proof": {
       "import": "./dist/proof.js",
       "types": "./dist/proof.d.ts",
       "default": "./dist/proof.js"
+    },
+    "./shamir": {
+      "import": "./dist/shamir.js",
+      "types": "./dist/shamir.d.ts",
+      "default": "./dist/shamir.js"
     },
     "./signer": {
       "import": "./dist/sig.js",
