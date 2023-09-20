@@ -19,7 +19,7 @@
     "signatures",
     "key derivation"
   ],
-  "version": "2.4.11",
+  "version": "2.5.0",
   "type": "module",
   "exports": {
     ".": {
