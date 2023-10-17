@@ -10,7 +10,16 @@ const treeshake = {
 	tryCatchDeoptimization  : false
 }
 
-const onwarn = warning => { throw new Error(warning) }
+const onwarn = warning => {
+  if (
+    warning.code === 'INVALID_ANNOTATION' && 
+    warning.message.includes('@__PURE__')
+  ) {
+    return
+  }
+  
+  throw new Error(warning)
+}
 
 export default {
   input: 'src/index.ts',
@@ -30,12 +39,9 @@ export default {
     {
       file: 'dist/browser.js',
       format: 'iife',
-      name: 'crypto_utils',
+      name: 'crypto_tools',
       plugins: [terser()],
-      sourcemap: true,
-      globals: {
-        crypto  : 'crypto'
-      }
+      sourcemap: true
     }
   ],
   plugins: [ typescript(), nodeResolve(), commonjs() ],
