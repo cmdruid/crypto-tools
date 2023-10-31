@@ -1,4 +1,4 @@
-import { keys, util }  from '../src/index.js'
+import { keys, util } from '../../dist/index.js'
 
 const secret = util.random(32)
 const [ sec, pub ] = keys.get_keypair(secret, true)
