@@ -11,6 +11,29 @@ type KeyTweak = [ tweak: Buff, is_hardened: boolean ]
 const INT_REGEX = /^[0-9]{0,10}$/,
       STR_REGEX = /^[0-9a-zA-Z_&?=]{64}$/
 
+export function derive_seed (
+  path : string,
+  seed : Bytes
+) {
+  return derive_key(path, seed, undefined, true)
+}
+
+export function derive_seckey (
+  path      : string,
+  seckey    : Bytes,
+  chaincode : Bytes
+) {
+  return derive_key(path, seckey, chaincode, true)
+}
+
+export function derive_pubkey (
+  path      : string,
+  pubkey    : Bytes,
+  chaincode : Bytes
+) {
+  return derive_key(path, pubkey, chaincode, false)
+}
+
 export function derive_key (
   path        : string,
   input_key   : Bytes,
@@ -137,9 +160,9 @@ export function encode_extkey (
   const tweaks = parse_tweaks(path)
   const tprev  = tweaks.at(-1)
   const depth  = Buff.num(tweaks.length, 1)
-  const fprint = (prev !== null) ? hash160(prev).slice(0, 4) : Buff.num(0, 4)
-  const index  = (tprev !== undefined) ? tprev[0].slice(-4, 4) : Buff.num(0, 4)
-  const key    = (seckey !== null) ? seckey.prepend(0x00) : pubkey
+  const fprint = (prev   !== null)      ? hash160(prev).slice(0, 4) : Buff.num(0, 4)
+  const index  = (tprev  !== undefined) ? tprev[0].slice(-4, 4) : Buff.num(0, 4)
+  const key    = (seckey !== null)      ? seckey.prepend(0x00) : pubkey
   return Buff.join([ prefix, depth, fprint, index, code, key ]).to_b58chk()
 }
 
