@@ -1,7 +1,1 @@
-import { keys, util }  from '../src/index.js'
-
-const secret = util.random(32)
-const [ sec, pub ] = keys.get_keypair(secret, true)
-
-console.log('seckey:', sec.hex)
-console.log('pubkey:', pub.hex)
+console.log(Math.floor(Math.random() * 100))
