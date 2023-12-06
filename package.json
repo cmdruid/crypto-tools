@@ -19,7 +19,7 @@
     "signatures",
     "key derivation"
   ],
-  "version": "2.6.6",
+  "version": "2.6.7",
   "type": "module",
   "exports": {
     ".": {
@@ -31,6 +31,11 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/main.cjs"
       }
+    },
+    "./cipher": {
+      "import": "./dist/lib/cipher.js",
+      "types": "./dist/lib/cipher.d.ts",
+      "default": "./dist/lib/cipher.js"
     },
     "./ecc": {
       "import": "./dist/lib/ecc.js",
