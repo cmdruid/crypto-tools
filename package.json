@@ -19,7 +19,7 @@
     "signatures",
     "key derivation"
   ],
-  "version": "2.6.5",
+  "version": "2.6.6",
   "type": "module",
   "exports": {
     ".": {
@@ -33,54 +33,54 @@
       }
     },
     "./ecc": {
-      "import": "./dist/ecc.js",
-      "types": "./dist/ecc.d.ts",
-      "default": "./dist/ecc.js"
+      "import": "./dist/lib/ecc.js",
+      "types": "./dist/lib/ecc.d.ts",
+      "default": "./dist/lib/ecc.js"
     },
     "./ecdh": {
-      "import": "./dist/ecdh.js",
-      "types": "./dist/ecdh.d.ts",
-      "default": "./dist/ecdh.js"
+      "import": "./dist/lib/ecdh.js",
+      "types": "./dist/lib/ecdh.d.ts",
+      "default": "./dist/lib/ecdh.js"
     },
     "./hash": {
-      "import": "./dist/hash.js",
-      "types": "./dist/hash.d.ts",
-      "default": "./dist/hash.js"
+      "import": "./dist/lib/hash.js",
+      "types": "./dist/lib/hash.d.ts",
+      "default": "./dist/lib/hash.js"
     },
     "./hd": {
-      "import": "./dist/hd.js",
-      "types": "./dist/hd.d.ts",
-      "default": "./dist/hd.js"
+      "import": "./dist/lib/hd.js",
+      "types": "./dist/lib/hd.d.ts",
+      "default": "./dist/lib/hd.js"
     },
     "./keys": {
-      "import": "./dist/keys.js",
-      "types": "./dist/keys.d.ts",
-      "default": "./dist/keys.js"
+      "import": "./dist/lib/keys.js",
+      "types": "./dist/lib/keys.d.ts",
+      "default": "./dist/lib/keys.js"
     },
     "./math": {
-      "import": "./dist/math.js",
-      "types": "./dist/math.d.ts",
-      "default": "./dist/math.js"
+      "import": "./dist/lib/math.js",
+      "types": "./dist/lib/math.d.ts",
+      "default": "./dist/lib/math.js"
     },
     "./merkle": {
-      "import": "./dist/merkle.js",
-      "types": "./dist/merkle.d.ts",
-      "default": "./dist/merkle.js"
+      "import": "./dist/lib/merkle.js",
+      "types": "./dist/lib/merkle.d.ts",
+      "default": "./dist/lib/merkle.js"
     },
     "./proof": {
-      "import": "./dist/proof.js",
-      "types": "./dist/proof.d.ts",
-      "default": "./dist/proof.js"
+      "import": "./dist/lib/proof.js",
+      "types": "./dist/lib/proof.d.ts",
+      "default": "./dist/lib/proof.js"
     },
     "./shamir": {
-      "import": "./dist/shamir.js",
-      "types": "./dist/shamir.d.ts",
-      "default": "./dist/shamir.js"
+      "import": "./dist/lib/shamir.js",
+      "types": "./dist/lib/shamir.d.ts",
+      "default": "./dist/lib/shamir.js"
     },
     "./signer": {
-      "import": "./dist/sig.js",
-      "types": "./dist/sig.d.ts",
-      "default": "./dist/sig.js"
+      "import": "./dist/lib/sig.js",
+      "types": "./dist/lib/sig.d.ts",
+      "default": "./dist/lib/sig.js"
     },
     "./util": {
       "import": "./dist/util.js",
@@ -90,7 +90,7 @@
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/main.cjs",
-  "unpkg": "./dist/browser.js",
+  "unpkg": "./dist/script.js",
   "files": [
     "README.md",
     "LICENSE",
