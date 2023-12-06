@@ -6,7 +6,7 @@
  */
 
 import { Buff, Bytes }  from '@cmdcode/buff'
-import { _0n, _1n, _N } from './const.js'
+import { _0n, _1n, _N } from '../const.js'
 import { Field }        from './ecc.js'
 
 import {

@@ -1,6 +1,6 @@
 import { Buff, Bytes }  from '@cmdcode/buff'
 import { Field, Point } from './ecc.js'
-import { random }       from './util.js'
+import { random }       from '../util.js'
 
 export function is_even_pub (pubkey : Bytes) : boolean {
   const pub = Buff.bytes(pubkey)

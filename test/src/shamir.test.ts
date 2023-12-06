@@ -4,7 +4,7 @@ import { Buff } from '@cmdcode/buff'
 import {
   create_shares,
   combine_shares
-} from '../../src/shamir.js'
+} from '../../src/lib/shamir.js'
 
 const ROUNDS = 100
 

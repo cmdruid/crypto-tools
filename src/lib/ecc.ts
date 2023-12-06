@@ -1,10 +1,10 @@
 import { Buff, Bytes }   from '@cmdcode/buff'
 import { secp256k1 }     from '@noble/curves/secp256k1'
 import { ProjPointType } from '@noble/curves/abstract/weierstrass'
-import { _N, _P, _G }    from './const.js'
+import { _N, _P, _G }    from '../const.js'
 
 import * as math         from './math.js'
-import * as assert       from './assert.js'
+import * as assert       from '../assert.js'
 
 type ECPoint    = ProjPointType<bigint>
 type FieldValue = string | number | bigint | Uint8Array | Field

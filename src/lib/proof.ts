@@ -1,9 +1,9 @@
 import { Buff, Bytes }  from '@cmdcode/buff'
 import { get_pubkey }   from './keys.js'
-import { SignOptions }  from './config.js'
+import { SignOptions }  from '../config.js'
 
-import * as assert from './assert.js'
-import * as util   from './util.js'
+import * as assert from '../assert.js'
+import * as util   from '../util.js'
 
 import {
   sign_msg,
@@ -14,7 +14,7 @@ import {
   Literal,
   ProofData,
   SignedEvent
-} from './types.js'
+} from '../types.js'
 
 const PROOF_DEFAULTS = {
   kind  : 20000,

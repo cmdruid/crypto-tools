@@ -4,7 +4,7 @@ import { sha256 }      from './hash.js'
 import {
   MerkleData,
   MerkleTree
-} from './types.js'
+} from '../types.js'
 
 type BranchEncoder = typeof encode_branch
 

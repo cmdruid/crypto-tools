@@ -1,7 +1,7 @@
 import { Buff, Bytes } from '@cmdcode/buff'
 import { secp256k1 }   from '@noble/curves/secp256k1'
-import { _1n }         from './const.js'
-import { PointData }   from './types.js'
+import { _1n }         from '../const.js'
+import { PointData }   from '../types.js'
 
 const ECPoint = secp256k1.ProjectivePoint
 

@@ -1,5 +1,5 @@
 import { Buff, Bytes }    from '@cmdcode/buff'
-import { _0n }            from './const.js'
+import { _0n }            from '../const.js'
 import { Field, Point }   from './ecc.js'
 import { get_shared_key } from './ecdh.js'
 import { hash340 }        from './hash.js'
@@ -10,9 +10,9 @@ import {
   get_seckey
 } from './keys.js'
 
-import { get_config, SignOptions } from './config.js'
+import { get_config, SignOptions } from '../config.js'
 
-import * as assert from './assert.js'
+import * as assert from '../assert.js'
 
 export function sign_msg (
   message  : Bytes,

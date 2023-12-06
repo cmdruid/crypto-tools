@@ -1,3 +1,4 @@
+import { pbkdf2 }            from '@noble/hashes/pbkdf2'
 import { sha256 as s256 }    from '@noble/hashes/sha256'
 import { sha512 as s512 }    from '@noble/hashes/sha512'
 import { ripemd160 as r160 } from '@noble/hashes/ripemd160'
@@ -58,4 +59,24 @@ export function hash340 (
 ) : Buff {
   const hash = taghash(tag)
   return Buff.join([ hash, ...data ]).digest
+}
+
+export function pkdf256 (
+  secret : Bytes,
+  salt   : Bytes,
+  count  = 2048
+) {
+  const sec = Buff.bytes(secret)
+  const slt = Buff.bytes(salt)
+  return pbkdf2(s256, sec, slt, { c: count, dkLen : 32 })
+}
+
+export function pkdf512 (
+  secret : Bytes,
+  salt   : Bytes,
+  count  = 2048
+) {
+  const sec = Buff.bytes(secret)
+  const slt = Buff.bytes(salt)
+  return pbkdf2(s512, sec, slt, { c: count, dkLen : 64 })
 }

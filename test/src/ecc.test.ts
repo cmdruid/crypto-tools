@@ -1,10 +1,10 @@
 import test       from 'tape'
 import { Buff }   from '@cmdcode/buff'
-import { Field }  from '../../src/ecc.js'
+import { Field }  from '../../src/lib/ecc.js'
 import { random } from '../../src/util.js'
 
 import * as tiny from 'tiny-secp256k1'
-import * as math from '../../src/math.js'
+import * as math from '../../src/lib/math.js'
 
 const a = random(32)
 const b = random(32)

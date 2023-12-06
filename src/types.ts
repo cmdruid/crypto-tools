@@ -1,7 +1,7 @@
 import { Buff } from '@cmdcode/buff'
 
-export type Literal = (string | number | boolean | null)
-
+export type Literal    = (string | number | boolean | null)
+export type CipherType = 'AES-CBC' | 'AES-GCM'
 export type MerkleTree = Array<string | string[]>
 
 export type MerkleData = [

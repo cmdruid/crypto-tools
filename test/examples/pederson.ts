@@ -26,7 +26,7 @@ const b = Buff.random(32)
 // Now we can compute A.
 const A = Point.generate(a).add(H.mul(b))
 
-// Verifier genrates a challenge c.
+// Verifier generates a challenge c.
 const c = Buff.random(32)
 
 // The prover calculates responses z1 = a + cx and z2 = b + cr.

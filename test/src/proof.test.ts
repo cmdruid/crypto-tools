@@ -4,7 +4,7 @@ import {
   create_proof,
   validate_proof,
   verify_proof
-} from '../../src/proof.js'
+} from '../../src/lib/proof.js'
 
 import pass_vectors from './vectors/proof.vectors.json' assert { type : 'json' }
 

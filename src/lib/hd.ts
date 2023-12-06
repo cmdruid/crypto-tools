@@ -2,9 +2,9 @@ import { Buff, Bytes }      from '@cmdcode/buff'
 import { Field, Point }     from './ecc.js'
 import { hash160, hmac512 } from './hash.js'
 import { get_pubkey }       from './keys.js'
-import { KeyLink, ExtKey }  from './types.js'
+import { KeyLink, ExtKey }  from '../types.js'
 
-import * as assert from './assert.js'
+import * as assert from '../assert.js'
 
 type KeyTweak = [ tweak: Buff, is_hardened: boolean ]
 
