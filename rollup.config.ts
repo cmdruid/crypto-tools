@@ -42,7 +42,7 @@ export default {
       minifyInternalExports: true
     },
     {
-      file: 'dist/browser.js',
+      file: 'dist/script.js',
       format: 'iife',
       name: 'crypto_tools',
       plugins: [terser()],

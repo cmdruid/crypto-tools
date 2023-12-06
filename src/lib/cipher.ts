@@ -6,7 +6,7 @@ if (
   typeof globalThis.crypto === 'undefined' ||
   typeof globalThis.crypto.subtle === 'undefined'
 ) {
-  throw new Error(
+  throw new Error (
 `globalThis.crypto is missing from your environment!
 
 If using NodeJS, make sure you are running v19 and above.
@@ -51,8 +51,8 @@ export async function encrypt (
   const msg = Buff.bytes(payload)
   const iv  = Buff.bytes(vector)
   const opt = { name: type, iv }
-  const enc = await subtle.encrypt(opt, key, msg)
-  return { data: Buff.bytes(enc), iv }
+  return subtle.encrypt(opt, key, msg)
+    .then(e => Buff.bytes(e))
 }
 
 export async function decrypt (

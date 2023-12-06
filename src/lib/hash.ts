@@ -68,7 +68,8 @@ export function pkdf256 (
 ) {
   const sec = Buff.bytes(secret)
   const slt = Buff.bytes(salt)
-  return pbkdf2(s256, sec, slt, { c: count, dkLen : 32 })
+  const key = pbkdf2(s256, sec, slt, { c: count, dkLen : 32 })
+  return Buff.raw(key)
 }
 
 export function pkdf512 (
@@ -78,5 +79,6 @@ export function pkdf512 (
 ) {
   const sec = Buff.bytes(secret)
   const slt = Buff.bytes(salt)
-  return pbkdf2(s512, sec, slt, { c: count, dkLen : 64 })
+  const key = pbkdf2(s512, sec, slt, { c: count, dkLen : 64 })
+  return Buff.raw(key)
 }
