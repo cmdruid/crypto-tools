@@ -18,25 +18,15 @@ or if developing locally, use 'http://127.0.0.1' instead of localhost.`
   )
 }
 
-// Attempt to import the crypto library from somewhere.
-const { subtle } = globalThis?.crypto ?? crypto ?? window?.crypto
-
-if (
-  typeof subtle === 'undefined'  ||
-  subtle.importKey === undefined ||
-  subtle.encrypt   === undefined ||
-  subtle.decrypt   === undefined
-) {
-  throw new Error('Subtle crypto library not found on this device!')
-}
+const { subtle } = globalThis.crypto
 
 async function import_key (
   secret : Bytes,
-  type   : CipherType = 'AES-GCM'
+  type   : CipherType
 ) {
   /** Derive a CryptoKey object (for Webcrypto library). */
   const key     = Buff.bytes(secret)
-  const options = { name: type }
+  const options = { name : type }
   const usage   = [ 'encrypt', 'decrypt' ] as KeyUsage[]
   return subtle.importKey('raw', key, options, true, usage)
 }
@@ -44,10 +34,10 @@ async function import_key (
 export async function encrypt (
   secret  : Bytes,
   payload : Bytes,
-  vector  : Bytes = Buff.random(32),
+  vector  : Bytes,
   type    : CipherType = 'AES-GCM'
 ) {
-  const key = await import_key(secret)
+  const key = await import_key(secret, type)
   const msg = Buff.bytes(payload)
   const iv  = Buff.bytes(vector)
   const opt = { name: type, iv }
@@ -61,7 +51,7 @@ export async function decrypt (
   vector  : Bytes,
   type    : CipherType = 'AES-GCM'
 ) {
-  const key = await import_key(secret)
+  const key = await import_key(secret, type)
   const msg = Buff.bytes(payload)
   const iv  = Buff.bytes(vector)
   const opt = { name: type, iv }
