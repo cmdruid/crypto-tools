@@ -155,7 +155,7 @@ export function recover_key (
   const pub   = Buff.bytes(pubkey)
   const sig   = Buff.bytes(signature)
   const s_val = Field.mod(sig.slice(32, 64))
-  const nonce = hash340('BIP0340/nonce', seed, pub, message)
+  const nonce = hash340('BIP0340/nonce', seed, message)
   const chal  = hash340('BIP0340/challenge', sig.slice(0, 32), pub, message)
   const k     = get_seckey(nonce, true)
   return s_val.sub(k).div(chal).buff
