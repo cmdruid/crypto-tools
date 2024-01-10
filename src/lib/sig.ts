@@ -1,30 +1,27 @@
-import { Buff, Bytes }    from '@cmdcode/buff'
-import { _0n }            from '../const.js'
-import { Field, Point }   from './ecc.js'
-import { get_shared_key } from './ecdh.js'
-import { hash340 }        from './hash.js'
+import { Buff, Bytes }  from '@cmdcode/buff'
+import { _0n }          from '../const.js'
+import { Field, Point } from './ecc.js'
+import { hash340 }      from './hash.js'
 
 import {
   get_pubkey,
-  parse_pubkey,
   get_seckey
 } from './keys.js'
 
-import { get_config, SignOptions } from '../config.js'
+import { SignOptions } from '../types.js'
 
 import * as assert from '../assert.js'
 
 export function sign_msg (
-  message  : Bytes,
-  secret   : Bytes,
-  options ?: SignOptions
+  message : Bytes,
+  secret  : Bytes,
+  options : SignOptions = {}
 ) : Buff {
   /**
    * Implementation of signature algorithm as specified in BIP0340.
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
-  const opt = get_config(options)
-  const { adaptor, key_tweak } = opt
+  const { adaptor, key_tweak } = options
 
   // Normalize our message into bytes.
   const m = Buff.bytes(message)
@@ -40,7 +37,7 @@ export function sign_msg (
   // Let d equal d' (negate if needed).
   const d = dp.negated
   // Compute our nonce value.
-  const n = gen_nonce(m, d, opt)
+  const n = gen_nonce(m, d, options)
   // Let k' equal our nonce mod N.
   let kp = Field.mod(n)
   // If adaptor present, apply to k'.
@@ -65,13 +62,13 @@ export function verify_sig (
   signature : Bytes,
   message   : Bytes,
   pubkey    : Bytes,
-  options  ?: SignOptions
+  options   : SignOptions = {}
 ) : boolean {
    /**
    * Implementation of verify algorithm as specified in BIP0340.
    * https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
    */
-  const { throws } = get_config(options)
+  const { throws = false } = options
   // Normalize the message into bytes.
   const msg = Buff.bytes(message)
   // Convert signature into a stream object.
@@ -119,34 +116,18 @@ export function verify_sig (
   return R.x.big === r.x.big
 }
 
-export function recover_key (
-  signature : Bytes,
-  message   : Bytes,
-  pub_key   : Bytes,
-  rec_key   : Bytes
-) : Buff {
-  const pub   = parse_pubkey(pub_key, true)
-  const sig   = Buff.bytes(signature)
-  const s_val = Field.mod(sig.slice(32, 64))
-  const seed  = get_shared_key(rec_key, pub, true)
-  const nonce = hash340('BIP0340/nonce', seed, pub, message)
-  const chal  = hash340('BIP0340/challenge', sig.slice(0, 32), pub, message)
-  const k     = get_seckey(nonce, true)
-  return s_val.sub(k).div(chal).buff
-}
-
 export function gen_nonce (
-  message  : Bytes,
-  secret   : Bytes,
-  options ?: SignOptions
+  message : Bytes,
+  secret  : Bytes,
+  options : SignOptions = {}
 ) : Buff {
-  const { aux, nonce_tweak, recovery_key } = get_config(options)
-  const pubkey = get_pubkey(secret, true)
-  let nonce : Buff, shared : Buff
-  if (recovery_key !== undefined) {
-    const rec_key = parse_pubkey(recovery_key, true)
-    shared = get_shared_key(secret, rec_key, true)
-    nonce  = Buff.join([ shared, pubkey ])
+  // Unpack config object.
+  const { aux, nonce_seed, nonce_tweak } = options
+  // Declare our nonce value
+  let nonce : Buff
+  // Initialize the nonce based on config.
+  if (nonce_seed !== undefined) {
+    nonce = Buff.bytes(nonce_seed, 32)
   } else {
     const seed = (aux === null) ? Buff.num(0, 32) : aux
     // Hash the auxiliary data according to BIP 0340.
@@ -163,4 +144,19 @@ export function gen_nonce (
     sn = sn.negated.add(nonce_tweak)
   }
   return sn.buff
+}
+
+export function recover_key (
+  message   : Bytes,
+  pubkey    : Bytes,
+  seed      : Bytes,
+  signature : Bytes
+) : Buff {
+  const pub   = Buff.bytes(pubkey)
+  const sig   = Buff.bytes(signature)
+  const s_val = Field.mod(sig.slice(32, 64))
+  const nonce = hash340('BIP0340/nonce', seed, pub, message)
+  const chal  = hash340('BIP0340/challenge', sig.slice(0, 32), pub, message)
+  const k     = get_seckey(nonce, true)
+  return s_val.sub(k).div(chal).buff
 }

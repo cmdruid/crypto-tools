@@ -1,4 +1,4 @@
-import { Buff } from '@cmdcode/buff'
+import { Buff, Bytes } from '@cmdcode/buff'
 
 export type Literal    = (string | number | boolean | null)
 export type CipherType = 'AES-CBC' | 'AES-GCM'
@@ -48,4 +48,13 @@ export interface SignedEvent {
   kind       : number
   content    : string
   tags       : Literal[][]
+}
+
+export interface SignOptions {
+  aux          ?: Bytes | null
+  adaptor      ?: Bytes
+  key_tweak    ?: Bytes
+  nonce_seed   ?: Bytes
+  nonce_tweak  ?: Bytes
+  throws       ?: boolean
 }
