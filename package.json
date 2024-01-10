@@ -19,7 +19,7 @@
     "signatures",
     "key derivation"
   ],
-  "version": "2.7.0",
+  "version": "2.7.1",
   "type": "module",
   "exports": {
     ".": {
@@ -41,6 +41,11 @@
       "import": "./dist/lib/ecc.js",
       "types": "./dist/lib/ecc.d.ts",
       "default": "./dist/lib/ecc.js"
+    },
+    "./ecdh": {
+      "import": "./dist/lib/ecdh.js",
+      "types": "./dist/lib/ecdh.d.ts",
+      "default": "./dist/lib/ecdh.js"
     },
     "./hash": {
       "import": "./dist/lib/hash.js",
