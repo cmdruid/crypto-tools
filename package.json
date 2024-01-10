@@ -42,11 +42,6 @@
       "types": "./dist/lib/ecc.d.ts",
       "default": "./dist/lib/ecc.js"
     },
-    "./ecdh": {
-      "import": "./dist/lib/ecdh.js",
-      "types": "./dist/lib/ecdh.d.ts",
-      "default": "./dist/lib/ecdh.js"
-    },
     "./hash": {
       "import": "./dist/lib/hash.js",
       "types": "./dist/lib/hash.d.ts",
@@ -71,11 +66,6 @@
       "import": "./dist/lib/merkle.js",
       "types": "./dist/lib/merkle.d.ts",
       "default": "./dist/lib/merkle.js"
-    },
-    "./proof": {
-      "import": "./dist/lib/proof.js",
-      "types": "./dist/lib/proof.d.ts",
-      "default": "./dist/lib/proof.js"
     },
     "./shamir": {
       "import": "./dist/lib/shamir.js",
