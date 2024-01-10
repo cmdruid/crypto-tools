@@ -127,7 +127,7 @@ export function gen_nonce (
   let nonce : Buff
   // Initialize the nonce based on config.
   if (nonce_seed !== undefined) {
-    nonce = Buff.bytes(nonce_seed, 32)
+    nonce = Buff.bytes(nonce_seed)
   } else {
     const seed = (aux === null) ? Buff.num(0, 32) : aux
     // Hash the auxiliary data according to BIP 0340.
