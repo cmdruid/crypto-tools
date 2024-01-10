@@ -16,6 +16,17 @@ export function is_even_pub (pubkey : Bytes) : boolean {
   }
 }
 
+export function ecdh (
+  self_sec : Bytes,
+  peer_pub : Bytes,
+  xonly    = false
+) : Buff {
+  const P   = Point.from_x(peer_pub)
+  const sec = get_seckey(self_sec)
+  const shared = P.mul(sec)
+  return (xonly) ? shared.x : shared.buff
+}
+
 export function gen_seckey (
   even_y ?: boolean
 ) : Buff {
