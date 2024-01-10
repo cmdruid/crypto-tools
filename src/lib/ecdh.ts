@@ -1,6 +1,6 @@
 import { Buff, Bytes } from '@cmdcode/buff'
 import { Point }       from './ecc.js'
-import { hmac512 }     from './hash.js'
+import { hmac256 }     from './hash.js'
 
 import {
   get_pubkey,
@@ -20,7 +20,6 @@ export function ecdh (
 }
 
 export function ecdhash (
-  message  : Bytes,
   self_sec : Bytes,
   peer_pub : Bytes,
   xonly    = false
@@ -29,5 +28,5 @@ export function ecdhash (
   const p2   = parse_pubkey(peer_pub, xonly)
   const seed = ecdh(self_sec, peer_pub, xonly)
   const pubs = [ p1.hex, p2.hex ].sort()
-  return hmac512(seed, ...pubs, message)
+  return hmac256(seed, ...pubs)
 }
