@@ -1,6 +1,8 @@
 import test from 'tape'
 
-import { keys, Field, util } from '../../src/index.js'
+import { Field, util } from '../../src/index.js'
+
+import { ecdh } from '../../src/lib/ecdh.js'
 
 export default function () {
   test('Testing ECDH Shared Secret Derivation', async t => {
@@ -12,14 +14,14 @@ export default function () {
     const raw_ab = b_point.mul(a_field).x.hex
     const raw_ba = a_point.mul(b_field).x.hex
 
-    const ecdsa_ab = keys.ecdh(a_field.hex, b_point.hex, false).hex
-    const ecdsa_ba = keys.ecdh(b_field.hex, a_point.hex, false).hex
+    const ecdsa_ab = ecdh(a_field.hex, b_point.hex, false).hex
+    const ecdsa_ba = ecdh(b_field.hex, a_point.hex, false).hex
 
-    const schnorr_ab = keys.ecdh(a_field.hex, b_point.x.hex, true).hex
-    const schnorr_ba = keys.ecdh(b_field.hex, a_point.x.hex, true).hex
+    const schnorr_ab = ecdh(a_field.hex, b_point.x.hex, true).hex
+    const schnorr_ba = ecdh(b_field.hex, a_point.x.hex, true).hex
 
-    const mixed_ab = keys.ecdh(a_field.hex, b_point.x.hex, true).hex
-    const mixed_ba = keys.ecdh(b_field.hex, a_point.hex, false).slice(1).hex
+    const mixed_ab = ecdh(a_field.hex, b_point.x.hex, true).hex
+    const mixed_ba = ecdh(b_field.hex, a_point.hex, false).slice(1).hex
 
     t.plan(4)
 
