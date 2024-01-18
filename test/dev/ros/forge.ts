@@ -19,7 +19,7 @@
  */
 
 import { Buff, Bytes } from '@cmdcode/buff'
-import { Field, keys, math }  from '../src/index.js'
+import { Field, keys, math }  from '../src/lib/index.js'
 import { _P, _G, _N } from '../src/const.js'
 
 type Entry = [ Bytes, Bytes ]
