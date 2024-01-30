@@ -50,6 +50,12 @@ export function pow (
   return ans
 }
 
+export function div (a : bigint, b : bigint, m : bigint) {
+  const exp = m - _2n  // Fermat's Little Theorum
+  const div = pow(b, exp, m)
+  return mod(a * div, m)
+}
+
 export function modN (a : bigint) : bigint {
   return mod(a, _N)
 }

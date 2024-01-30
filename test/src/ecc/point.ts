@@ -1,5 +1,6 @@
-import { Buff, Bytes }    from '@cmdcode/buff'
-import { mod, modN, pow } from './math.js'
+import { Buff, Bytes } from '@cmdcode/buff'
+
+import { div, mod, modN, pow } from './math.js'
 
 export interface Point { x : bigint, y : bigint }
 
@@ -162,33 +163,42 @@ export function point_add (
   if (A === null && B !== null) {
     return B
   }
+
   if (B === null && A !== null) {
     return A
   }
+
   if (A === null || B === null) {
     throw new TypeError('Both points are null!')
   }
+
   if (A.x === B.x && A.y !== B.y) {
     throw new TypeError('Matching x has unequal y!')
   }
 
-  let lam = _0n
+  let slope = _0n, 
+      x1 = A.x, 
+      x2 = B.x,
+      y1 = A.y,
+      y2 = B.y
 
   if (point_eq(A, B)) {
-    const num = _2n * A.y
-    const exp = _P - _2n
-    lam = _3n * A.x * A.x * pow(num, exp, _P)
-    lam = mod(lam, _P)
+    // slope = (3x1**2) / (2y1)
+    const y1_sq  = _2n * y1
+    const x1_cb  = _3n * x1
+    const x1_cb2 = x1_cb * x1
+    slope = div(x1_cb2, y1_sq, _P)
+    slope = mod(slope, _P)
   } else {
-    const dif = B.y - A.y
-    const num = B.x - A.x
-    const exp = _P - _2n
-    lam = dif * pow(num, exp, _P)
-    lam = mod(lam, _P)
+    // s = (y2 – y1) / (x2 – x1)
+    const sx = x2 - x1
+    const sy = y2 - y1
+    slope = div(sy, sx, _P)
   }
-  const x3 = lam * lam - A.x - B.x
-  const y  = lam * (A.x - x3) - A.y
-  return { x: mod(x3, _P), y: mod(y, _P) }
+  const slope_sq = slope * slope
+  const x3 = slope_sq - x1 - x2
+  const y3 = slope * (x1 - x3) - y1
+  return { x: mod(x3, _P), y: mod(y3, _P) }
 }
 
 export function point_mul (
