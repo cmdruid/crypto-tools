@@ -56,5 +56,6 @@ export interface SignOptions {
   key_tweak    ?: Bytes
   nonce_seed   ?: Bytes
   nonce_tweak  ?: Bytes
+  sec_nonce    ?: Bytes
   throws       ?: boolean
 }

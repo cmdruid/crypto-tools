@@ -122,7 +122,7 @@ export function gen_nonce (
   options : SignOptions = {}
 ) : Buff {
   // Unpack config object.
-  const { aux, nonce_seed, nonce_tweak } = options
+  const { aux, nonce_seed, nonce_tweak, sec_nonce } = options
   // Declare our nonce value
   let nonce : Buff
   // Initialize the nonce based on config.
@@ -138,7 +138,9 @@ export function gen_nonce (
     nonce = Buff.join([ t, get_pubkey(secret, true) ])
   }
   // Compute our nonce as a tagged hash of the seed value and message.
-  let sn = Field.mod(hash340('BIP0340/nonce', nonce, message))
+  let sn = (sec_nonce !== undefined)
+    ? Field.mod(sec_nonce)
+    : Field.mod(hash340('BIP0340/nonce', nonce, message))
   // Apply any internal tweaks that are specified.
   if (nonce_tweak !== undefined) {
     sn = sn.negated.add(nonce_tweak)
