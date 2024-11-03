@@ -17,7 +17,7 @@ export function sha512 (...data : Bytes[]) : Buff {
 
 export function ripe160 (...data : Bytes[]) : Buff {
   const b = Buff.join(data)
-  return Buff.raw(s512(b))
+  return Buff.raw(r160(b))
 }
 
 export function hash256 (...data : Bytes[]) : Buff {
